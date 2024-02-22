@@ -1,0 +1,94 @@
+[06-Aug-2023 17:59:23 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[06-Aug-2023 17:59:23 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[06-Aug-2023 18:02:33 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[06-Aug-2023 18:02:33 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[06-Aug-2023 18:02:33 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[06-Aug-2023 18:02:33 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[27-Aug-2023 04:42:18 America/Chicago] PHP Warning:  session_start(): Cannot start session when headers already sent in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 2
+[27-Aug-2023 04:42:18 America/Chicago] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home4/vftracke/palmal.vftracker.com/admin/vehicle-repaire.php:1) in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 6
+[17-Sep-2023 09:23:07 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[17-Sep-2023 09:23:07 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[17-Sep-2023 09:23:07 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[17-Sep-2023 09:23:07 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[17-Sep-2023 09:23:07 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[17-Sep-2023 09:23:35 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[17-Sep-2023 09:23:35 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[17-Sep-2023 09:23:35 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[17-Sep-2023 09:23:35 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[18-Sep-2023 15:55:32 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[18-Sep-2023 15:55:32 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 05:00:55 America/Chicago] PHP Warning:  session_start(): Cannot start session when headers already sent in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 2
+[18-Sep-2023 05:00:55 America/Chicago] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home4/vftracke/palmal.vftracker.com/admin/vehicle-repaire.php:1) in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 6
+[18-Sep-2023 17:51:01 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[18-Sep-2023 17:51:01 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 17:53:28 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 18:27:00 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[18-Sep-2023 18:27:00 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 18:38:45 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 18:38:45 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[18-Sep-2023 18:38:45 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[18-Sep-2023 18:38:45 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[18-Sep-2023 18:41:03 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 18:41:03 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[18-Sep-2023 18:41:03 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[18-Sep-2023 18:41:03 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[18-Sep-2023 18:41:03 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[18-Sep-2023 18:41:03 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[18-Sep-2023 18:41:03 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[18-Sep-2023 19:03:57 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[18-Sep-2023 19:03:57 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 19:03:57 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[18-Sep-2023 19:03:57 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[18-Sep-2023 19:03:57 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[18-Sep-2023 19:06:58 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 19:06:58 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/admin/vehicleSummaeryViewPdf.php on line 130
+[18-Sep-2023 19:06:58 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[18-Sep-2023 19:06:58 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[18-Sep-2023 19:06:58 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[18-Sep-2023 19:08:52 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 19:08:52 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[18-Sep-2023 19:08:52 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[18-Sep-2023 19:08:52 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[18-Sep-2023 19:22:45 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[18-Sep-2023 19:22:46 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[18-Sep-2023 19:22:46 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[18-Sep-2023 19:22:46 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[18-Sep-2023 19:22:46 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[06-Nov-2023 04:05:05 America/Chicago] PHP Warning:  session_start(): Cannot start session when headers already sent in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 2
+[06-Nov-2023 04:05:05 America/Chicago] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home4/vftracke/palmal.vftracker.com/admin/vehicle-repaire.php:1) in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 6
+[09-Nov-2023 15:02:57 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[09-Nov-2023 15:02:57 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[09-Nov-2023 15:02:57 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[09-Nov-2023 15:02:57 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[09-Nov-2023 15:02:57 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[09-Nov-2023 15:02:57 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[09-Nov-2023 15:02:57 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[09-Nov-2023 15:02:57 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[22-Dec-2023 01:31:25 America/Chicago] PHP Warning:  session_start(): Cannot start session when headers already sent in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 2
+[22-Dec-2023 01:31:25 America/Chicago] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home4/vftracke/palmal.vftracker.com/admin/districts_add.php:2) in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 6
+[22-Dec-2023 01:31:25 America/Chicago] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home4/vftracke/palmal.vftracker.com/admin/districts_add.php:2) in /home4/vftracke/palmal.vftracker.com/admin/districts_add.php on line 24
+[21-Jan-2024 03:26:24 America/Chicago] PHP Warning:  session_start(): Cannot start session when headers already sent in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 2
+[21-Jan-2024 03:26:24 America/Chicago] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home4/vftracke/palmal.vftracker.com/admin/vehicle-repaire.php:1) in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 6
+[21-Jan-2024 04:35:39 America/Chicago] PHP Warning:  session_start(): Cannot start session when headers already sent in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 2
+[21-Jan-2024 04:35:39 America/Chicago] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home4/vftracke/palmal.vftracker.com/admin/vehicle-repaire.php:1) in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 6
+[21-Jan-2024 04:36:32 America/Chicago] PHP Warning:  session_start(): Cannot start session when headers already sent in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 2
+[21-Jan-2024 04:36:32 America/Chicago] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home4/vftracke/palmal.vftracker.com/admin/vehicle-repaire.php:1) in /home4/vftracke/palmal.vftracker.com/admin/includes/session.php on line 6
+[21-Jan-2024 17:09:49 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[21-Jan-2024 17:09:49 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[21-Jan-2024 17:09:49 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[21-Jan-2024 17:09:49 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[21-Jan-2024 17:09:49 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[21-Jan-2024 17:10:31 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[21-Jan-2024 17:10:31 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[21-Jan-2024 17:10:31 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[21-Jan-2024 17:10:31 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
+[21-Jan-2024 18:58:30 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[21-Jan-2024 18:58:30 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[21-Jan-2024 18:58:33 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[21-Jan-2024 19:52:16 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[21-Jan-2024 19:52:16 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[05-Feb-2024 09:19:45 Asia/Dhaka] PHP Warning:  "continue" targeting switch is equivalent to "break". Did you mean to use "continue 2"? in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 17778
+[05-Feb-2024 09:19:45 Asia/Dhaka] PHP Warning:  chr() expects parameter 1 to be int, string given in /home4/vftracke/palmal.vftracker.com/tcpdf/include/tcpdf_fonts.php on line 1671
+[05-Feb-2024 09:19:45 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19478
+[05-Feb-2024 09:19:45 Asia/Dhaka] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19507
+[05-Feb-2024 09:19:45 Asia/Dhaka] PHP Warning:  Invalid argument supplied for foreach() in /home4/vftracke/palmal.vftracker.com/tcpdf/tcpdf.php on line 19510
