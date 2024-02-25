@@ -173,7 +173,7 @@
 			</div>
 			<div class="modal-body">
 				<form class="form-horizontal" id="contact_formEdit" method="POST" enctype="multipart/form-data">
-					<input type="hidden" id="id_fr_mc_info" name="id_fr_mc_info" />
+					<input type="hidden" id="id_fr_req" name="id_fr_req" />
 					<div class="row">
 						<div class="col-md-6">
 							<div class="form-group">
@@ -182,52 +182,52 @@
 								</div>
 								<div class="col-sm-12 mb-2">
 									<label class="">Token </label>
-									<input type="text" id="mechanicInfo" class="form-control" name="mechanicInfo"
-										placeholder=" Name " readonly>
+									<input type="text" id="tokenTitleForRequisition" class="form-control"
+										name="tokenTitleForRequisition" placeholder=" Name " readonly>
 								</div>
 								<div class="col-sm-12">
 									<label class="">Token Date</label>
-									<input type="text" id="mechanicComment" class="form-control" name="mechanicInfo"
-										placeholder=" Date " readonly>
+									<input type="text" id="tokenDateForRequisition" class="form-control"
+										name="tokenDateForRequisition" placeholder=" Date " readonly>
 								</div>
 							</div>
 						</div>
 						<div class="col-md-6" style="border-left: 1px solid #6ffcf5">
 							<div class="form-group">
-							<div class="col-sm-12">
+								<div class="col-sm-12">
 									<label class="">Mechanic Info </label>
 								</div>
 								<div class="col-sm-12 mb-2">
 									<label class="">Mechanic Name </label>
-									<input type="text" id="mechanicInfo" class="form-control" name="mechanicInfo"
-										placeholder=" Name " readonly>
+									<input type="text" id="mechanicNameForRequisition" class="form-control"
+										name="mechanicNameForRequisition" placeholder=" Name " readonly>
 								</div>
 								<div class="col-sm-12">
 									<label class="">Mechanic Comment </label>
-									<input type="text" id="mechanicComment" class="form-control" name="mechanicInfo"
-										placeholder=" Comment " readonly>
+									<input type="text" id="mechanicCommentForRequisition" class="form-control"
+										name="mechanicCommentForRequisition" placeholder=" Comment " readonly>
 								</div>
 							</div>
 						</div>
 						<div class="col-md-12" style="border-left: 1px solid #6ffcf5">
 							<div class="form-group">
-							<div class="col-sm-12">
-									<label class="">Engineer Info </label>
-								</div>
+
 								<div class="col-sm-6 mb-2">
 									<label class="">Engineer Name </label>
-									<input type="text" id="mechanicInfo" class="form-control" name="mechanicInfo"
-										placeholder=" Name " readonly>
+									<input type="text" id="engineerNameForRequisition" class="form-control"
+										name="engineerNameForRequisition" placeholder=" Name " readonly>
 								</div>
 								<div class="col-sm-12">
 									<label class="">Engineer Comment </label>
-									<textarea  id="mechanicComment" class="form-control" name="mechanicInfo"
-										placeholder=" Comment " ></textarea>
+									<textarea id="engineerCommentForRequisition" class="form-control"
+										name="engineerCommentForRequisition" placeholder=" Comment "></textarea>
+									<span id="engineerCommentForError" class="text-danger"></span>
 								</div>
 							</div>
 						</div>
 						<div class="col-md-12">
-							<div class="col-md-1  col-md-offset-11"><button type="button" class="btn btn-primary col-md-12" onclick="addRow()">+</button></div>
+							<div class="col-md-1  col-md-offset-11"><button type="button"
+									class="btn btn-primary col-md-12" onclick="addRow()">+</button></div>
 						</div>
 					</div>
 
@@ -238,14 +238,24 @@
 									<th>Product Name</th>
 									<th>Specification</th>
 									<th>Quantity</th>
+									<th>Unit</th>
 									<th>Remarks</th>
+									<th>Action</th>
 								</thead>
 								<tbody id="requisitionTableBody">
-									<tr>
-										<td><input class="form-control" placeholder="Product Name" id="productId_0" type="text"></td>
-										<td><input class="form-control" placeholder="Specification" id="specId_0" type="text"></td>
-										<td><input class="form-control" placeholder="Quantity" id="qtyId_0" type="number"></td>
-										<td><input class="form-control" placeholder="Remarks" id="remarksId_0" type="text"></td>
+									<tr id="rowId_0">
+										<td><input class="form-control" placeholder="Product Name" id="products_0"
+												type="text"></td>
+										<td><input class="form-control" placeholder="Specification" id="spec_0"
+												type="text"></td>
+										<td><input class="form-control" placeholder="Quantity" id="qty_0" type="number">
+										</td>
+										<td><input class="form-control" placeholder="Unit" id="unit_0" type="number">
+										</td>
+										<td><input class="form-control" placeholder="Remarks" id="remarks_0"
+												type="text"></td>
+										<td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; "
+												aria-hidden="true" onclick="deleteReq(0)"></i></td>
 									</tr>
 								</tbody>
 							</table>
@@ -254,7 +264,8 @@
 					<div class="modal-footer mt-2">
 						<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i
 								class="fa fa-close"></i> Close</button>
-						<button type="submit" class="btn btn-primary btn-flat" name="editDricver"><i class="fa fa-save">
+						<button type="button" class="btn btn-primary btn-flat" name="editDricver"
+							onclick="saveRequisition()"><i class="fa fa-save">
 							</i> Update</button>
 					</div>
 				</form>
@@ -265,11 +276,23 @@
 
 
 <script>
-var roNo = 0;
-function addRow(roNo){
-	$('#requisitionTableBody').append('<tr><td><input class="form-control" placeholder="Product Name" id="productId_0" type="text"></td><td><input class="form-control" placeholder="Specification" id="specId_0" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qtyId_0" type="number"></td><td><input class="form-control" placeholder="Remarks" id="remarksId_0" type="text"></td></tr>');
-	roNo++;
-}
+	var roNo = 1;
+	function addRow() {
+		$('#requisitionTableBody').append('<tr id="rowId_' + roNo + '"><td><input class="form-control" placeholder="Product Name" id="products_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Specification" id="spec_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qty_' + roNo + '" type="number"></td><td><input class="form-control" placeholder="Unit" id="unit_' + roNo + '" type="number"></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + roNo + '" type="text"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReq(' + roNo + ')"></i></td></tr>');
+		roNo++;
+	}
+
+
+	function deleteReq(row) {
+
+		if (confirm('Are you sure you want to delete?')) {
+			$('#rowId_' + row).remove();
+		} else {
+
+			return
+		}
+
+	}
 </script>
 
 

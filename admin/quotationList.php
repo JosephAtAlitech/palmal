@@ -37,18 +37,18 @@
 				<div class="row">
 					<div class="col-xs-12">
 						<div class="box">
-							<div class="box-header with-border">
+							<!-- <div class="box-header with-border">
 								<a href="#addnewToken" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i
 										class="fa fa-plus"></i> Add Token</a>
-							</div>
+							</div> -->
 							<div class="box-body">
-								<table id="tokenTable" class="table table-bordered">
+								<table id="quotationTable" class="table table-bordered">
 									<thead>
 										<th>id</th>
-										<th>Token No</th>
+										<th>Quotation Date No</th>
+										<th>Quote By</th>
 										<th>Token Title</th>
-										<th>Mechanic Info</th>
-										<th>Engneer</th>
+
 										<th>Action</th>
 									</thead>
 									<tbody>
@@ -84,8 +84,8 @@
 
 		var manageTokenTable = '';
 		$(document).ready(function () {
-			manageTokenTable = $("#tokenTable").DataTable({
-				'ajax': 'tokenAdd.php',
+			manageTokenTable = $("#quotationTable").DataTable({
+				'ajax': 'quotationAdd.php',
 				'order': [],
 				'dom': 'Bfrtip',
 				'buttons': [
@@ -405,31 +405,36 @@
 		}
 
 
+
 		function confirmDelete(id) {
-			$('#deleteTrip').modal('show');
-			$.ajax({
-				type: 'POST',
-				url: 'tokenAdd.php',
-				data: { id: id },
-				dataType: 'json',
-				beforeSend: function () {
-					// Show image container
-					$("#editLoader").show();
-				},
-				success: function (response) {
-					//alert(JSON.stringify(response));
-					$('#deletid').val(response.id);
-					$('#deletTripid').html(response.id);
 
+			if (confirm('Are you sure you want to delete?')) {
+				$.ajax({
+					type: 'POST',
+					url: 'quotationAdd.php',
+					data: {
+						id: id,
+						"Action": 'deleteQuotation'
+					},
+					dataType: 'json',
+					beforeSend: function () {
+						// Show image container
+						$("#editLoader").show();
+					},
+					success: function (response) {
+						//alert(JSON.stringify(response));
+						manageTokenTable.ajax.reload(null, false);
+					}, error: function (xhr) {
+						alert(xhr.responseText);
+					},
+					complete: function (data) {
+						// Hide image container
+						$("#editLoader").hide();
+					}
+				});
+			} else {
 
-				}, error: function (xhr) {
-					alert(xhr.responseText);
-				},
-				complete: function (data) {
-					// Hide image container
-					$("#editLoader").hide();
-				}
-			});
+			}
 		}
 
 

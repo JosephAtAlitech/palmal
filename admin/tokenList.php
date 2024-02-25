@@ -316,6 +316,100 @@
 		});
 
 
+		function saveRequisition() {
+
+			var id = $('#id_fr_req').val();
+			var engineerComment = $('#engineerCommentForRequisition').val();
+
+			var regEx = /^[0-9a-zA-Z]+$/;
+			if (engineerComment.match(regEx)) {
+				$('#engineerCommentForError').text('');
+			}
+			else {
+				$('#engineerCommentForError').text("Please enter letters and numbers only.");
+				return;
+			}
+			var flag_p = 0;
+			var products = [];
+			$('input[id^="products_"]').each(function () {
+				var $this = $(this);
+				products.push($this.val());
+				if ($this.val() < 1) {
+					alert("Product Cannot empty!!")
+					flag_p = 1;
+					return false;
+				}
+			});
+			if (flag_p == 1) {
+				return;
+			}
+			var specs = [];
+			$('input[id^="spec_"]').each(function () {
+				var $this = $(this);
+				specs.push($this.val());
+			});
+			var flag = 0;
+			var qty = [];
+			$('input[id^="qty_"]').each(function () {
+				var $this = $(this);
+				if ($this.val() < 1) {
+					alert("Cannot take Quantity less then 1 !!")
+					flag = 1;
+					return false;
+				}
+				qty.push($this.val());
+			});
+			if (flag == 1) {
+				return;
+			}
+			var units = [];
+			$('input[id^="unit_"]').each(function () {
+				var $this = $(this);
+				units.push($this.val());
+			});
+			var remarks = [];
+			$('input[id^="remarks_"]').each(function () {
+				var $this = $(this);
+				remarks.push($this.val());
+			});
+			var fd = new FormData();
+
+			fd.append('id', id);
+			fd.append('products', products);
+			fd.append('specs', specs);
+			fd.append('qty', qty);
+			fd.append('units', units);
+			fd.append('remarks', remarks);
+			fd.append('Action', 'addRequisitions');
+			$.ajax({
+				url: "tokenAdd.php",
+				method: "POST",
+				data: fd,
+				contentType: false,
+				processData: false,
+				datatype: "json",
+				success: function (result) {
+					if (result != "success") {
+						alert(JSON.stringify(result));
+					} else if (result == "success") {
+						$('#addnewToken').modal('hide');
+					}
+					//alert(JSON.stringify(result));
+					manageTokenTable.ajax.reload(null, false);
+				},
+				error: function (response) {
+					alert(JSON.stringify(response));
+				},
+
+				beforeSend: function () {
+					$('#loading').show();
+				},
+				complete: function () {
+					$('#loading').hide();
+				}
+			});
+
+		}
 
 		function allocateMechanic(id) {
 			$('#allocateMechanic').modal('show');
@@ -324,7 +418,7 @@
 				url: 'tokenAdd.php',
 				data: {
 					id: id,
-					"Action": 'getMechanic'
+					"Action": 'getMechanicAndEngineer'
 				},
 				dataType: 'json',
 				beforeSend: function () {
@@ -353,7 +447,7 @@
 				url: 'tokenAdd.php',
 				data: {
 					id: id,
-					"Action": 'getMechanic'
+					"Action": 'getMechanicAndEngineer'
 				},
 				dataType: 'json',
 				beforeSend: function () {
@@ -382,7 +476,10 @@
 			$.ajax({
 				type: 'POST',
 				url: 'tokenAdd.php',
-				data: { id: id },
+				data: {
+					id: id,
+					"Action": 'getMechanicAndEngineer'
+				},
 				dataType: 'json',
 				beforeSend: function () {
 					// Show image container
@@ -390,9 +487,44 @@
 				},
 				success: function (response) {
 					//alert(JSON.stringify(response));
-					$('#deletid').val(response.id);
-					$('#deletTripid').html(response.id);
+					$('#id_fr_req').val(response.id);
+					$('#tokenTitleForRequisition').val(response.token_title ? response.token_title : '');
+					$('#tokenDateForRequisition').val(response.token_date ? response.token_date : '');
+					$('#mechanicNameForRequisition').val(response.m_name ? response.m_name : '');
+					$('#mechanicCommentForRequisition').val(response.problems ? response.problems : '');
+					$('#engineerNameForRequisition').val(response.e_name ? response.e_name : '');
+					$('#engineerCommentForRequisition').text(response.engr_req_details ? response.engr_req_details : '');
 
+					$.ajax({
+						type: 'POST',
+						url: 'tokenAdd.php',
+						data: {
+							id: id,
+							"Action": 'getTokenRequisition'
+						},
+						dataType: 'json',
+						beforeSend: function () {
+							// Show image container
+							$("#editLoader").show();
+						},
+						success: function (response) {
+							//alert(JSON.stringify(response));
+							//alert(JSON.stringify(response.length));
+							var i = 0;
+							$('#requisitionTableBody').html('');
+							for (i = 0; i < response.length; i++) {
+								$('#requisitionTableBody').append('<tr id="rowId_' + i + '"><td><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response[i].req_product + '"></td><td><input class="form-control" placeholder="Specification" id="spec_' + i + '" type="text" value="' + response[i].spec + '"> </td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response[i].qty + '"></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="number" value="' + response[i].unit + '"></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + i + '" type="text" value="' + response[i].remarks + '"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReqFromSource(' + i + ',' + response[i].id + ')"></i></td></tr>');
+							}
+							roNo = i;
+
+						}, error: function (xhr) {
+							alert(xhr.responseText);
+						},
+						complete: function (data) {
+							// Hide image container
+							$("#editLoader").hide();
+						}
+					});
 
 				}, error: function (xhr) {
 					alert(xhr.responseText);
@@ -402,34 +534,75 @@
 					$("#editLoader").hide();
 				}
 			});
+
+		}
+
+		function deleteReqFromSource(row, id) {
+
+			if (confirm('Are you sure you want to delete?')) {
+				$.ajax({
+					type: 'POST',
+					url: 'tokenAdd.php',
+					data: {
+						id: id,
+						"Action": 'deleteRequisition'
+					},
+					dataType: 'json',
+					beforeSend: function () {
+						// Show image container
+						$("#editLoader").show();
+					},
+					success: function (response) {
+
+						$('#rowId_' + row).remove();
+					}, error: function (xhr) {
+						alert(xhr.responseText);
+					},
+					complete: function (data) {
+						// Hide image container
+						$("#editLoader").hide();
+					}
+				});
+
+			} else {
+
+				return
+			}
+
 		}
 
 
+
+
 		function confirmDelete(id) {
-			$('#deleteTrip').modal('show');
-			$.ajax({
-				type: 'POST',
-				url: 'tokenAdd.php',
-				data: { id: id },
-				dataType: 'json',
-				beforeSend: function () {
-					// Show image container
-					$("#editLoader").show();
-				},
-				success: function (response) {
-					//alert(JSON.stringify(response));
-					$('#deletid').val(response.id);
-					$('#deletTripid').html(response.id);
 
+			if (confirm('Are you sure you want to delete?')) {
+				$.ajax({
+					type: 'POST',
+					url: 'tokenAdd.php',
+					data: {
+						id: id,
+						"Action": 'deleteToken'
+					},
+					dataType: 'json',
+					beforeSend: function () {
+						// Show image container
+						$("#editLoader").show();
+					},
+					success: function (response) {
+						//alert(JSON.stringify(response));
+						manageTokenTable.ajax.reload(null, false);
+					}, error: function (xhr) {
+						alert(xhr.responseText);
+					},
+					complete: function (data) {
+						// Hide image container
+						$("#editLoader").hide();
+					}
+				});
+			} else {
 
-				}, error: function (xhr) {
-					alert(xhr.responseText);
-				},
-				complete: function (data) {
-					// Hide image container
-					$("#editLoader").hide();
-				}
-			});
+			}
 		}
 
 

@@ -61,7 +61,7 @@ class MYPDF extends TCPDF {
 					$sql = "SELECT tbl_token.* , m.firstname m_name, e.firstname e_name from tbl_token 
 							join admin as m on tbl_token.mechanic_id = m.id
 							join admin as e on tbl_token.engineer_id = e.id
-							WHERE id= '".$id."' ORDER BY id DESC";
+							WHERE tbl_token.id= '".$id."' ORDER BY id DESC";
 				
 				$query = $conn->query($sql);
 				$row12 = $query->fetch_assoc();
