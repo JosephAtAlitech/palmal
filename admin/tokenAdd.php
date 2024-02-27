@@ -153,7 +153,7 @@ if (isset($_POST["Action"])) {
                     <li><a href="#" onclick="allocateMechanic(' . $id . ')"><i class="fa fa-edit"></i> Allocate Mechanic</a></li>
                     <li><a href="#" onclick="mechanicComment(' . $id . ')"><i class="fa fa-edit"></i> Mechanic Comment</a></li>
                     <li><a href="#" onclick="addEgineerRequisition(' . $id . ')"><i class="fa fa-edit"></i> Add Egineer Requisition</a></li>
-                    <li><a href="addQuotationView.php?id=' . $id . '&type=" ><i class="fa fa-edit"></i> Add Quotation</a></li>
+                    <li><a href="quotationList.php?id=' . $id . '" ><i class="fa fa-edit"></i> Quotation List</a></li>
                     <li><a href="tokenReport.php?id=' . $id . '" ><i class="fa fa-edit"></i> View Details</a></li>
                     <li><a href="#" onclick="confirmDelete(' . $id . ')"><i class="fa fa-trash"></i> Delete</a></li>
                 </ul>

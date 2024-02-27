@@ -109,8 +109,6 @@
 			</a>
 			<ul class="treeview-menu">
 				<li><a href="tokenList.php"><i class="fa fa-bars"></i> <span> Token List</span></a></li>
-				<li><a href="quotationList.php"><i class="fa fa-bars"></i> <span>Quotation List</span></a></li>
-
 			</ul>
 		</li>
 		<?php if($_SESSION['admin'] != '38' && $_SESSION['admin'] != '39' && $_SESSION['admin'] != '40') { ?>

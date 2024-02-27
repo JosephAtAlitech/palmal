@@ -37,10 +37,17 @@
 				<div class="row">
 					<div class="col-xs-12">
 						<div class="box">
-							<!-- <div class="box-header with-border">
-								<a href="#addnewToken" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i
-										class="fa fa-plus"></i> Add Token</a>
-							</div> -->
+							<?php
+							if(isset($_GET['id']) ) {
+								$id = $_GET['id'];
+							} else {
+								$id = '';
+							}
+							?>
+							<div class="box-header with-border">
+								<a href="addQuotationView.php?id=<?=$id?>&type=procurement" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i
+										class="fa fa-plus"></i> Add Quotation</a>
+							</div>
 							<div class="box-body">
 								<table id="quotationTable" class="table table-bordered">
 									<thead>
@@ -48,7 +55,6 @@
 										<th>Quotation Date No</th>
 										<th>Quote By</th>
 										<th>Token Title</th>
-
 										<th>Action</th>
 									</thead>
 									<tbody>
@@ -71,6 +77,11 @@
 	<script type="text/javascript">
 
 
+		const queryString = window.location.search;
+		console.log(queryString);
+		const urlParams = new URLSearchParams(queryString);
+		const id = urlParams.get('id')
+		console.log(id);
 
 		$(document).ready(function () {
 			$('#mechanic').select2({
@@ -81,11 +92,11 @@
 			});
 		});
 
-
 		var manageTokenTable = '';
 		$(document).ready(function () {
+			
 			manageTokenTable = $("#quotationTable").DataTable({
-				'ajax': 'quotationAdd.php',
+				'ajax': 'quotationAdd.php?id='+id,
 				'order': [],
 				'dom': 'Bfrtip',
 				'buttons': [
@@ -199,7 +210,7 @@
 					var id = $("#id_fr_mc_allct").val();
 					var mechanic_for_allocate = $("#mechanic_for_allocate").val();
 
-					alert(id)
+					///alert(id)
 					var fd = new FormData();
 
 					fd.append('id', id);

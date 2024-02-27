@@ -58,10 +58,11 @@ if (isset($_POST["Action"])) {
 
     }  
 } else {
+    $getId = $_GET['id'];
     $sql = "SELECT tbl_quotation.*, tbl_token.token_title ,tbl_token.id  as token_id , admin.firstname FROM `tbl_quotation` 
             JOIN tbl_token on tbl_quotation.tbl_token_id = tbl_token.id
             LEFT JOIN admin on tbl_quotation.quote_by_id = admin.id
-            WHERE tbl_quotation.deleted = 'No' ORDER BY tbl_quotation.id  DESC";
+            WHERE tbl_quotation.deleted = 'No' and tbl_token.id = $getId ORDER BY tbl_quotation.id  DESC";
     $query = $conn->query($sql);
     $i = 1;
     $output = array();

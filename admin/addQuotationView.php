@@ -38,8 +38,8 @@
                     <div class="col-xs-12">
                         <div class="box">
                             <div class="box-header with-border">
-                                <a  onclick="history.back()" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-reply"
-                                        aria-hidden="true"></i> Back</a>
+                                <a onclick="history.back()" class="btn btn-primary btn-sm btn-flat"><i
+                                        class="fa fa-reply" aria-hidden="true"></i> Back</a>
                             </div>
                             <div class="box-body">
                                 <div class="form-group ">
@@ -52,19 +52,50 @@
                                         $token = $row['token_title'];
                                     }
                                     ?>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <input type="hidden" id="tokenId" value="<?= $id ?>">
                                         <label class="">Token Title <span class="text-danger">*</span></label>
                                         <input type="text" id="tokenTitle" class="form-control" name="tokenTitle"
                                             placeholder=" Token Title " value="<?= $token ?>" disabled>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <label class="">Quotation Date<span class="text-danger">*</span></label>
                                         <input type="date" id="quotationDate" class="form-control" name="quotationDate"
                                             value="<?= date('Y-m-d') ?>" placeholder=" Quotation Date ">
                                         <span id="quotationDateError"></span>
                                     </div>
+                                    <div class="col-sm-4">
+                                        <label class="">Supplier<span class="text-danger">*</span></label>
+                                        <select type="date" id="supplier" class="form-control" name="supplier"
+                                            placeholder="Vandor ">
+
+                                            <?php
+
+                                            $sql = "SELECT * from tbl_party where deleted = 'No' ORDER BY id desc";
+                                            $result = $conn->query($sql);
+                                            echo "<option value='0'>Select Vandor</option>";
+                                            if ($result) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    if ($_SESSION["id"] == $row['id']) {
+                                                        echo "<option value='" . $row['id'] . "' selected>" . $row['partyName'] . "</option>";
+                                                    } else {
+                                                        echo "<option value='" . $row['id'] . "'>" . $row['partyName'] . "</option>";
+                                                    }
+
+                                                }
+                                            }
+
+
+
+                                            ?>
+                                        </select>
+                                        <span id="supplierError"></span>
+                                    </div>
                                 </div>
+                                <br>
+                                <br>
+                                <hr>
+
                                 <div class=" form-group col-md-12 mt-4">
                                     <table id="" class="table table-bordered">
                                         <thead>
@@ -147,20 +178,20 @@
                                             <tr>
                                                 <td colspan="5"></td>
                                                 <td style="text-align: right;">Quote By :</td>
-                                                <td class="d-flex"><select id="quoteBy" class="form-control"
-                                                        type="text">
+                                                <td class="d-flex"><select id="quoteBy" class="form-control" type="text"
+                                                        disabled>
                                                         <?php
                                                         $sql = "SELECT * from admin where deleted = 'On' ORDER BY id desc";
                                                         $result = $conn->query($sql);
                                                         echo "<option value='0'>Select Vandor</option>";
                                                         if ($result) {
                                                             while ($row = $result->fetch_assoc()) {
-                                                                if($_SESSION["id"] ==  $row['id'] ){
+                                                                if ($_SESSION["id"] == $row['id']) {
                                                                     echo "<option value='" . $row['id'] . "' selected>" . $row['firstname'] . "</option>";
-                                                                }else{
+                                                                } else {
                                                                     echo "<option value='" . $row['id'] . "'>" . $row['firstname'] . "</option>";
                                                                 }
-                                                              
+
                                                             }
                                                         }
                                                         ?>
@@ -175,26 +206,27 @@
                                             <tr>
                                                 <td colspan="5"></td>
                                                 <td style="text-align: right;">Ait :</td>
-                                                <td class="d-flex"><input id="ait" class="form-control" placeholder="Ait" type="text">
+                                                <td class="d-flex"><input id="ait" class="form-control"
+                                                        placeholder="Ait" type="text">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="5"></td>
                                                 <td style="text-align: right;">Discount :</td>
-                                                <td class="d-flex"><input id="discount" class="form-control" placeholder="Discount"
-                                                        type="text"></td>
+                                                <td class="d-flex"><input id="discount" class="form-control"
+                                                        placeholder="Discount" type="text"></td>
                                             </tr>
                                             <tr>
                                                 <td colspan="5"></td>
                                                 <td style="text-align: right;">Grand Total:</td>
-                                                <td class="d-flex"><input id="grandTotal" class="form-control" placeholder="Grand Total"
-                                                        type="text"></td>
+                                                <td class="d-flex"><input id="grandTotal" class="form-control"
+                                                        placeholder="Grand Total" type="text"></td>
                                             </tr>
                                             <tr>
                                                 <td colspan="5"></td>
                                                 <td style="text-align: right;">Quote Amount :</td>
-                                                <td class="d-flex"><input id="quoteAmount" class="form-control" placeholder="Quote Amount"
-                                                        type="text"></td>
+                                                <td class="d-flex"><input id="quoteAmount" class="form-control"
+                                                        placeholder="Quote Amount" type="text"></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -228,9 +260,16 @@
     <script type="text/javascript">
 
 
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        var type = urlParams.get('type')
+        console.log(type);
 
         $(document).ready(function () {
             $('#quoteBy').select2({
+                width: "100%"
+            });
+            $('#supplier').select2({
                 width: "100%"
             });
         });
@@ -301,7 +340,7 @@
                 var $this = $(this);
                 unitPrice.push($this.val());
             });
-           
+
             var totalPrice = [];
             $('input[id^="tPrice_"]').each(function () {
                 var $this = $(this);
@@ -325,6 +364,7 @@
             fd.append('discount', discount);
             fd.append('grandTotal', grandTotal);
             fd.append('quoteAmount', quoteAmount);
+            fd.append('type', type);
             fd.append('Action', 'saveQuotation');
 
             $.ajax({
@@ -342,9 +382,9 @@
                         if (confirm('Do you what to view the report?')) {
 
                             window.location('');
-                        } else {}
+                        } else { }
 
-                        
+
                     }
                     //alert(JSON.stringify(result));
                     manageTokenTable.ajax.reload(null, false);
