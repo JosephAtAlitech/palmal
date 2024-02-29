@@ -202,7 +202,6 @@ if (isset($_GET['id'])) {
 }
 
 $content .= "<style>
-				.shoaib{width:33.3%;height: 50px;padding: 60px;border: 1px dotted gray;}
 				span{text-align: center;color: gray;font-size: 10px;margin-top: 10%;}
 			</style>
 			<table><br><br><br><br>
