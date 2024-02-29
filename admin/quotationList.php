@@ -45,7 +45,7 @@
 							}
 							?>
 							<div class="box-header with-border">
-								<a href="addQuotationView.php?id=<?=$id?>&type=procurement" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i
+								<a href="addQuotationView.php?Token_id=<?=$id?>&type=procurement" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i
 										class="fa fa-plus"></i> Add Quotation</a>
 							</div>
 							<div class="box-body">

@@ -44,8 +44,8 @@
                             <div class="box-body">
                                 <div class="form-group ">
                                     <?php
-                                    if (isset($_GET['id'])) {
-                                        $id = $_GET['id'];
+                                    if (isset($_GET['Token_id'])) {
+                                        $id = $_GET['Token_id'];
                                         $sql = "SELECT * FROM `tbl_token` WHERE id = $id ";
                                         $result = $conn->query($sql);
                                         $row = $result->fetch_assoc();
@@ -70,7 +70,6 @@
                                             placeholder="Vandor ">
 
                                             <?php
-
                                             $sql = "SELECT * from tbl_party where deleted = 'No' ORDER BY id desc";
                                             $result = $conn->query($sql);
                                             echo "<option value='0'>Select Vandor</option>";
@@ -81,11 +80,8 @@
                                                     } else {
                                                         echo "<option value='" . $row['id'] . "'>" . $row['partyName'] . "</option>";
                                                     }
-
                                                 }
                                             }
-
-
 
                                             ?>
                                         </select>
@@ -122,50 +118,78 @@
                                         </thead>
                                         <tbody>
                                             <?php
-                                            if (isset($_GET['id'])) {
+                                            if (isset($_GET['Token_id'])) {
+                                                $token_id = $_GET['Token_id'];
+                                                $quotation_id = $_GET['id'];
 
-                                                $id = $_GET['id'];
-                                                $sql = 'SELECT * from tbl_token_requisition where tbl_token_id = ' . $id . ' and deleted ="No"';
-                                                $result = $conn->query($sql);
+
+                                                if ($_GET['type'] == 'procurement') {
+                                                    $sql = 'SELECT * FROM tbl_token_requisition where tbl_token_id = ' . $token_id . ' and deleted ="No"';
+                                                    $result = $conn->query($sql);
+                                                } else {
+                                                    $sql = "SELECT tbl_quotation_details.*, tbl_token_requisition.spec, tbl_token_requisition.req_product  FROM  tbl_quotation_details 
+                                                    join tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
+                                                    join tbl_token_requisition on tbl_quotation_details.tbl_token_requisition_id = tbl_token_requisition.id
+                                                    WHERE tbl_quotation.tbl_token_id = '" . $token_id . "' AND  tbl_quotation.id = '" . $quotation_id . "'  ORDER BY id DESC";
+                                                    $result = $conn->query($sql);
+                                                }
+
+
                                                 $i = 1;
                                                 $j = 0;
                                                 if (isset($_GET['type'])) {
                                                     if ($_GET['type'] == 'wing_head') {
                                                         while ($row = $result->fetch_assoc()) {
+                                                            $reqId = $row['id'];
+                                                            $spec = $row['spec'];
+                                                            $qty = $row['qty'];
+                                                            $unit = $row['unit'];
+                                                            $wing_uPrice = $row['wing_head_unit_price'];
+                                                            $wing_tPrice = $row['wing_head_total_amount'];
                                                             echo '<tr>
                                                                     <td>' . $i++ . '</td>
-                                                                    <td>  <input type="hidden" id="requisitionId_' . $j . '" value="' . $row['id'] . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $row['spec'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $row['qty'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $row['unit'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="wing_head_uPrice_' . $j . '" value=""></td>
-                                                                    <td><input class="form-control" type="text" id="wing_head_tPrice_' . $j . '" value=""></td>
+                                                                    <td>  <input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
+                                                                    <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
+                                                                    <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
+                                                                    <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
+                                                                    <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '"></td>
+                                                                    <td><input class="form-control" type="number" id="wing_head_tPrice_' . $j . '" value="' . $wing_tPrice . '"></td>
                                                                 </tr>';
                                                             $j++;
                                                         }
                                                     } else if ($_GET['type'] == 'audit') {
                                                         while ($row = $result->fetch_assoc()) {
+                                                            $reqId = $row['id'];
+                                                            $spec = $row['spec'];
+                                                            $qty = $row['qty'];
+                                                            $unit = $row['unit'];
+                                                            $audit_uPrice = $row['audit_unit_price'];
+                                                            $audit_tPrice = $row['audit_total_amount'];
                                                             echo '<tr>
                                                                     <td>' . $i++ . '</td>
-                                                                    <td> <input type="hidden" id="requisitionId_' . $j . '" value="' . $row['id'] . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $row['spec'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $row['qty'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $row['unit'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="audit_uPrice_' . $j . '" value=""></td>
-                                                                    <td><input class="form-control" type="text" id="audit_tPrice_' . $j . '" value=""></td>
+                                                                    <td> <input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
+                                                                    <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
+                                                                    <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
+                                                                    <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
+                                                                    <td><input class="form-control" type="number" id="audit_uPrice_' . $j . '" value="' . $audit_uPrice . '"></td>
+                                                                    <td><input class="form-control" type="number" id="audit_tPrice_' . $j . '" value="' . $audit_tPrice . '"></td>
                                                                 </tr>';
                                                             $j++;
                                                         }
                                                     } else {
                                                         while ($row = $result->fetch_assoc()) {
+                                                            $reqId = $row['id'];
+                                                            $spec = $row['spec'];
+                                                            $qty = $row['qty'];
+                                                            $unit = $row['unit'];
                                                             echo '<tr>
                                                                 <td>' . $i++ . '</td>
                                                                 <td> <input type="hidden" id="requisitionId_' . $j . '" value="' . $row['id'] . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $row['spec'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $row['qty'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $row['unit'] . '" disabled></td>
-                                                                <td><input class="form-control" type="text" id="uPrice_' . $j . '" value=""></td>
-                                                                <td><input class="form-control" type="text" id="tPrice_' . $j . '" value=""></td>
+                                                                <td><input class="form-control" type="number" id="uPrice_' . $j . '" value=""></td>
+                                                                <td><input class="form-control" type="number" id="tPrice_' . $j . '" value=""></td>
                                                             </tr>';
                                                             $j++;
                                                         }
@@ -191,7 +215,6 @@
                                                                 } else {
                                                                     echo "<option value='" . $row['id'] . "'>" . $row['firstname'] . "</option>";
                                                                 }
-
                                                             }
                                                         }
                                                         ?>
@@ -200,7 +223,8 @@
                                             <tr>
                                                 <td colspan="5"></td>
                                                 <td style="text-align: right;">Vat :</td>
-                                                <td class="d-flex"><input id="vat" class="form-control" type="text">
+                                                <td class="d-flex"><input id="vat" class="form-control"
+                                                        placeholder="Vat" type="text">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -263,6 +287,7 @@
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         var type = urlParams.get('type')
+        var quotation_id = urlParams.get('id')
         console.log(type);
 
         $(document).ready(function () {
@@ -311,6 +336,38 @@
                 var $this = $(this);
                 requisitionIds.push($this.val());
             });
+           
+            if (type != 'procurement') {
+                var quoteDetailsIds = [];
+                $('input[id^="quoteDetailsId_"]').each(function () {
+                    var $this = $(this);
+                    quoteDetailsIds.push($this.val());
+                });
+
+                var wing_head_uPrice = [];
+                $('input[id^="wing_head_uPrice_"]').each(function () {
+                    var $this = $(this);
+                    wing_head_uPrice.push($this.val());
+                });
+
+                var wing_head_tPrice = [];
+                $('input[id^="wing_head_tPrice_"]').each(function () {
+                    var $this = $(this);
+                    wing_head_tPrice.push($this.val());
+                });
+
+                var audit_uPrice = [];
+                $('input[id^="audit_uPrice_"]').each(function () {
+                    var $this = $(this);
+                    audit_uPrice.push($this.val());
+                });
+
+                var audit_tPrice = [];
+                $('input[id^="audit_tPrice_"]').each(function () {
+                    var $this = $(this);
+                    audit_tPrice.push($this.val());
+                });
+            }
 
             var products = [];
             $('input[id^="req_product_"]').each(function () {
@@ -335,6 +392,7 @@
                 var $this = $(this);
                 units.push($this.val());
             });
+
             var unitPrice = [];
             $('input[id^="uPrice_"]').each(function () {
                 var $this = $(this);
@@ -346,6 +404,8 @@
                 var $this = $(this);
                 totalPrice.push($this.val());
             });
+
+
             var fd = new FormData();
 
             fd.append('tokenId', tokenId);
@@ -358,6 +418,18 @@
             fd.append('qty', qty);
             fd.append('unitPrice', unitPrice);
             fd.append('totalPrice', totalPrice);
+
+            if (type != 'procurement') {
+                fd.append('quotation_id', quotation_id);
+                fd.append('quoteDetailsIds', quoteDetailsIds);
+
+                fd.append('wing_head_uPrice', wing_head_uPrice);
+                fd.append('wing_head_tPrice', wing_head_tPrice);
+
+                fd.append('audit_uPrice', audit_uPrice);
+                fd.append('audit_tPrice', audit_tPrice);
+            }
+
             fd.append('quoteBy', quoteBy);
             fd.append('vat', vat);
             fd.append('ait', ait);
@@ -378,13 +450,11 @@
                     if (result != "success") {
                         alert(JSON.stringify(result));
                     } else if (result == "success") {
-
                         if (confirm('Do you what to view the report?')) {
-
                             window.location('');
-                        } else { }
+                        } else {
 
-
+                        }
                     }
                     //alert(JSON.stringify(result));
                     manageTokenTable.ajax.reload(null, false);

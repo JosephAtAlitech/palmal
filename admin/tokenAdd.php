@@ -12,6 +12,14 @@ if (isset($_POST["Action"])) {
 
         try {
             $conn->begin_transaction();
+            $sql = "SELECT LPAD(max(token_no)+1, 6, 0) as tokenCode from tbl_token";
+            $query = $conn->query($sql);
+            while ($prow = $query->fetch_assoc()) {
+                $salesOrderNo = $prow['tokenCode'];
+            }
+            if ($salesOrderNo == "") {
+                $salesOrderNo = "000001";
+            }
             $sql = "INSERT INTO tbl_token ( token_title,  token_details, mechanic_id, engineer_id,token_date , status, created_by, created_date ) 
             VALUES( '$tokenTitle', '$tokenDetails', '$mechanic', '$engineer','$tokenDate', 'Pending',  '$loginID',  '$Date' )";
             if ($query = $conn->query($sql)) {

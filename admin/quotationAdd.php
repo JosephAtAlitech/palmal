@@ -18,20 +18,58 @@ if (isset($_POST["Action"])) {
         $qty = explode(",", $_POST["qty"]);
         $units = explode(",", $_POST["units"]);
         $requisitionIds = explode(",", $_POST["requisitionIds"]);
+       
         $unitPrice = explode(",", $_POST["unitPrice"]);
         $totalPrice = explode(",", $_POST["totalPrice"]);
+        if($_POST['type'] == 'wing_head'){
+            $wing_head_uPrice = explode(",", $_POST["wing_head_uPrice"]);
+            $wing_head_tPrice = explode(",", $_POST["wing_head_tPrice"]);
+            $quoteDetailsIds = explode(",", $_POST["quoteDetailsIds"]);
+        }
+        if($_POST['type'] == 'wing_head'){
+            $audit_uPrice = explode(",", $_POST["audit_uPrice"]);
+            $audit_tPrice = explode(",", $_POST["audit_tPrice"]);
+        }
+    
+    
 
+      
         try {
             $conn->begin_transaction();
-            $sql = "INSERT INTO tbl_quotation (tbl_token_id, quote_by_id, total_amount, discount, quote_date, Vat, Ait, grand_total, deleted, created_by, created_date ) 
-            VALUES( '$tokenId', '$quoteBy', '$quoteAmount', '$discount','$quoteDate', '$vat','$ait','$grandTotal', 'No', '$loginID',  '$Date' )";
+            if($_POST['type'] == 'procurement'){
+                $sql = "INSERT INTO tbl_quotation (tbl_token_id, quote_by_id, total_amount, discount, quote_date, Vat, Ait, grand_total, deleted, created_by, created_date ) 
+                VALUES( '$tokenId', '$quoteBy', '$quoteAmount', '$discount','$quoteDate', '$vat','$ait','$grandTotal', 'No', '$loginID',  '$Date' )";
+            }else{
+
+            }
+            
 
             if ($query = $conn->query($sql)) {
                 $quotation_id = $conn->insert_id;
                 for ($i = 0; $i < count($productsArr); $i++) {
-                    $sql = "INSERT INTO tbl_quotation_details (tbl_quotation_id, tbl_token_requisition_id, Product_name, qty, unit, unit_price,total_amount, wing_head_unit_price,  wing_head_total_amount , audit_unit_price,  audit_total_amount , created_by, created_date ) 
-                            VALUES( '$quotation_id', '$requisitionIds[$i]', '$productsArr[$i]', '$qty[$i]', '$units[$i]', '$unitPrice[$i]', '$totalPrice[$i]', '$unitPrice[$i]', '$totalPrice[$i]', '$unitPrice[$i]','$totalPrice[$i]', '$loginID', '$Date' )";
-                    $query = $conn->query($sql);
+                    if($_POST['type'] == 'wing_head'){
+        
+                        $ad_uPrice = $wing_head_uPrice[$i];
+                        $ad_tPrice = $wing_head_tPrice[$i];
+
+                        $sql = "UPDATE tbl_quotation_details set wing_head_unit_price = $wing_head_uPrice[$i], wing_head_total_amount = $wing_head_tPrice[$i], audit_unit_price =  $ad_uPrice,  audit_total_amount =$ad_tPrice, updated_by = $loginID , updated_date = $Date Where id= $quoteDetailsIds[$i] ";
+                        $query = $conn->query($sql);
+                        
+                    }else if($_POST['type'] == 'audit'){  
+                       
+                
+                        $quoteDetailsIds = explode(",", $_POST["quoteDetailsIds"]);
+                        $sql = "UPDATE tbl_quotation_details set audit_unit_price =   $audit_uPrice[$i] ,  audit_total_amount =$audit_tPrice[$i], updated_by = $loginID , updated_date = $Date Where id= $quoteDetailsIds[$i]";
+                        $query = $conn->query($sql);
+
+                    }else{
+
+                        $sql = "INSERT INTO tbl_quotation_details (tbl_quotation_id, tbl_token_requisition_id, Product_name, qty, unit, unit_price,total_amount, wing_head_unit_price,  wing_head_total_amount , audit_unit_price,  audit_total_amount , created_by, created_date ) 
+                        VALUES( '$quotation_id', '$requisitionIds[$i]', '$productsArr[$i]', '$qty[$i]', '$units[$i]', '$unitPrice[$i]', '$totalPrice[$i]', '$unitPrice[$i]', '$totalPrice[$i]', '$unitPrice[$i]','$totalPrice[$i]', '$loginID', '$Date' )";
+                        $query = $conn->query($sql);
+
+                    }
+                
                 }
                 $conn->commit();
                 echo json_encode($sql);
@@ -73,8 +111,8 @@ if (isset($_POST["Action"])) {
                     <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-gear tiny-icon"></i>  <span class="caret"></span></button>
                         <ul class="dropdown-menu dropdown-menu-right" style="border: 1px solid gray;" role="menu">
-                            <li><a href="addQuotationView.php?id=' . $row['token_id'] . '&type=wing_head" ><i class="fa fa-edit"></i> Wing Head Quotation</a></li>
-                            <li><a href="addQuotationView.php?id=' . $row['token_id'] . '&type=audit" ><i class="fa fa-edit"></i> Audit Quotation</a></li>
+                            <li><a href="addQuotationView.php?Token_id=' . $row['token_id'] . '&id=' . $row['id'] . '&type=wing_head" ><i class="fa fa-edit"></i> Wing Head Quotation</a></li>
+                            <li><a href="addQuotationView.php?Token_id=' . $row['token_id'] . '&id=' . $row['id'] . '&type=audit" ><i class="fa fa-edit"></i> Audit Quotation</a></li>
                             <li><a href="tokenReport.php?id=' . $row['token_id'] . '" ><i class="fa fa-edit"></i> View Details</a></li>
                             <li><a href="#" onclick="confirmDelete(' . $id . ')"><i class="fa fa-trash"></i> Delete</a></li>
                         </ul>
