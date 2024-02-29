@@ -15,13 +15,13 @@ if (isset($_POST["Action"])) {
             $sql = "SELECT LPAD(max(token_no)+1, 6, 0) as tokenCode from tbl_token";
             $query = $conn->query($sql);
             while ($prow = $query->fetch_assoc()) {
-                $salesOrderNo = $prow['tokenCode'];
+                $tokenNo = $prow['tokenCode'];
             }
-            if ($salesOrderNo == "") {
-                $salesOrderNo = "000001";
+            if ($tokenNo == "") {
+                $tokenNo = "000001";
             }
-            $sql = "INSERT INTO tbl_token ( token_title,  token_details, mechanic_id, engineer_id,token_date , status, created_by, created_date ) 
-            VALUES( '$tokenTitle', '$tokenDetails', '$mechanic', '$engineer','$tokenDate', 'Pending',  '$loginID',  '$Date' )";
+            $sql = "INSERT INTO tbl_token (token_no, token_title,  token_details, mechanic_id, engineer_id,token_date , status, created_by, created_date ) 
+            VALUES( '$tokenNo','$tokenTitle', '$tokenDetails', '$mechanic', '$engineer','$tokenDate', 'Pending',  '$loginID',  '$Date' )";
             if ($query = $conn->query($sql)) {
                 $conn->commit();
                 echo json_encode('success');
@@ -36,11 +36,11 @@ if (isset($_POST["Action"])) {
     } else if ($_POST["Action"] == "addRequisitions") {
         $tokenId = $_POST["id"];
         $products = $_POST["products"];
-        $productsArr =  explode(",", $products);
-        $specs =  explode(",", $_POST["specs"]);
-        $qty = explode(",", $_POST["qty"]) ;
-        $units =  explode(",", $_POST["units"]);
-        $remarks =  explode(",", $_POST["remarks"]);
+        $productsArr = explode(",", $products);
+        $specs = explode(",", $_POST["specs"]);
+        $qty = explode(",", $_POST["qty"]);
+        $units = explode(",", $_POST["units"]);
+        $remarks = explode(",", $_POST["remarks"]);
 
         try {
             $conn->begin_transaction();
@@ -66,15 +66,28 @@ if (isset($_POST["Action"])) {
                 where tbl_token_requisition.deleted ='No' and tbl_token_requisition.tbl_token_id = $id";
         $query = $conn->query($sql);
         if ($query) {
-            while ( $row = $query->fetch_assoc()) {
+            while ($row = $query->fetch_assoc()) {
                 array_push($requisitionArr, $row);
             }
             echo json_encode($requisitionArr);
         } else {
             echo json_encode($conn->error . $sql);
         }
-    }
-    else if ($_POST["Action"] == "deleteToken") {
+    } else if ($_POST["Action"] == "getUnit") {
+        $unites = [];
+        $sql = "SELECT unitName, id from tbl_units where deleted = 'no' ORDER BY id desc";
+        $query = $conn->query($sql);
+
+        if ($query) {
+            while ($row = $query->fetch_assoc()) {
+                array_push($unites, $row);
+            }
+           
+            echo json_encode($unites);
+        } else {
+            echo json_encode($conn->error . $sql);
+        }
+    } else if ($_POST["Action"] == "deleteToken") {
 
         $id = $_POST["id"];
         $sql = "UPDATE  tbl_token set deleted = 'Yes'
@@ -86,8 +99,7 @@ if (isset($_POST["Action"])) {
             echo json_encode($conn->error . $sql);
         }
 
-    } 
-    else if ($_POST["Action"] == "deleteRequisition") {
+    } else if ($_POST["Action"] == "deleteRequisition") {
 
         $id = $_POST["id"];
         $sql = "UPDATE  tbl_token_requisition set deleted = 'Yes'
@@ -99,8 +111,7 @@ if (isset($_POST["Action"])) {
             echo json_encode($conn->error . $sql);
         }
 
-    } 
-     else if ($_POST["Action"] == "getMechanicAndEngineer") {
+    } else if ($_POST["Action"] == "getMechanicAndEngineer") {
 
         $id = $_POST["id"];
         $sql = "SELECT tbl_token.* , m.firstname m_name, e.firstname e_name from tbl_token 
@@ -108,6 +119,7 @@ if (isset($_POST["Action"])) {
                 join admin as e on tbl_token.engineer_id = e.id
                 where tbl_token.id = $id";
         $query = $conn->query($sql);
+
         if ($query) {
             $row = $query->fetch_array();
             echo json_encode($row);

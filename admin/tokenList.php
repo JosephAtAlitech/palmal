@@ -70,8 +70,53 @@
 	<script src="select2/select2.min.js"></script>
 	<script type="text/javascript">
 
+    var roNo = 1;
+	function addRow() {
+		$.ajax({
+			type: 'POST',
+			url: 'tokenAdd.php',
+			data: {
+				"Action": 'getUnit'
+			},
+			dataType: 'json',
+			beforeSend: function () {
+				// Show image container
+				$("#editLoader").show();
+			},
+			success: function (response) {
+				
+				var data = '';
+				data += '<tr id="rowId_' + roNo + '"><td><input class="form-control" placeholder="Product Name" id="products_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Specification" id="spec_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qty_' + roNo + '" type="number"></td><td><select class="custom-select form-control" id="unit_' + roNo + '" name="unit_0" aria-describedby="inputGroupSuccess1Status">';
+
+				data += '<option value="0">Select Unit</option>';
+				for (var i = 0; i < response.length; i++) {
+					 data += '<option value="' + response[i].unitName + '">' + response[i].unitName + '</option>';
+				}
+				data += '</select></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + roNo + '" type="text"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReq(' + roNo + ')"></i></td></tr>';
+				$('#requisitionTableBody').append(data);
+				roNo++;
+			}, error: function (xhr) {
+				alert(xhr.responseText);
+			},
+			complete: function (data) {
+				// Hide image container
+				$("#editLoader").hide();
+			}
+		});
+
+	}
 
 
+	function deleteReq(row) {
+
+		if (confirm('Are you sure you want to delete?')) {
+			$('#rowId_' + row).remove();
+		} else {
+
+			return
+		}
+
+	}
 		$(document).ready(function () {
 			$('#mechanic').select2({
 				width: "100%"
@@ -80,7 +125,6 @@
 				width: "100%"
 			});
 		});
-
 
 		var manageTokenTable = '';
 		$(document).ready(function () {

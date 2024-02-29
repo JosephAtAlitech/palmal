@@ -120,13 +120,14 @@
                                             <?php
                                             if (isset($_GET['Token_id'])) {
                                                 $token_id = $_GET['Token_id'];
-                                                $quotation_id = $_GET['id'];
 
 
                                                 if ($_GET['type'] == 'procurement') {
                                                     $sql = 'SELECT * FROM tbl_token_requisition where tbl_token_id = ' . $token_id . ' and deleted ="No"';
                                                     $result = $conn->query($sql);
                                                 } else {
+                                                    $quotation_id = $_GET['id'];
+
                                                     $sql = "SELECT tbl_quotation_details.*, tbl_token_requisition.spec, tbl_token_requisition.req_product  FROM  tbl_quotation_details 
                                                     join tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
                                                     join tbl_token_requisition on tbl_quotation_details.tbl_token_requisition_id = tbl_token_requisition.id
@@ -152,7 +153,7 @@
                                                                     <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
-                                                                    <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '"></td>
+                                                                    <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'wing_head\')" onchange="calTotalPrice(' . $j . ',\'wing_head\')"></td>
                                                                     <td><input class="form-control" type="number" id="wing_head_tPrice_' . $j . '" value="' . $wing_tPrice . '"></td>
                                                                 </tr>';
                                                             $j++;
@@ -171,7 +172,7 @@
                                                                     <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
-                                                                    <td><input class="form-control" type="number" id="audit_uPrice_' . $j . '" value="' . $audit_uPrice . '"></td>
+                                                                    <td><input class="form-control" type="number" id="audit_uPrice_' . $j . '" value="' . $audit_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'audit\')" onchange="calTotalPrice(' . $j . ',\'audit\')"></td>
                                                                     <td><input class="form-control" type="number" id="audit_tPrice_' . $j . '" value="' . $audit_tPrice . '"></td>
                                                                 </tr>';
                                                             $j++;
@@ -182,14 +183,15 @@
                                                             $spec = $row['spec'];
                                                             $qty = $row['qty'];
                                                             $unit = $row['unit'];
+
                                                             echo '<tr>
                                                                 <td>' . $i++ . '</td>
                                                                 <td> <input type="hidden" id="requisitionId_' . $j . '" value="' . $row['id'] . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $row['spec'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $row['qty'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $row['unit'] . '" disabled></td>
-                                                                <td><input class="form-control" type="number" id="uPrice_' . $j . '" value=""></td>
-                                                                <td><input class="form-control" type="number" id="tPrice_' . $j . '" value=""></td>
+                                                                <td><input class="form-control" type="number" id="uPrice_' . $j . '" value="" onkeyup="calTotalPrice(' . $j . ',\'procurement\')" onchange="calTotalPrice(' . $j . ',\'procurement\')"></td>
+                                                                <td><input class="form-control" type="number" id="tPrice_' . $j . '" value="" disabled></td>
                                                             </tr>';
                                                             $j++;
                                                         }
@@ -300,6 +302,31 @@
         });
 
 
+        function calTotalPrice(n, str) {
+
+            if (str == "wing_head") {
+                var qty = $('#qty_' + n).val();
+                var unitPrice = $('#wing_head_uPrice_' + n).val();
+                var total = qty * unitPrice;
+                $('#wing_head_tPrice_' + n).val(total);
+            }
+            else if (str == "wing_head") {
+                var qty = $('#qty_' + n).val();
+                var unitPrice = $('#audit_uPrice_' + n).val();
+                var total = qty * unitPrice;
+                $('#audit_tPrice_' + n).val(total);
+            } else {
+                var qty = $('#qty_' + n).val();
+                var unitPrice = $('#uPrice_' + n).val();
+                var total = qty * unitPrice;
+                $('#tPrice_' + n).val(total);
+
+            }
+
+
+        }
+
+
         var manageTokenTable = '';
         $(document).ready(function () {
             manageTokenTable = $("#tokenTable").DataTable({
@@ -313,8 +340,6 @@
                     processing: "<img src='../images/loader.gif'>"
                 },
             });
-
-
 
         });
 
@@ -336,7 +361,7 @@
                 var $this = $(this);
                 requisitionIds.push($this.val());
             });
-           
+
             if (type != 'procurement') {
                 var quoteDetailsIds = [];
                 $('input[id^="quoteDetailsId_"]').each(function () {

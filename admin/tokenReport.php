@@ -108,7 +108,7 @@ if (isset($_GET['id'])) {
                     </td>Token details
 
                     <td width='15%' class='citiestd15'>Token details <br>Status  <br>Create Date</td>
-                    <td width='35%' class='citiestd16'>: " . $token_details . " <br>" . $status . "<br>: " . $token_date . "</td>
+                    <td width='35%' class='citiestd16'>: " . $token_details . " <br>: " . $status . "<br>: " . $token_date . "</td>
                     </tr></table> <hr><br><br>";
 	$content .= '	<br><br>	Token Requisition information :<br><br>
 					<table border="1" cellspacing="0" cellpadding="3">

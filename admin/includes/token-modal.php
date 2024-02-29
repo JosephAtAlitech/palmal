@@ -250,7 +250,20 @@
 												type="text"></td>
 										<td><input class="form-control" placeholder="Quantity" id="qty_0" type="number">
 										</td>
-										<td><input class="form-control" placeholder="Unit" id="unit_0" type="number">
+										<td>
+											<select class="custom-select form-control" id="unit_0" name="unit_0"
+												aria-describedby="inputGroupSuccess1Status">
+												<?php
+												$sql = "SELECT unitName, id from tbl_units where deleted = 'no' ORDER BY id desc";
+												$result = $conn->query($sql);
+												echo "<option value='0'>Select Unit</option>";
+												if ($result) {
+													while ($row = $result->fetch_assoc()) {
+														echo "<option value='" . $row['unitName'] . "'>" . $row['unitName'] . "</option>";
+													}
+												}
+												?>
+											</select>
 										</td>
 										<td><input class="form-control" placeholder="Remarks" id="remarks_0"
 												type="text"></td>
@@ -276,23 +289,7 @@
 
 
 <script>
-	var roNo = 1;
-	function addRow() {
-		$('#requisitionTableBody').append('<tr id="rowId_' + roNo + '"><td><input class="form-control" placeholder="Product Name" id="products_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Specification" id="spec_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qty_' + roNo + '" type="number"></td><td><input class="form-control" placeholder="Unit" id="unit_' + roNo + '" type="number"></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + roNo + '" type="text"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReq(' + roNo + ')"></i></td></tr>');
-		roNo++;
-	}
-
-
-	function deleteReq(row) {
-
-		if (confirm('Are you sure you want to delete?')) {
-			$('#rowId_' + row).remove();
-		} else {
-
-			return
-		}
-
-	}
+	
 </script>
 
 
