@@ -24,7 +24,7 @@ if (isset($_POST["Action"])) {
             VALUES( '$tokenNo','$tokenTitle', '$tokenDetails', '$mechanic', '$engineer','$tokenDate', 'Pending',  '$loginID',  '$Date' )";
             if ($query = $conn->query($sql)) {
                 $conn->commit();
-                echo json_encode('success');
+                echo 'success';
             } else {
                 $conn->rollback();
                 echo json_encode($conn->error . $sql);
@@ -37,39 +37,60 @@ if (isset($_POST["Action"])) {
         $tokenId = $_POST["id"];
         $products = $_POST["products"];
         $productsArr = explode(",", $products);
+        $requisition_ids = explode(",", $_POST["requisition_ids"]);
         $specs = explode(",", $_POST["specs"]);
         $qty = explode(",", $_POST["qty"]);
         $units = explode(",", $_POST["units"]);
         $remarks = explode(",", $_POST["remarks"]);
-
+        $engineerRequisitionDate = $_POST["engineerRequisitionDate"];
+        $engineerComment = $_POST["engineerComment"];
         try {
             $conn->begin_transaction();
+            
+            $sql = "UPDATE tbl_token SET engr_req_details = $engineerComment , engr_requisition_date = $engineerRequisitionDate , status = 'Running' WHERE tbl_token.id = $tokenId";
+            $query = $conn->query($sql);
+
             for ($i = 0; $i < count($productsArr); $i++) {
-                $sql = "INSERT INTO tbl_token_requisition ( tbl_token_id,  req_product, spec, qty, unit , remarks, created_by, created_date ) 
-                 VALUES( '$tokenId', '$productsArr[$i]', '$specs[$i]', '$qty[$i]','$units[$i]', '$remarks[$i]',  '$loginID',  '$Date' )";
-                $query = $conn->query($sql);
+                if ($requisition_ids[$i] < 0) {
+                    $sql = "INSERT INTO tbl_token_requisition ( tbl_token_id,  req_product, spec, qty, unit , remarks, created_by, created_date ) 
+                    VALUES( '$tokenId', '$productsArr[$i]', '$specs[$i]', '$qty[$i]','$units[$i]', '$remarks[$i]',  '$loginID',  '$Date' )";
+                    $query = $conn->query($sql);
+                } else {
+                    $sql = "UPDATE tbl_token_requisition SET req_product = '$productsArr[$i]' , spec = '$specs[$i]',qty = '$qty[$i]',unit = '$units[$i]',remarks = '$remarks[$i]' where tbl_token_requisition.id = $requisition_ids[$i]";
+                    $query = $conn->query($sql);
+                }
+
             }
 
-
             $conn->commit();
-            echo json_encode('success');
+            echo "success";
 
         } catch (Exception $e) {
             $conn->rollback();
             echo $conn->error . $e;
         }
+        $conn->close();
     } else if ($_POST["Action"] == "getTokenRequisition") {
 
         $id = $_POST["id"];
         $requisitionArr = [];
         $sql = "SELECT tbl_token_requisition.* from tbl_token_requisition 
                 where tbl_token_requisition.deleted ='No' and tbl_token_requisition.tbl_token_id = $id";
-        $query = $conn->query($sql);
-        if ($query) {
-            while ($row = $query->fetch_assoc()) {
-                array_push($requisitionArr, $row);
+        $query1 = $conn->query($sql);
+
+        $unites = [];
+        $sql = "SELECT unitName, id from tbl_units where deleted = 'no' ORDER BY id desc";
+        $query2 = $conn->query($sql);
+
+        if ($query1 && $query2) {
+            while ($row1 = $query1->fetch_assoc()) {
+                array_push($requisitionArr, $row1);
             }
-            echo json_encode($requisitionArr);
+            while ($row2 = $query2->fetch_assoc()) {
+                array_push($unites, $row2);
+            }
+
+            echo json_encode(['requisitions' => $requisitionArr, 'units' => $unites]);
         } else {
             echo json_encode($conn->error . $sql);
         }
@@ -82,7 +103,7 @@ if (isset($_POST["Action"])) {
             while ($row = $query->fetch_assoc()) {
                 array_push($unites, $row);
             }
-           
+
             echo json_encode($unites);
         } else {
             echo json_encode($conn->error . $sql);
@@ -94,7 +115,7 @@ if (isset($_POST["Action"])) {
                 where tbl_token.id = $id";
         $query = $conn->query($sql);
         if ($query) {
-            echo json_encode('success');
+            echo 'success';
         } else {
             echo json_encode($conn->error . $sql);
         }
@@ -106,7 +127,7 @@ if (isset($_POST["Action"])) {
                 where tbl_token_requisition.id = $id";
         $query = $conn->query($sql);
         if ($query) {
-            echo json_encode('success');
+            echo json_encode("success");
         } else {
             echo json_encode($conn->error . $sql);
         }
@@ -115,9 +136,9 @@ if (isset($_POST["Action"])) {
 
         $id = $_POST["id"];
         $sql = "SELECT tbl_token.* , m.firstname m_name, e.firstname e_name from tbl_token 
-                join admin as m on tbl_token.mechanic_id = m.id
-                join admin as e on tbl_token.engineer_id = e.id
-                where tbl_token.id = $id";
+                left outer join admin as m on tbl_token.mechanic_id = m.id
+                inner join admin as e on tbl_token.engineer_id = e.id
+                where tbl_token.id = $id AND tbl_token.deleted ='No'";
         $query = $conn->query($sql);
 
         if ($query) {
@@ -136,7 +157,7 @@ if (isset($_POST["Action"])) {
                 WHERE tbl_token.id = " . $id . "";
 
         if ($conn->query($sql)) {
-            echo json_encode(['status' => 'success']);
+            echo "success";
         } else {
             echo json_encode($conn->error . $sql);
         }
@@ -149,7 +170,7 @@ if (isset($_POST["Action"])) {
                 SET `problems` = '" . $problems . "'
                 WHERE id = " . $id . "";
         if ($conn->query($sql)) {
-            echo json_encode('success');
+            echo "success";
         } else {
             echo json_encode($conn->error . $sql);
         }
@@ -157,14 +178,27 @@ if (isset($_POST["Action"])) {
     }
 } else {
     $sql = "SELECT tbl_token.*, m.firstname m_name, e.firstname e_name FROM `tbl_token`
-    join admin as m on tbl_token.mechanic_id = m.id
-    join admin as e on tbl_token.engineer_id = e.id
+            inner join admin as e on tbl_token.engineer_id = e.id
+            left outer join admin as m on tbl_token.mechanic_id = m.id
      where tbl_token.deleted = 'No' ORDER BY id  DESC";
     $query = $conn->query($sql);
     $i = 1;
+    $output = array('data' => array());
 
     while ($row = $query->fetch_assoc()) {
         $id = $row['id'];
+        $status = $row['status'];
+        $sql2 = "SELECT tbl_token_requisition.id FROM `tbl_token_requisition`
+                WHERE tbl_token_requisition.tbl_token_id =  $id AND tbl_token_requisition.deleted ='No'";
+
+        $query1 = $conn->query($sql2);
+      //  $row1 = $query1->fetch_array();
+        $rows = $query1->num_rows;
+
+        $sql3 = "SELECT tbl_quotation.id FROM `tbl_quotation`
+              WHERE tbl_quotation.tbl_token_id =  $id AND tbl_quotation.deleted ='No'";
+        $query2 = $conn->query($sql3);
+        $qRows = $query2->num_rows;
 
         $button = ' <div class="btn-group">
                 <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
@@ -178,17 +212,26 @@ if (isset($_POST["Action"])) {
                     <li><a href="#" onclick="confirmDelete(' . $id . ')"><i class="fa fa-trash"></i> Delete</a></li>
                 </ul>
                 </div>';
-        // if ($row['delete_status'] == 'Active') {
-        //     $status = '<b style="color:green">' . $row['delete_status'] . '</b>';
-        // } else {
-        //     $status = '<b style="color:red">' . $row['delete_status'] . '</b>';
-        // }
+        if ($status == 'Pending') {
+            $badge = '<span class="label label-info">' . $status . '</span>';
+        } else if ($status == 'Running') {
+            $badge = '<span class="label label-primary">' . $status . '</span>';
+        } else if ($status == 'Completed') {
+            $badge = '<span class="label label-success">' . $status . '</span>';
+        } else if ($status == 'Cancel') {
+            $badge = '<span class="label label-danger">' . $status . '</span>';
+        } else {
+            $badge = '<span class="label label-default">' . $status . '</span>';
+        }
         $output['data'][] = array(
             $i++,
-            '<b>No</b> : ',
-            '<b>Title</b> : ' . $row['token_title'],
-            '<b>Mechanic</b> : ' . $row['m_name'],
-            '<b>Engineer</b> : ' . $row['e_name'],
+            $row['token_no'],
+            $row['token_title'],
+            $row['m_name'],
+            $row['e_name'],
+            '<b>No of Request Product(' . $rows . ')</b>',
+            '<b>No of Quatation (' . $qRows . ')</b>',
+            $badge,
             $button
         );
     }

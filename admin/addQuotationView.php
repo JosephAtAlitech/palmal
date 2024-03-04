@@ -91,10 +91,42 @@
                                 <br>
                                 <br>
                                 <hr>
-
+                                <?php
+                                if (isset($_GET['type'])) {
+                                                if ($_GET['type'] == 'wing_head') { ?>
+                                                    <div class="col-sm-4">
+                                                    <label class="">Wing head Approval Date<span class="text-danger">*</span></label>
+                                                    <input type="date" id="wing_head_approval_date" class="form-control" name="wing_head_approval_date"
+                                                        value="<?= date('Y-m-d') ?>" placeholder=" Wing head Approval Date ">
+                                                    <span id="wing_head_approval_dateError"></span>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label class="">Wing head Comment<span class="text-danger">*</span></label>
+                                                    <textarea id="wing_head_comment" class="form-control" name="wing_head_comment"
+                                                        placeholder=" Wing head Comment "></textarea>
+                                                    <span id="wing_head_commentError"></span>
+                                                </div>
+                                                <?php } else if ($_GET['type'] == 'audit') { ?>
+                                                    <div class="col-sm-4">
+                                                    <label class="">Audit Approval Date<span class="text-danger">*</span></label>
+                                                    <input type="date" id="audit_approval_date" class="form-control" name="audit_approval_date"
+                                                        value="<?= date('Y-m-d') ?>" placeholder=" QuotAudit Approvalation Date ">
+                                                    <span id="audit_approval_dateError"></span>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <label class="">Audit Comment<span class="text-danger">*</span></label>
+                                                    <textarea id="audit_comment" class="form-control" name="audit_comment"
+                                                        placeholder=" Audit Comment "></textarea>
+                                                    <span id="audit_commentError"></span>
+                                                </div>
+                                                <?php
+                                                }
+                                            }
+                                            ?>
+                                            <br>  <br>  <br>  <br> <br>
                                 <div class=" form-group col-md-12 mt-4">
                                     <table id="" class="table table-bordered">
-                                        <thead>
+                                        <thead class="bg-primary">
                                             <th>id</th>
                                             <th>Product Name</th>
                                             <th>Specification</th>
@@ -115,6 +147,7 @@
                                                 }
                                             }
                                             ?>
+                                            <th>Active</th>
                                         </thead>
                                         <tbody>
                                             <?php
@@ -131,7 +164,7 @@
                                                     $sql = "SELECT tbl_quotation_details.*, tbl_token_requisition.spec, tbl_token_requisition.req_product  FROM  tbl_quotation_details 
                                                     join tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
                                                     join tbl_token_requisition on tbl_quotation_details.tbl_token_requisition_id = tbl_token_requisition.id
-                                                    WHERE tbl_quotation.tbl_token_id = '" . $token_id . "' AND  tbl_quotation.id = '" . $quotation_id . "'  ORDER BY id DESC";
+                                                    WHERE tbl_quotation.tbl_token_id = " . $token_id . " AND  tbl_quotation.id = " . $quotation_id . " AND tbl_quotation_details.deleted = 'No'  ORDER BY id DESC";
                                                     $result = $conn->query($sql);
                                                 }
 
@@ -147,15 +180,16 @@
                                                             $unit = $row['unit'];
                                                             $wing_uPrice = $row['wing_head_unit_price'];
                                                             $wing_tPrice = $row['wing_head_total_amount'];
-                                                            echo '<tr>
+                                                            echo '<tr id="rowNo_' . $j . '">
                                                                     <td>' . $i++ . '</td>
                                                                     <td>  <input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
-                                                                    <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'wing_head\')" onchange="calTotalPrice(' . $j . ',\'wing_head\')"></td>
+                                                                    <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'wing_head\')" onchange="calTotalPrice(' . $j . ',\'wing_head\')" placeholder="Enter Amount"></td>
                                                                     <td><input class="form-control" type="number" id="wing_head_tPrice_' . $j . '" value="' . $wing_tPrice . '"></td>
-                                                                </tr>';
+                                                                    <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
+                                                                    </tr>';
                                                             $j++;
                                                         }
                                                     } else if ($_GET['type'] == 'audit') {
@@ -166,14 +200,15 @@
                                                             $unit = $row['unit'];
                                                             $audit_uPrice = $row['audit_unit_price'];
                                                             $audit_tPrice = $row['audit_total_amount'];
-                                                            echo '<tr>
+                                                            echo '<tr id="rowNo_' . $j . '">
                                                                     <td>' . $i++ . '</td>
                                                                     <td> <input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
-                                                                    <td><input class="form-control" type="number" id="audit_uPrice_' . $j . '" value="' . $audit_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'audit\')" onchange="calTotalPrice(' . $j . ',\'audit\')"></td>
+                                                                    <td><input class="form-control" type="number" id="audit_uPrice_' . $j . '" value="' . $audit_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'audit\')" onchange="calTotalPrice(' . $j . ',\'audit\')" placeholder="Enter Amount"></td>
                                                                     <td><input class="form-control" type="number" id="audit_tPrice_' . $j . '" value="' . $audit_tPrice . '"></td>
+                                                                    <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
                                                                 </tr>';
                                                             $j++;
                                                         }
@@ -184,15 +219,16 @@
                                                             $qty = $row['qty'];
                                                             $unit = $row['unit'];
 
-                                                            echo '<tr>
+                                                            echo '<tr id="rowNo_' . $j . '">
                                                                 <td>' . $i++ . '</td>
                                                                 <td> <input type="hidden" id="requisitionId_' . $j . '" value="' . $row['id'] . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $row['spec'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $row['qty'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $row['unit'] . '" disabled></td>
-                                                                <td><input class="form-control" type="number" id="uPrice_' . $j . '" value="" onkeyup="calTotalPrice(' . $j . ',\'procurement\')" onchange="calTotalPrice(' . $j . ',\'procurement\')"></td>
-                                                                <td><input class="form-control" type="number" id="tPrice_' . $j . '" value="" disabled></td>
-                                                            </tr>';
+                                                                <td><input class="form-control" type="number" id="uPrice_' . $j . '" value="" onkeyup="calTotalPrice(' . $j . ',\'procurement\')" onchange="calTotalPrice(' . $j . ',\'procurement\')" placeholder="Enter Amount"></td>
+                                                                <td><input class="form-control" type="number" id="tPrice_' . $j . '" value="" onchange="priceUpdate()" disabled></td>
+                                                                <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
+                                                                </tr>';
                                                             $j++;
                                                         }
                                                     }
@@ -221,13 +257,23 @@
                                                         }
                                                         ?>
                                                     </select></td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="5"></td>
+                                                <td style="text-align: right;">Total Price :</td>
+                                                <td class="d-flex"><input id="price" class="form-control"
+                                                        placeholder="Price" type="text">
+                                                </td>
+                                                <td></td>
                                             </tr>
                                             <tr>
                                                 <td colspan="5"></td>
                                                 <td style="text-align: right;">Vat :</td>
                                                 <td class="d-flex"><input id="vat" class="form-control"
-                                                        placeholder="Vat" type="text">
+                                                        placeholder="Vat" type="number" onkeyup="calculateVatAit()">
                                                 </td>
+                                                <td></td>
                                             </tr>
                                             <tr>
                                                 <td colspan="5"></td>
@@ -235,12 +281,17 @@
                                                 <td class="d-flex"><input id="ait" class="form-control"
                                                         placeholder="Ait" type="text">
                                                 </td>
+                                                <td></td>
                                             </tr>
                                             <tr>
                                                 <td colspan="5"></td>
                                                 <td style="text-align: right;">Discount :</td>
                                                 <td class="d-flex"><input id="discount" class="form-control"
-                                                        placeholder="Discount" type="text"></td>
+                                                        placeholder="Discount" type="number" onkeyup="calculateTotal()"
+                                                        onchange="calculateTotal()">
+                                                    <span class="text-danger discountError"></span>
+                                                </td>
+                                                <td></td>
                                             </tr>
                                             <tr>
                                                 <td colspan="5"></td>
@@ -253,6 +304,7 @@
                                                 <td style="text-align: right;">Quote Amount :</td>
                                                 <td class="d-flex"><input id="quoteAmount" class="form-control"
                                                         placeholder="Quote Amount" type="text"></td>
+                                                <td></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -302,6 +354,125 @@
         });
 
 
+        function priceUpdate() {
+
+            var Totalprice = 0;
+
+            if (type == 'wing_head') {
+                $('input[id^="wing_head_uPrice_"]').each(function () {
+                    var $this = $(this);
+                    if ($this.val() == '' || $this.val() == 'null' || $this.val() == 'Nah') {
+                        $this.val(0);
+                        //alert($this.val())
+                    }
+                    Totalprice += parseFloat($this.val());
+                });
+            }
+            else if (type == 'audit') {
+                $('input[id^="audit_uPrice_"]').each(function () {
+                    var $this = $(this);
+                    if ($this.val() == '' || $this.val() == 'null' || $this.val() == 'Nah') {
+                        $this.val(0);
+                        //alert($this.val())
+                    }
+                    Totalprice += parseFloat($this.val());
+                });
+            } else {
+                $('input[id^="tPrice_"]').each(function () {
+                    var $this = $(this);
+                    if ($this.val() == '' || $this.val() == 'null' || $this.val() == 'Nah') {
+                        $this.val(0);
+                        //alert($this.val())
+                    }
+                    Totalprice += parseFloat($this.val());
+                });
+            }
+            $('#price').val(Totalprice);
+
+            calculateTotal()
+
+        }
+
+        function calculateTotal() {
+            var totalAmount = $("#price").val();
+            if (totalAmount == '') { totalAmount = 0; }
+
+
+            if (parseFloat($("#vat").val()) >= 0 || $("#vat").val() != '' || $("#vat").val() != 'Nah') {
+                console.log('1')
+                vat = parseFloat($("#vat").val());
+                if (parseFloat($("#vat").val()) > totalAmount) {
+                    $("#vatError").text("Vat cannot greater then price!");
+                    $("#vat").val(totalAmount);
+                } else {
+                    $("#vatError").text("");
+                }
+
+                var grandTotal = '';
+                if ($("#grandTotal").val() > 0 || $("#grandTotal").val() != '' || $("#grandTotal").val() != 'Nah') {
+                    grandTotal = parseFloat($("#grandTotal").val());
+                } else {
+                    grandTotal = 0;
+                }
+                var grandTotal = parseFloat(totalAmount) + parseFloat(vat);
+                $("#grandTotal").val(grandTotal);
+
+            } else {
+                $("#vat").val("0");
+                vat = 0;
+            }
+
+            if (parseFloat($("#discount").val()) >= 0 || parseFloat($("#discount").val()) != '' || parseFloat($("#discount").val()) != 'Nah') {
+                var discount = 0;
+                var payChar = $("#discount").val().substr(-1);
+                if (payChar == "%") {
+                    discount = (totalAmount / 100) * parseFloat($("#discount").val());
+                } else {
+                    if (parseFloat($("#discount").val()) >= 0) {
+                        discount = parseFloat($("#discount").val());
+                        if (parseFloat($("#discount").val()) > totalAmount) {
+                            $("#discountError").text("Discount cannot greater then price!");
+                            $("#grandTotal").text("");
+                            $("#discount").val(totalAmount);
+                            $("#grandTotal").text("0");
+                        } else {
+                            $("#discountError").text("");
+                        }
+                        var grandTotal = parseFloat(totalAmount) - parseFloat(discount);
+                        $("#grandTotal").val(grandTotal);
+                    } else {
+                        $("#discount").val("0");
+                        discount = 0;
+                    }
+                }
+            } else {
+                $("#discount").val(0)
+            }
+
+
+        }
+        function calculateVatAit() {
+            var vat = 0;
+            var totalAmount = $("#price").val();
+            if (parseFloat($("#vat").val()) >= 0 || parseFloat($("#vat").val()) != '') {
+                vat = parseFloat($("#vat").val());
+                if (parseFloat($("#vat").val()) > totalAmount) {
+                    $("#vatError").text("Vat cannot greater then price!");
+                    $("#vat").val(totalAmount);
+                } else {
+                    $("#vatError").text("");
+                }
+
+                grandTotal = $("#grandTotal").val();
+                $("#grandTotal").val(grandTotal + vat);
+            } else {
+                $("#vat").val("0");
+                vat = 0;
+            }
+
+        }
+
+
         function calTotalPrice(n, str) {
 
             if (str == "wing_head") {
@@ -322,8 +493,7 @@
                 $('#tPrice_' + n).val(total);
 
             }
-
-
+            priceUpdate()
         }
 
 
@@ -355,6 +525,7 @@
             var discount = $('#discount').val();
             var grandTotal = $('#grandTotal').val();
             var quoteAmount = $('#quoteAmount').val();
+            var supplier = $('#supplier').val();
 
             var requisitionIds = [];
             $('input[id^="requisitionId_"]').each(function () {
@@ -392,7 +563,16 @@
                     var $this = $(this);
                     audit_tPrice.push($this.val());
                 });
+                var wing_head_approval_date = $('#wing_head_approval_date').val();
+                var audit_approval_date = $('#audit_approval_date').val();
+                var wing_head_comment = $('#wing_head_comment').val();
+                var audit_comment = $('#audit_comment').val();
+                
             }
+            // console.log(audit_uPrice)
+            // console.log(quoteDetailsIds)
+            // alert(type)
+            // return
 
             var products = [];
             $('input[id^="req_product_"]').each(function () {
@@ -435,6 +615,7 @@
 
             fd.append('tokenId', tokenId);
             fd.append('quoteDate', quoteDate);
+            fd.append('supplier', supplier);
             fd.append('requisitionIds', requisitionIds);
             fd.append('products', products);
             fd.append('specs', specs);
@@ -443,6 +624,7 @@
             fd.append('qty', qty);
             fd.append('unitPrice', unitPrice);
             fd.append('totalPrice', totalPrice);
+
 
             if (type != 'procurement') {
                 fd.append('quotation_id', quotation_id);
@@ -453,6 +635,11 @@
 
                 fd.append('audit_uPrice', audit_uPrice);
                 fd.append('audit_tPrice', audit_tPrice);
+
+                fd.append('wing_head_approval_date', wing_head_approval_date);
+                fd.append('audit_approval_date', audit_approval_date);
+                fd.append('wing_head_comment', wing_head_comment);
+                fd.append('audit_comment', audit_comment);
             }
 
             fd.append('quoteBy', quoteBy);
@@ -528,35 +715,19 @@
         }
 
 
-        function addEgineerRequisition(id) {
-            $('#addEgineerRequisition').modal('show');
-            $.ajax({
-                type: 'POST',
-                url: 'tokenAdd.php',
-                data: { id: id },
-                dataType: 'json',
-                beforeSend: function () {
-                    // Show image container
-                    $("#editLoader").show();
-                },
-                success: function (response) {
-                    //alert(JSON.stringify(response));
-                    $('#deletid').val(response.id);
-                    $('#deletTripid').html(response.id);
 
 
-                }, error: function (xhr) {
-                    alert(xhr.responseText);
-                },
-                complete: function (data) {
-                    // Hide image container
-                    $("#editLoader").hide();
-                }
-            });
+        function deleteRow(row, id) {
+
+            if (confirm('Are you sure you want to delete?')) {
+                $('#rowNo_' + row).remove();
+
+            } else {
+
+                return
+            }
+
         }
-
-
-
 
 
 

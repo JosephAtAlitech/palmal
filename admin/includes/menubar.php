@@ -205,3 +205,8 @@
     </section>
     <!-- /.sidebar -->
   </aside>
+  
+  
+  <div id="loading" style="display:none;">
+    <img id="loading-image" src="../images/loader.gif" alt="Loading..."  />
+</div>

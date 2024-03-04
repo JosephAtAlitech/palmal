@@ -41,7 +41,19 @@
 								<a href="#addnewToken" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i
 										class="fa fa-plus"></i> Add Token</a>
 							</div>
+							<div class="row">
+								<div class="col-xs-6">
+
+								</div>
+								<div class="col-xs-6">
+									<div id='divMsg' class='alert alert-success alert-dismissible successMessage'>
+									</div>
+									<div id='divErrorMsg' class='alert alert-danger alert-dismissible errorMessage'>
+									</div>
+								</div>
+							</div>
 							<div class="box-body">
+
 								<table id="tokenTable" class="table table-bordered">
 									<thead>
 										<th>id</th>
@@ -49,6 +61,9 @@
 										<th>Token Title</th>
 										<th>Mechanic Info</th>
 										<th>Engneer</th>
+										<th>Requisions</th>
+										<th>Quotations</th>
+										<th>Status</th>
 										<th>Action</th>
 									</thead>
 									<tbody>
@@ -70,53 +85,53 @@
 	<script src="select2/select2.min.js"></script>
 	<script type="text/javascript">
 
-    var roNo = 1;
-	function addRow() {
-		$.ajax({
-			type: 'POST',
-			url: 'tokenAdd.php',
-			data: {
-				"Action": 'getUnit'
-			},
-			dataType: 'json',
-			beforeSend: function () {
-				// Show image container
-				$("#editLoader").show();
-			},
-			success: function (response) {
-				
-				var data = '';
-				data += '<tr id="rowId_' + roNo + '"><td><input class="form-control" placeholder="Product Name" id="products_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Specification" id="spec_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qty_' + roNo + '" type="number"></td><td><select class="custom-select form-control" id="unit_' + roNo + '" name="unit_0" aria-describedby="inputGroupSuccess1Status">';
+		var roNo = 1;
+		function addRow() {
+			$.ajax({
+				type: 'POST',
+				url: 'tokenAdd.php',
+				data: {
+					"Action": 'getUnit'
+				},
+				dataType: 'json',
+				beforeSend: function () {
+					// Show image container
+					$("#editLoader").show();
+				},
+				success: function (response) {
 
-				data += '<option value="0">Select Unit</option>';
-				for (var i = 0; i < response.length; i++) {
-					 data += '<option value="' + response[i].unitName + '">' + response[i].unitName + '</option>';
+					var data = '';
+					data += '<tr id="rowId_' + roNo + '"><td><input type="hidden" value="-1"  id="requisition_id_' + roNo + '" ><input class="form-control" placeholder="Product Name" id="products_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Specification" id="spec_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qty_' + roNo + '" type="number"></td><td><select class="custom-select form-control" id="unit_' + roNo + '" name="unit_' + roNo + '" aria-describedby="inputGroupSuccess1Status">';
+
+					data += '<option value="0">Select Unit</option>';
+					for (var i = 0; i < response.length; i++) {
+						data += '<option value="' + response[i].unitName + '">' + response[i].unitName + '</option>';
+					}
+					data += '</select></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + roNo + '" type="text"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReq(' + roNo + ')"></i></td></tr>';
+					$('#requisitionTableBody').append(data);
+					roNo++;
+				}, error: function (xhr) {
+					alert(xhr.responseText);
+				},
+				complete: function (data) {
+					// Hide image container
+					$("#editLoader").hide();
 				}
-				data += '</select></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + roNo + '" type="text"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReq(' + roNo + ')"></i></td></tr>';
-				$('#requisitionTableBody').append(data);
-				roNo++;
-			}, error: function (xhr) {
-				alert(xhr.responseText);
-			},
-			complete: function (data) {
-				// Hide image container
-				$("#editLoader").hide();
-			}
-		});
+			});
 
-	}
-
-
-	function deleteReq(row) {
-
-		if (confirm('Are you sure you want to delete?')) {
-			$('#rowId_' + row).remove();
-		} else {
-
-			return
 		}
 
-	}
+
+		function deleteReq(row) {
+
+			if (confirm('Are you sure you want to delete?')) {
+				$('#rowId_' + row).remove();
+			} else {
+
+				return
+			}
+
+		}
 		$(document).ready(function () {
 			$('#mechanic').select2({
 				width: "100%"
@@ -137,7 +152,8 @@
 				],
 				language: {
 					processing: "<img src='../images/loader.gif'>"
-				},
+				}
+
 			});
 
 			$('#token_add_form').bootstrapValidator({
@@ -173,6 +189,10 @@
 								alert(JSON.stringify(result));
 							} else if (result == "success") {
 								$('#addnewToken').modal('hide');
+								$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Token Added");
+								$("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
+									$(this).hide(); n();
+								});
 							}
 							//alert(JSON.stringify(result));
 							manageTokenTable.ajax.reload(null, false);
@@ -243,7 +263,6 @@
 					var id = $("#id_fr_mc_allct").val();
 					var mechanic_for_allocate = $("#mechanic_for_allocate").val();
 
-					alert(id)
 					var fd = new FormData();
 
 					fd.append('id', id);
@@ -258,12 +277,16 @@
 						processData: false,
 						datatype: "json",
 						success: function (result) {
-							if (result.status != "success") {
-								alert(JSON.stringify(result));
-							} else if (result.status == "success") {
+							if (result != "success") {
+								//alert(JSON.stringify(result));
+							} else if (result == "success") {
 								$('#allocateMechanic').modal('hide');
+								$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Mechanic Allocated");
+								$("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
+									$(this).hide(); n();
+								});
 							}
-							//alert(JSON.stringify(result));
+							alert(JSON.stringify(result));
 							manageTokenTable.ajax.reload(null, false);
 						},
 						error: function (response) {
@@ -305,7 +328,7 @@
 					var problems = $("#problems").val();
 
 
-					alert(problems)
+
 					var fd = new FormData();
 
 					fd.append('id', id);
@@ -320,9 +343,9 @@
 						processData: false,
 						datatype: "json",
 						success: function (result) {
-							if (result != "success") {
+							if (result != '\"success\"') {
 								alert(JSON.stringify(result));
-							} else if (result == "success") {
+							} else if (result == '\"success\"') {
 								$('#mechanicComment').modal('hide');
 							}
 							manageTokenTable.ajax.reload(null, false);
@@ -364,7 +387,10 @@
 
 			var id = $('#id_fr_req').val();
 			var engineerComment = $('#engineerCommentForRequisition').val();
-
+			var engineerRequisitionDate = $('#engineerRequisitionDate').val();
+			
+			//alert(engineerComment+"  "+engineerRequisitionDate)
+			
 			var regEx = /^[0-9a-zA-Z]+$/;
 			if (engineerComment.match(regEx)) {
 				$('#engineerCommentForError').text('');
@@ -373,17 +399,26 @@
 				$('#engineerCommentForError').text("Please enter letters and numbers only.");
 				return;
 			}
+			
+			
+			var requisition_ids = [];
+			$('input[id^="requisition_id_"]').each(function () {
+				var $this = $(this);
+				requisition_ids.push($this.val());
+			});
+
 			var flag_p = 0;
 			var products = [];
 			$('input[id^="products_"]').each(function () {
 				var $this = $(this);
 				products.push($this.val());
-				if ($this.val() < 1) {
+				if ($this.val() == '') {
 					alert("Product Cannot empty!!")
 					flag_p = 1;
 					return false;
 				}
 			});
+
 			if (flag_p == 1) {
 				return;
 			}
@@ -406,19 +441,34 @@
 			if (flag == 1) {
 				return;
 			}
+
+			var flag_u = 0;
 			var units = [];
-			$('input[id^="unit_"]').each(function () {
+			$('select[id^="unit_"]').each(function () {
 				var $this = $(this);
 				units.push($this.val());
+				if ($this.val() == '') {
+					alert("Unit Cannot empty!!")
+					flag_u = 1;
+					return false;
+				}
 			});
+			if (flag_u == 1) {
+				return;
+			}
+
 			var remarks = [];
 			$('input[id^="remarks_"]').each(function () {
 				var $this = $(this);
 				remarks.push($this.val());
 			});
+		
 			var fd = new FormData();
 
 			fd.append('id', id);
+			fd.append('engineerRequisitionDate', engineerRequisitionDate);
+			fd.append('engineerComment', engineerComment);
+			fd.append('requisition_ids', requisition_ids);
 			fd.append('products', products);
 			fd.append('specs', specs);
 			fd.append('qty', qty);
@@ -435,10 +485,14 @@
 				success: function (result) {
 					if (result != "success") {
 						alert(JSON.stringify(result));
-					} else if (result == "success") {
-						$('#addnewToken').modal('hide');
+					} else if (result == 'success') {
+						$('#addEgineerRequisition').modal('hide');
+							$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Mechanic Allocated");
+								$("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
+									$(this).hide(); n();
+								});
 					}
-					//alert(JSON.stringify(result));
+					$('#engineerCommentForRequisition').val('');
 					manageTokenTable.ajax.reload(null, false);
 				},
 				error: function (response) {
@@ -516,6 +570,7 @@
 
 
 		function addEgineerRequisition(id) {
+
 			$('#addEgineerRequisition').modal('show');
 			$.ajax({
 				type: 'POST',
@@ -529,15 +584,15 @@
 					// Show image container
 					$("#editLoader").show();
 				},
-				success: function (response) {
-					//alert(JSON.stringify(response));
-					$('#id_fr_req').val(response.id);
-					$('#tokenTitleForRequisition').val(response.token_title ? response.token_title : '');
-					$('#tokenDateForRequisition').val(response.token_date ? response.token_date : '');
-					$('#mechanicNameForRequisition').val(response.m_name ? response.m_name : '');
-					$('#mechanicCommentForRequisition').val(response.problems ? response.problems : '');
-					$('#engineerNameForRequisition').val(response.e_name ? response.e_name : '');
-					$('#engineerCommentForRequisition').text(response.engr_req_details ? response.engr_req_details : '');
+				success: function (result) {
+
+					$('#id_fr_req').val(result.id);
+					$('#tokenTitleForRequisition').val(result.token_title ? result.token_title : '');
+					$('#tokenDateForRequisition').val(result.token_date ? result.token_date : '');
+					$('#mechanicNameForRequisition').val(result.m_name ? result.m_name : '');
+					$('#mechanicCommentForRequisition').val(result.problems ? result.problems : '');
+					$('#engineerNameForRequisition').val(result.e_name ? result.e_name : '');
+					$('#engineerCommentForRequisition').text(result.engr_req_details ? result.engr_req_details : '');
 
 					$.ajax({
 						type: 'POST',
@@ -552,31 +607,43 @@
 							$("#editLoader").show();
 						},
 						success: function (response) {
-							//alert(JSON.stringify(response));
+						
 							//alert(JSON.stringify(response.length));
 							var i = 0;
+							data = '';
 							$('#requisitionTableBody').html('');
-							for (i = 0; i < response.length; i++) {
-								$('#requisitionTableBody').append('<tr id="rowId_' + i + '"><td><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response[i].req_product + '"></td><td><input class="form-control" placeholder="Specification" id="spec_' + i + '" type="text" value="' + response[i].spec + '"> </td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response[i].qty + '"></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="number" value="' + response[i].unit + '"></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + i + '" type="text" value="' + response[i].remarks + '"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReqFromSource(' + i + ',' + response[i].id + ')"></i></td></tr>');
-							}
+							for (i = 0; i < response['requisitions'].length; i++) {
+								data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="requisition_id_' + i + '" value="' + response['requisitions'][i].id + '"><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['requisitions'][i].req_product + '"></td><td><input class="form-control" placeholder="Specification" id="spec_' + i + '" type="text" value="' + response['requisitions'][i].spec + '"> </td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['requisitions'][i].qty + '"></td><td><select class="form-control" placeholder="Unit" id="unit_' + i + '"  value="' + response['requisitions'][i].unit + '">';
+								data += '<option value="0">Select Unit</option>';
+								for (var j = 0; j < response['units'].length; j++) {
+									if (response['units'][i].unitName == response['requisitions'][i].unit) {
+										data += '<option value="' + response['units'][j].unitName + '" selected>' + response['units'][j].unitName + '</option>';
+									} else {
+										data += '<option value="' + response['units'][j].unitName + '">' + response['units'][j].unitName + '</option>';
+									}
+								}
+								data += '</select></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + i + '" type="text" value="' + response['requisitions'][i].remarks + '"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReqFromSource(' + i + ',' + response['requisitions'][i].id + ')"></i></td></tr>';
+				             }
+							 $('#requisitionTableBody').append(data);
 							roNo = i;
 
-						}, error: function (xhr) {
+						}, 
+						error: function (xhr) {
 							alert(xhr.responseText);
 						},
 						complete: function (data) {
-							// Hide image container
-							$("#editLoader").hide();
+								// Hide image container
+								$("#editLoader").hide();
 						}
 					});
 
 				}, error: function (xhr) {
-					alert(xhr.responseText);
-				},
-				complete: function (data) {
-					// Hide image container
-					$("#editLoader").hide();
-				}
+			alert(JSON.stringify(xhr));
+		},
+		complete: function (data) {
+			// Hide image container
+			$("#editLoader").hide();
+		}
 			});
 
 		}
@@ -594,7 +661,7 @@
 					dataType: 'json',
 					beforeSend: function () {
 						// Show image container
-						$("#editLoader").show();
+						$("#loading").show();
 					},
 					success: function (response) {
 
@@ -604,7 +671,7 @@
 					},
 					complete: function (data) {
 						// Hide image container
-						$("#editLoader").hide();
+						$("#loading").hide();
 					}
 				});
 
@@ -631,7 +698,7 @@
 					dataType: 'json',
 					beforeSend: function () {
 						// Show image container
-						$("#editLoader").show();
+						$("#loading").show();
 					},
 					success: function (response) {
 						//alert(JSON.stringify(response));
@@ -641,7 +708,7 @@
 					},
 					complete: function (data) {
 						// Hide image container
-						$("#editLoader").hide();
+						$("#loading").hide();
 					}
 				});
 			} else {
@@ -668,40 +735,6 @@
 				getRow(id);
 			});
 		});
-
-		function getRow(id) {
-			$.ajax({
-				type: 'POST',
-				url: 'vehicle-row.php',
-				data: { id: id },
-				dataType: 'json',
-				success: function (response) {
-					$('#editid').val(response.id);
-					$('#deletid').val(response.id);
-					$('#EditVehicleNumber').val(response.vehicle_number);
-					$('#wVFTID').val(response.wUnitID);
-					$('#Editvtype').val(response.v_type);
-					$('#oilTankCapacity').val(response.oil_tank_capacity);
-					$('#deletvehicleNumber').html(response.vehicle_number);
-					$('#EditpurchaseDate').val(response.purchase_date);
-					$('#EditMakersName').val(response.makers_name);
-					$('#Editpurchase_date').val(response.purchase_date);
-					$('#EditYearOfManufacture').val(response.year_of_manufacture);
-					$('#ChesisNumber').val(response.chasis_number);
-					$('#EnginNumber').val(response.engin_number);
-					$('#EditBranchStatus').val(response.branch_status);
-
-					$('#Users').val(response.users);
-
-					$('#RegistrationCirtificate12').html("<img src='../images/registration/" + response.registration_cirtificate + "' style='width: 100%;height: 90px;border-radius: 15%;'/>");
-					$('#Insurancecertificate12').html("<img src='../images/insurance/" + response.insurance_cirtificate + "' style='width: 100%;height: 90px;border-radius: 15%;'/>");
-					$('#PermitCirtificate12').html("<img src='../images/permit/" + response.permit_cirtificate + "' style='width: 100%;height: 90px;border-radius: 15%;'/>");
-					$('#PollutionCirtificate12').html("<img src='../images/pollution/" + response.pollution_cirtificate + "' style='width: 100%;height: 90px;border-radius: 15%;'/>");
-
-				}
-			});
-		}
-
 
 
 	</script>

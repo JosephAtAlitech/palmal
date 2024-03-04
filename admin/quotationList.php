@@ -55,6 +55,8 @@
 										<th>Quotation Date No</th>
 										<th>Quote By</th>
 										<th>Token Title</th>
+										<th>Quote Products</th>
+										<th>Quote Amount</th>
 										<th>Action</th>
 									</thead>
 									<tbody>

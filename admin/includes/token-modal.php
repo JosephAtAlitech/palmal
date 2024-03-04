@@ -12,16 +12,16 @@
 
 					<div class="form-group">
 						<div class="col-sm-6">
+							<label class="">Token Date</label>
+							<input type="date" id="tokenDate" class="form-control" name="tokenDate"
+								value="<?= date("Y-m-d") ?>" placeholder=" Token Date ">
+						</div>
+						<div class="col-sm-6">
 							<label class="">Token Title <span class="text-danger">*</span></label>
 							<input type="text" id="tokenTitle" class="form-control" name="tokenTitle"
 								placeholder=" Token Title ">
 						</div>
-						<div class="col-sm-6">
-							<label class="">Token Details <span class="text-danger">*</span></label>
-							<input type="text" id="tokenDetails" class="form-control" name="tokenDetails"
-								placeholder=" Token Details ">
-							<span id="phone-availability-status"></span>
-						</div>
+
 					</div>
 					<div class="form-group">
 						<div class="col-sm-6">
@@ -45,7 +45,7 @@
 								<?php
 								$sql = "SELECT * from admin where deleted = 'On' ORDER BY id desc";
 								$result = $conn->query($sql);
-								echo "<option value='0'>Select Engineer</option>";
+								echo "<option value=''>Select Engineer</option>";
 								if ($result) {
 									while ($row = $result->fetch_assoc()) {
 										echo "<option value='" . $row['id'] . "'>" . $row['firstname'] . "</option>";
@@ -56,10 +56,11 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<div class="col-sm-4">
-							<label class="">Token Date</label>
-							<input type="date" id="tokenDate" class="form-control" name="tokenDate"
-								value="<?= date("Y-m-d") ?>" placeholder=" Token Date ">
+						<div class="col-sm-6">
+							<label class="">Token Details <span class="text-danger">*</span></label>
+							<textarea type="text" id="tokenDetails" class="form-control" name="tokenDetails"
+								placeholder=" Token Details" rows="4"></textarea>
+							<span id="phone-availability-status"></span>
 						</div>
 					</div>
 
@@ -164,7 +165,7 @@
 
 <!-- Edit Mechanic Comment -->
 <div class="modal fade" id="addEgineerRequisition">
-	<div class="modal-dialog modal-lg">
+	<div class="modal-dialog modal-lg" style="width:60%">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -211,7 +212,11 @@
 						</div>
 						<div class="col-md-12" style="border-left: 1px solid #6ffcf5">
 							<div class="form-group">
-
+							<div class="col-sm-6 mb-2">
+									<label class="">Engineer Requisition Date </label>
+									<input type="date" id="engineerRequisitionDate" class="form-control"
+										name="engineerRequisitionDate" placeholder=" RequisitionDate " >
+								</div>
 								<div class="col-sm-6 mb-2">
 									<label class="">Engineer Name </label>
 									<input type="text" id="engineerNameForRequisition" class="form-control"
@@ -289,7 +294,7 @@
 
 
 <script>
-	
+
 </script>
 
 
