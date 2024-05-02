@@ -1,0 +1,12 @@
+	<li class="treeview">
+			<a href="#">
+				<i class="fa fa-gears"></i>
+				<span> Token Requsition</span>
+				<span class="pull-right-container">
+				  <i class="fa fa-angle-left pull-right"></i>
+				</span>
+			</a>
+			<ul class="treeview-menu">
+				<li><a href="tokenList.php"><i class="fa fa-bars"></i> <span> Token List</span></a></li>
+			</ul>
+		</li>
