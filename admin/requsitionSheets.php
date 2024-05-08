@@ -11,9 +11,8 @@
 ?>
 <?php include 'includes/header.php'; ?>
 <body class="hold-transition skin-blue sidebar-mini">
-<link rel="stylesheet" href="select2/select2.min.css" />
+<link rel="stylesheet" href="select2/select2.min.css"/>
 <div class="wrapper">
-
   <?php include 'includes/navbar.php'; ?>
   <?php include 'includes/menubar.php'; ?>
 <!-- Content Wrapper. Contains page content -->
@@ -28,7 +27,6 @@
             </section>
             <!-- Main content -->
             <section class="content">
-              
               <link rel="stylesheet" href="css/buttons.dataTables.min.css"/>
               <div class="row">
                 <div class="col-xs-12">
@@ -62,6 +60,7 @@
 						</div>				
 						<div class="table-responsive">
 							<h2>Make Requisition Sheets </h2>
+							<h2 id="sql"></h2>
 							<table class="table table-hover">
 								<thead style="background-color: #4d4d4d;color: white;">
 								  <tr>
@@ -70,8 +69,9 @@
 									<th>Expire Date</th>
 									<th>Document Name</th>
 									<th>Office Money</th>
-									<th>Toekn Money</th>
+									<th>Token Money</th>
 									<th>Others Money</th>
+				
 								  </tr>
 								</thead>
 								<tbody id="table_completedProductList"></tbody>

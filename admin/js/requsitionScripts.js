@@ -69,6 +69,8 @@ $("#form_vechicleRequisition").submit(function (){
             $('#loading').show();
        },
 		success: function(response){
+			//alert(response);
+			
 			if(response == "Success"){
 			    $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
 			    $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
