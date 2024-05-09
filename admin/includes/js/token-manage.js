@@ -13,6 +13,7 @@ function addRow() {
         },
         success: function (response) {
 
+            var groups = ['New Spare Parts','Recondition Spare Parts','Vendor Workshop Works'];
             var data = '';
             data += '<tr id="rowId_' + roNo + '"><td><input type="hidden" value="-1"  id="requisition_id_' + roNo + '" ><input class="form-control" placeholder="Product Name" id="products_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Specification" id="spec_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qty_' + roNo + '" type="number"></td><td><select class="custom-select form-control" id="unit_' + roNo + '" name="unit_' + roNo + '" aria-describedby="inputGroupSuccess1Status">';
 
@@ -24,7 +25,14 @@ function addRow() {
                     data += '<option value="' + response[i].unitName + '">' + response[i].unitName + '</option>';
                 }
             }
-            data += '</select></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + roNo + '" type="text"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReq(' + roNo + ')"></i></td></tr>';
+            data += '</select></td>';
+            data +='<td><select class="custom-select form-control" id="group_' + roNo + '" name="group_' + roNo + '"><option value="" >Select Group</option>';            
+            for (var i = 0; i < groups.length; i++) {
+                data += '<option value="' + groups[i] + '">' +groups[i]+ '</option>';
+            }            
+            data += '</select></td>';
+
+            data += '<td><input class="form-control" placeholder="Remarks" id="remarks_' + roNo + '" type="text"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReq(' + roNo + ')"></i></td></tr>';
             $('#requisitionTableBody').append(data);
             roNo++;
         }, error: function (xhr) {
@@ -318,13 +326,11 @@ $(document).ready(function () {
                             $(this).hide(); n();
                         });
                     }
-
                     manageTokenTable.ajax.reload(null, false);
                 },
                 error: function (response) {
                     //alert(JSON.stringify(response));
                 },
-
                 beforeSend: function () {
                     $('#loading').show();
                 },
@@ -340,7 +346,6 @@ $(document).ready(function () {
         },
         excluded: [':disabled'],
         fields: {
-
             mechanic_for_allocate: {
                 validators: {
                     notEmpty: {
@@ -459,7 +464,6 @@ $(document).ready(function () {
                 error: function (response) {
                     alert(JSON.stringify(response));
                 },
-
                 beforeSend: function () {
                     $('#loading').show();
                 },
@@ -568,6 +572,15 @@ function saveRequisition() {
     if (flag_u == 1) {
         return;
     }
+    var group = [];
+    $('select[id^="group_"]').each(function () {
+        var $this = $(this);
+        group.push($this.val());
+        if ($this.val() == '') {
+            alert("Group Must be selected!!")
+            return;
+        }
+    });
 
     var remarks = [];
     $('input[id^="remarks_"]').each(function () {
@@ -582,6 +595,7 @@ function saveRequisition() {
     fd.append('engineerComment', engineerComment);
     fd.append('requisition_ids', requisition_ids);
     fd.append('products', products);
+    fd.append('group', group);
     fd.append('specs', specs);
     fd.append('qty', qty);
     fd.append('units', units);
@@ -601,7 +615,7 @@ function saveRequisition() {
                 alert(JSON.stringify(result));
             } else if (result == 'success') {
                 $('#addEgineerRequisition').modal('hide');
-                $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Mechanic Allocated");
+                $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Product requisition Succeful");
                 $("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
                     $(this).hide(); n();
                 });
@@ -731,9 +745,11 @@ function addEgineerRequisition(id) {
                     var i = 0;
                     data = '';
 
-                    $('#requisitionSpareTableBody').html('');
+                    $('#requisitionTableBody').html('');
                     for (i = 0; i < response['requisitions'].length; i++)
                     {
+                      var groups = ['New Spare Parts','Recondition Spare Parts','Vendor Workshop Works'];
+
 
                         data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="requisition_id_' + i + '" value="' + response['requisitions'][i].id + '"><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['requisitions'][i].req_product + '"></td><td><input class="form-control" placeholder="Specification" id="spec_' + i + '" type="text" value="' + response['requisitions'][i].spec + '"> </td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['requisitions'][i].qty + '"></td><td><select class="form-control" placeholder="Unit" id="unit_' + i + '"  value="' + response['requisitions'][i].unit + '">';
                         data += '<option value="">Select Unit</option>';
@@ -747,10 +763,21 @@ function addEgineerRequisition(id) {
                                 data += '<option value="' + response['units'][j].unitName + '">' + response['units'][j].unitName + '</option>';
                             }
                         }
-                        data += '</select></td><td><input class="form-control" placeholder="Remarks" id="remarks_' + i + '" type="text" value="' + response['requisitions'][i].remarks + '"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReqFromSource(' + i + ',' + response['requisitions'][i].id + ')"></i></td></tr>';
+                        data += '</select></td>';
+                        data +='<td><select class="custom-select form-control" id="group_' + roNo + '" name="group_' + roNo + '"><option value="" >Select Group</option>';            
+                        for (var k = 0; k < groups.length; k++) {
+                            if (groups[k] ==   response['requisitions'][i].req_group_name ) {
+                                data += '<option value="' + groups[k] + '" selected>' + groups[k] + '</option>';
+                            } else {
+                                data += '<option value="' + groups[k] + '">' +groups[k]+ '</option>';
+                            }
+                        }            
+                        data += '</select></td>';
+                        data += '<td><input class="form-control" placeholder="Remarks" id="remarks_' + i + '" type="text" value="' + response['requisitions'][i].remarks + '"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReqFromSource(' + i + ',' + response['requisitions'][i].id + ')"></i></td></tr>';
+                    
                     
                     }
-                    $('#requisitionSpareTableBody').append(data);
+                    $('#requisitionTableBody').append(data);
                     roNo = i;
                 },
                 error: function (xhr) {

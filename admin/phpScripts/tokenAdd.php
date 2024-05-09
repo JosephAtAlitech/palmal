@@ -47,6 +47,7 @@ if (isset($_POST["Action"])) {
         $productsArr = explode(",", $products);
         $requisition_ids = explode(",", $_POST["requisition_ids"]);
         $specs = explode(",", $_POST["specs"]);
+        $group = explode(",", $_POST["group"]);
         $qty = explode(",", $_POST["qty"]);
         $units = explode(",", $_POST["units"]);
         $remarks = explode(",", $_POST["remarks"]);
@@ -61,19 +62,16 @@ if (isset($_POST["Action"])) {
 
             for ($i = 0; $i < count($productsArr); $i++) {
                 if ($requisition_ids[$i] < 0) {
-                    $sql = "INSERT INTO tbl_token_requisition ( tbl_token_id,  req_product, spec, qty, unit , remarks, created_by, created_date ) 
-                    VALUES( '$tokenId', '$productsArr[$i]', '$specs[$i]', '$qty[$i]','$units[$i]', '$remarks[$i]',  '$loginID',  '$Date' )";
+                    $sql = "INSERT INTO tbl_token_requisition ( tbl_token_id,  req_product, req_group_name, spec, qty, unit , remarks, created_by, created_date ) 
+                    VALUES( '$tokenId', '$productsArr[$i]','$group[$i]', '$specs[$i]', '$qty[$i]','$units[$i]', '$remarks[$i]',  '$loginID',  '$Date' )";
                     $query = $conn->query($sql);
-
+                    
                     $sql1 = "UPDATE tbl_token SET  department_status = 'Workshop' WHERE tbl_token.id = $tokenId";
                     $query = $conn->query($sql1);
-
-
                 } else {
                     $sql = "UPDATE tbl_token_requisition SET req_product = '$productsArr[$i]' , spec = '$specs[$i]',qty = '$qty[$i]',unit = '$units[$i]',remarks = '$remarks[$i]' where tbl_token_requisition.id = $requisition_ids[$i]";
                     $query = $conn->query($sql);
                 }
-
             }
             $sql2 = "SELECT id from quotation_log where step = '1' AND token_id ='$tokenId' and deleted='No'";
             $query2 = $conn->query($sql2);
@@ -301,7 +299,7 @@ if (isset($_POST["Action"])) {
         }
 
         $status = $row['status'];
-        $sql2 = "SELECT tbl_token_requisition.id , tbl_token_requisition.req_product FROM `tbl_token_requisition`
+        $sql2 = "SELECT tbl_token_requisition.id , tbl_token_requisition.req_product, req_group_name FROM `tbl_token_requisition`
                 WHERE tbl_token_requisition.tbl_token_id =  $id AND tbl_token_requisition.deleted ='No'";
 
         $query1 = $conn->query($sql2);
@@ -310,7 +308,7 @@ if (isset($_POST["Action"])) {
         $products .= '<table >';
 
         while ($row2 = $query1->fetch_assoc()) {
-            $products .= '<li>' . $row2['req_product'] . '</li>';
+            $products .= '<li>' . $row2['req_product'] . '  <small>( ' . $row2['req_group_name'] . ')</small></li> ';
         }
         $products .= '</table>';
         //  $row1 = $query1->fetch_array();
