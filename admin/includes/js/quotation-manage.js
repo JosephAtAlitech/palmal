@@ -15,6 +15,58 @@ $(document).ready(function () {
 });
 
 
+function setLowerBidder(){
+    var token_id = $('#token_id').val();
+    $.ajax({
+        type: 'POST',
+        url: 'phpScripts/quotationAdd.php',
+        data: {
+            id: id,
+            token_id: token_id,
+            "Action": 'setLowerBidder'
+        },
+        dataType: 'json',
+        beforeSend: function () {
+            // Show image container
+            $("#loading").show();
+        },
+        success: function (response) {
+          
+            //alert(JSON.stringify(response));
+           
+            if(response.code != 200){
+                $("#lowerBidderErrorMsg").html("<strong><i class='icon fa fa-check'></i>"+response.code+" ! </strong> "+response.msg);
+                $("#lowerBidderErrorMsg").show().delay(4500).fadeOut().queue(function (n) {
+                    $(this).hide(); n();
+                });
+            }
+            $('#lowerBidderModal').modal('show');
+            $("#bidderTableHeader").html('');
+            $("#bidderInfo").html('');
+            data ='';
+            data1 ='';
+            if(response.code == 200 || response.code == 201){
+                data1 ='<th>Group</th><th>Price</th><th>Supplier</th>';
+                data+='<tr><td>'+response.data.group_1+'</td><td>'+response.data.lower_amount_1+'</td><td>'+response.data.supplier_1+'</td></tr>'
+                data+='<tr><td>'+response.data.group_2+'</td><td>'+response.data.lower_amount_2+'</td><td>'+response.data.supplier_2+'</td></tr>'
+                data+='<tr><td>'+response.data.group_3+'</td><td>'+response.data.lower_amount_3+'</td><td>'+response.data.supplier_3+'</td></tr>'
+                
+                $("#bidderTableHeader").append(data1);
+                $("#bidderInfo").append(data);
+            }
+           
+        },
+        error: function (xhr) {
+            alert(xhr.responseText);
+        },
+        complete: function (data) {
+            // Hide image container
+            $("#loading").hide();
+        }
+    });
+}
+
+
 
 var manageTokenTable = '';
 $(document).ready(function () {
@@ -83,7 +135,6 @@ $(document).ready(function () {
                 error: function (response) {
                     alert(JSON.stringify(response));
                 },
-
                 beforeSend: function () {
                     $('#loading').show();
                 },
@@ -119,14 +170,13 @@ $(document).ready(function () {
 });
 
 // PO section
-function prGenerate(id, token_id) {
-    $("#quote_id_fr_pr").val(id);
+function prGenerate(token_id) {
+   // $("#quote_id_fr_pr").val(id);
     $("#token_id_fr_pr").val(token_id);
     $.ajax({
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
         data: {
-            id: id,
             token_id: token_id,
             "Action": 'getPrInfo'
         },
@@ -138,7 +188,7 @@ function prGenerate(id, token_id) {
         success: function (response) {
             $('#prGenerateModal').modal('show');
             //alert(JSON.stringify(response));
-            if (response == 'mngmnt_not_approverd') {
+            if (response == 'mngmnt_not_approved') {
                 $("#prModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> Management Not Approved");
                 $("#prModalErrorMsg").show().delay(3500).fadeOut().queue(function (n) {
                     $(this).hide(); n();
@@ -170,7 +220,7 @@ function prGenerate(id, token_id) {
 }
 
 function confirmPr() {
-    var id = $("#quote_id_fr_pr").val();
+    // var id = $("#quote_id_fr_pr").val();
     var token_id = $("#token_id_fr_pr").val();
     var pr_date = $("#pr_date").val();
 //alert(id+' '+token_id+' '+po_date);
@@ -178,7 +228,6 @@ function confirmPr() {
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
         data: {
-            id: id,
             token_id: token_id,
             pr_date: pr_date,
             "Action": 'setPrGenerateDate'
@@ -213,17 +262,15 @@ function confirmPr() {
 
 
 
-
 // PO section
-function poApproval(id, token_id) {
-    $("#quote_id_fr_po").val(id);
+function poApproval(token_id) {
+    // $("#quote_id_fr_po").val(id);
     $("#token_id_fr_po").val(token_id);
  
     $.ajax({
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
         data: {
-            id: id,
             token_id: token_id,
             "Action": 'poApprovalGet'
         },
@@ -269,15 +316,14 @@ function poApproval(id, token_id) {
 }
 
 function confirmPo() {
-    var id = $("#quote_id_fr_po").val();
+    // var id = $("#quote_id_fr_po").val();
     var token_id = $("#token_id_fr_po").val();
     var po_date = $("#po_date").val();
-//alert(id+' '+token_id+' '+po_date);
+    //alert(id+' '+token_id+' '+po_date);
     $.ajax({
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
         data: {
-            id: id,
             token_id: token_id,
             po_date: po_date,
             "Action": 'setPoApprovalDate'
@@ -295,7 +341,6 @@ function confirmPo() {
                 $("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
                     $(this).hide(); n();
                 });
-
             } else {
                 alert(JSON.stringify(response));
             }
@@ -314,15 +359,14 @@ function confirmPo() {
 
 // store section
 
-function storeDeprt(id, token_id) {
-    $("#quote_id_fr_str").val(id);
+function storeDeprt(token_id) {
+    //$("#quote_id_fr_str").val(id);
     $("#token_id_fr_str").val(token_id);
     //alert(id)
     $.ajax({
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
         data: {
-            id: id,
             token_id: token_id,
             "Action": 'productsAsPerPo'
         },
@@ -340,7 +384,7 @@ function storeDeprt(id, token_id) {
                 data = '';
                 $('#lowBidProducts').html('');
                 for (i = 0; i < response['products'].length; i++) {
-                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input type="checkbox" id="checkbox_no_' + i + '" value="' + response['products'][i].id + '" ></td><td><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].Product_name + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td></tr>';
+                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input type="checkbox" id="checkbox_no_' + i + '" value="' + response['products'][i].id + '" ></td><td><input class="form-control" width="20%" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].req_product + '" readonly></td><td width="20%"><input class="form-control" placeholder="Group Name" id="req_group_' + i + '" type="text" value="' + response['products'][i].req_group_name + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td><td><input class="form-control" placeholder="Remarks" id="store_pro_remarks_' + i + '" type="text" value="" > </td></tr>';
                 }
                 $('#lowBidProducts').append(data);
 
@@ -379,16 +423,19 @@ function storeDeprt(id, token_id) {
 
 
 function confirmStore() {
-    var quoteId = $("#quote_id_fr_str").val();
+    //var quoteId = $("#quote_id_fr_str").val();
     var tokenId = $("#token_id_fr_str").val();
     var store_date = $("#store_date").val();
     var storeComment = $("#storeComment").val();
     var quoteDetailsId = [];
+    var store_remarks = [];
 
+    var i=0;
     $('[id^="checkbox_no_"]').each(function () {
         if ($(this).is(':checked')) {
             quoteDetailsId.push($(this).val());
         }
+        store_remarks[i] = $("#store_pro_remarks_"+i).val();
     });
 
     if (quoteDetailsId == '') {
@@ -401,9 +448,9 @@ function confirmStore() {
 
     var fd = new FormData();
 
-    fd.append('quoteId', quoteId);
     fd.append('tokenId', tokenId);
     fd.append('store_date', store_date);
+    fd.append('store_remarks', store_remarks);
     fd.append('storeComment', storeComment);
     fd.append('quoteDetailsId', quoteDetailsId);
     fd.append('Action', "setStoreApprovalInfo");
@@ -446,14 +493,13 @@ function confirmStore() {
 
 // confirm Procurement section
 
-function confirmProcurement(id, token_id) {
-    $("#quote_id_fr_prc").val(id);
+function confirmProcurement(token_id) {
+    //$("#quote_id_fr_prc").val(id);
     $("#token_id_fr_prc").val(token_id);
     $.ajax({
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
         data: {
-            id: id,
             token_id: token_id,
             "Action": 'productsAsPerStore'
         },
@@ -491,7 +537,7 @@ function confirmProcurement(id, token_id) {
                 data = '';
                 $('#finalProducts').html('');
                 for (i = 0; i < response['products'].length; i++) {
-                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].Product_name + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td></tr>';
+                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].req_product + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td></tr>';
                 }
                 $('#finalProducts').append(data);
 
@@ -556,8 +602,11 @@ function finalConfirmation() {
 }
 
 
-function confirmApproval(id, token_id_fr_ap, userType) {
+function confirmApproval(id, user) {
+    let userType = user.replace(/^\'+|\'+$/g, '');
+
     $('#dgmApprovalModal').modal('show');
+
     switch (userType) {
         case 'auditor':
             $('#approvalType').text('Auditor Vetting');
@@ -582,16 +631,15 @@ function confirmApproval(id, token_id_fr_ap, userType) {
         default:
         // code block
     }
-    $("#quote_id").val(id);
+    //$("#quote_id").val(id);
     $("#userType").val(userType);
-    $("#token_id_for_approval").val(token_id_fr_ap);
+    $("#token_id_for_approval").val(id);
 
     $.ajax({
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
         data: {
-            id: id,
-            token_id: token_id_fr_ap,
+            token_id: id,
             userType: userType,
             "Action": 'checkAppovalStatus'
         },
@@ -601,7 +649,7 @@ function confirmApproval(id, token_id_fr_ap, userType) {
             $("#editLoader").show();
         },
         success: function (response) {
-
+            alert(JSON.stringify(response));
             if (response == 'revious_step_not_approved') {
                 $("#approvalModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> Waiting for approval process!");
                 $("#approvalModalErrorMsg").show().delay(3000).fadeOut().queue(function (n) {
@@ -626,7 +674,7 @@ function confirmApproval(id, token_id_fr_ap, userType) {
                 $('#approvalStatus').prop('disabled', true);
             }
         }, error: function (xhr) {
-            alert(xhr.responseText);
+            alert(JSON.stringify(xhr));
         },
         complete: function (data) {
             // Hide image container

@@ -21,9 +21,6 @@
 							<input type="date" id="tokenDate" class="form-control" name="tokenDate"
 								value="<?= date("Y-m-d") ?>" placeholder=" Last Repair Date ">
 						</div>
-
-						
-
 					</div>
 					<div class="form-group">
 						<div class="col-sm-4">
@@ -158,6 +155,44 @@
 		</div>
 	</div>
 </div>
+
+
+<!-- Edit Allocate Mechanic -->
+<div class="modal fade" id="lowerBidderModal">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title"><b>Lower Bidder Info</b></h4>
+			</div>
+			<div class="col-xs-6">
+				<div id='lowerBidderMsg' class='alert alert-success alert-dismissible successMessage'>
+				</div>
+				<div id='lowerBidderErrorMsg' class='alert alert-danger alert-dismissible errorMessage'>
+				</div>
+			</div>
+			<div class="modal-body">
+				<table class="table table-bordered table-responsive">
+					<thead id='bidderTableHeader'>
+						
+					</thead>
+					<tbody id='bidderInfo'>
+
+					</tbody>
+				</table>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i
+							class="fa fa-close"></i> Close</button>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
 <!-- Edit Allocate Mechanic -->
 <div class="modal fade" id="allocateMechanic">
 	<div class="modal-dialog">
@@ -281,8 +316,8 @@
 							<div class="col-sm-12 mb-2">
 								<label class="">Approval Status<span class="text-danger">*</span></label>
 								<select class="form-control" id="approvalStatus" name="approvalStatus">
-									<option value="Yes" selected>Approve</option>
-									<option value="No">Reject</option>
+									<option value="Accepted" selected>Accept</option>
+									<option value="Rejected">Reject</option>
 								</select>
 							</div>
 						</div>
@@ -374,7 +409,7 @@
 			<div class="modal-body">
 
 				<div class="form-group">
-					<input type="hidden" id="quote_id_fr_pr">
+					<!-- <input type="hidden" id="quote_id_fr_pr"> -->
 					<input type="hidden" id="token_id_fr_pr">
 					<div class="col-sm-12">
 						<label class="">PR Date <span class="text-danger">*</span></label>
@@ -441,6 +476,8 @@
 							<th>Quantity</th>
 							<th>Unit</th>
 							<th>Price</th>
+							<th>Remarks</th>
+							<th>Supplier</th>
 						</thead>
 						<tbody id="lowBidProducts">
 
@@ -620,21 +657,10 @@
 							</div>
 						</div>
 						<div class="col-md-12">
-							<div class="col-md-4  col-md-offset-8" style="display:flex">
-							<select class="form-control btn btn-default col-md-6 mr-2" id="groupSelection" onchange="changeDiv()">
-							<?php
-								$sql = "SELECT * from tbl_requisition_group";
-								$result = $conn->query($sql);
-
-								if ($result) {
-									while ($row = $result->fetch_assoc()) {
-										echo "<option value='" . $row['group_name'] . "'><b class='badge'>" . $row['group_name'] . "</b></option>";
-									}
-								}
-								?>
-							</select>	
+							<div class="col-md-2  col-md-offset-10" >
+							
 							<button type="button"
-									class="btn btn-primary col-md-6" onclick="addRow()">+</button></div>
+									class="btn btn-primary col-md-12" onclick="addRow()">+</button></div>
 						</div>
 					</div>
 
@@ -642,14 +668,15 @@
 						<div class="col-sm-12 mb-2">
 							<table id="requisitionTable" class="table table-bordered">
 								<thead>
-									<th>Product Name</th>
-									<th>Specification</th>
-									<th>Quantity</th>
-									<th>Unit</th>
-									<th>Remarks</th>
-									<th>Action</th>
+									<th width='30%'>Product Name</th>
+									<th width='5%'>Specification</th>
+									<th width='5%'>Quantity</th>
+									<th width='7%'>Unit</th>
+									<th width='12%'>Group</th>
+									<th width='10%'>Remarks</th>
+									<th width='3%'>Action</th>
 								</thead>
-								<tbody id="requisitionSpareTableBody">
+								<tbody id="requisitionTableBody">
 									<tr id="row1Id_0">
 										<td><input class="form-control" placeholder="Product Name" id="products_0"
 												type="text"></td>
@@ -672,33 +699,13 @@
 												?>
 											</select>
 										</td>
-										<td><input class="form-control" placeholder="Remarks" id="remarks_0"
-												type="text"></td>
-										<td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; "
-												aria-hidden="true" onclick="deleteReq(0)"></i></td>
-									</tr>
-								</tbody>
-								<tbody id="requisitionRSpareTableBody" style="display:none">
-									<tr id="row2Id_0">
-										<td><input class="form-control" placeholder="Product Name" id="products_0"
-												type="text"></td>
-										<td><input class="form-control" placeholder="Specification" id="spec_0"
-												type="text"></td>
-										<td><input class="form-control" placeholder="Quantity" id="qty_0" type="number">
-										</td>
 										<td>
-											<select class="custom-select form-control" id="unit_0" name="unit_0"
+											<select class="custom-select form-control" id="group_0" name="group_0"
 												aria-describedby="inputGroupSuccess1Status">
-												<?php
-												$sql = "SELECT unitName, id from tbl_units where deleted = 'no' ORDER BY id desc";
-												$result = $conn->query($sql);
-												echo "<option value='0'>Select Unit</option>";
-												if ($result) {
-													while ($row = $result->fetch_assoc()) {
-														echo "<option value='" . $row['unitName'] . "'>" . $row['unitName'] . "</option>";
-													}
-												}
-												?>
+												<option value="">Select Group</option>
+												<option value="New Spare Parts">New Spare Parts</option>
+												<option value="Recondition Spare Parts">Recondition Spare Parts</option>
+												<option value="Vendor Workshop Works">Vendor Workshop Works</option>
 											</select>
 										</td>
 										<td><input class="form-control" placeholder="Remarks" id="remarks_0"
@@ -707,35 +714,8 @@
 												aria-hidden="true" onclick="deleteReq(0)"></i></td>
 									</tr>
 								</tbody>
-								<tbody id="requisitionWorkshopTableBody" style="display:none">
-									<tr id="row3Id_0">
-										<td><input class="form-control" placeholder="Product Name" id="products_0"
-												type="text"></td>
-										<td><input class="form-control" placeholder="Specification" id="spec_0"
-												type="text"></td>
-										<td><input class="form-control" placeholder="Quantity" id="qty_0" type="number">
-										</td>
-										<td>
-											<select class="custom-select form-control" id="unit_0" name="unit_0"
-												aria-describedby="inputGroupSuccess1Status">
-												<?php
-												$sql = "SELECT unitName, id from tbl_units where deleted = 'no' ORDER BY id desc";
-												$result = $conn->query($sql);
-												echo "<option value='0'>Select Unit</option>";
-												if ($result) {
-													while ($row = $result->fetch_assoc()) {
-														echo "<option value='" . $row['unitName'] . "'>" . $row['unitName'] . "</option>";
-													}
-												}
-												?>
-											</select>
-										</td>
-										<td><input class="form-control" placeholder="Remarks" id="remarks_0"
-												type="text"></td>
-										<td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; "
-												aria-hidden="true" onclick="deleteReq(0)"></i></td>
-									</tr>
-								</tbody>
+					
+							
 								
 							</table>
 						</div>

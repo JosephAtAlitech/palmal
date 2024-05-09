@@ -241,11 +241,12 @@
                                 <div class=" form-group col-md-12 mt-4"><br>
                                     <table id="" class="table table-bordered">
                                         <thead class="bg-primary">
-                                            <th>id</th>
-                                            <th>Product Name</th>
-                                            <th>Specification</th>
-                                            <th>Qty</th>
-                                            <th>unit</th>
+                                            <th width="2%">Id</th>
+                                            <th width="30%">Product Name</th>
+                                            <th width="5%">Specification</th>
+                                            <th width="5%">Qty</th>
+                                            <th width="5%">Unit</th>
+                                            <th width="12%">Group</th>
 
                                             <?php
                                             if (isset ($_GET['type'])) {
@@ -269,7 +270,7 @@
                                                 $token_id = $_GET['Token_id'];
 
                                                 if ($_GET['type'] == 'procurement') {
-                                                    $sql = 'SELECT * FROM tbl_token_requisition where tbl_token_id = ' . $token_id . ' and deleted ="No"';
+                                                    $sql = 'SELECT * FROM tbl_token_requisition where tbl_token_id = ' . $token_id . ' and deleted ="No" order by req_group_name';
                                                     $result = $conn->query($sql);
                                                 } else {
                                                     $quotation_id = $_GET['id'];
@@ -279,7 +280,6 @@
                                                     join tbl_token_requisition on tbl_quotation_details.tbl_token_requisition_id = tbl_token_requisition.id
                                                     WHERE tbl_quotation.tbl_token_id = " . $token_id . " AND  tbl_quotation.id = " . $quotation_id . " AND tbl_quotation_details.deleted = 'No'  ORDER BY id DESC";
                                                     $result = $conn->query($sql);
-
                                                 }
 
                                                 $i = 1;
@@ -294,6 +294,7 @@
                                                             $spec = $row['spec'];
                                                             $qty = $row['qty'];
                                                             $unit = $row['unit'];
+                                                            $group = $row['quotation_group_name'];
                                                             $wing_uPrice = $row['wing_head_unit_price'];
                                                             $wing_tPrice = $row['wing_head_total_amount'];
                                                             $totalUnitPrice += (int) $wing_tPrice;
@@ -303,6 +304,7 @@
                                                                     <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
+                                                                    <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
                                                                     <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'wing_head\')" onchange="calTotalPrice(' . $j . ',\'wing_head\')" placeholder="Enter Amount"></td>
                                                                     <td><input class="form-control" type="number" id="wing_head_tPrice_' . $j . '" value="' . $wing_tPrice . '" disabled></td>
                                                                     <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
@@ -317,6 +319,7 @@
                                                             $spec = $row['spec'];
                                                             $qty = $row['qty'];
                                                             $unit = $row['unit'];
+                                                            $group = $row['quotation_group_name'];
                                                             $audit_uPrice = $row['audit_unit_price'];
                                                             $audit_tPrice = $row['audit_total_amount'];
                                                             $totalUnitPrice += (int) $audit_tPrice;
@@ -326,6 +329,7 @@
                                                                     <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
+                                                                    <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
                                                                     <td><input class="form-control" type="number" id="audit_uPrice_' . $j . '" value="' . $audit_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'audit\')" onchange="calTotalPrice(' . $j . ',\'audit\')" placeholder="Enter Amount"></td>
                                                                     <td><input class="form-control" type="number" id="audit_tPrice_' . $j . '" value="' . $audit_tPrice . '" disabled></td>
                                                                     <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
@@ -338,6 +342,7 @@
                                                             $spec = $row['spec'];
                                                             $qty = $row['qty'];
                                                             $unit = $row['unit'];
+                                                            $group = $row['req_group_name'];
 
                                                             echo '<tr id="rowNo_' . $j . '">
                                                                 <td>' . $i++ . '</td>
@@ -345,6 +350,7 @@
                                                                 <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $row['spec'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $row['qty'] . '" disabled></td>
                                                                 <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $row['unit'] . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
                                                                 <td><input class="form-control" type="number" id="uPrice_' . $j . '" value="" onkeyup="calTotalPrice(' . $j . ',\'procurement\')" onchange="calTotalPrice(' . $j . ',\'procurement\')" placeholder="Enter Amount"></td>
                                                                 <td><input class="form-control" type="number" id="tPrice_' . $j . '" value="" onchange="priceUpdate()" disabled></td>
                                                                 <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
@@ -359,7 +365,7 @@
                                             ?>
 
                                             <tr>
-                                                <td colspan="5"></td>
+                                                <td colspan="6"></td>
                                                 <td style="text-align: right;">Total Price :</td>
                                                 <td class="d-flex"><input id="price" value="<?= $totalUnitPrice ?>"
                                                         class="form-control" placeholder="Price" type="text" readonly>
@@ -367,7 +373,7 @@
                                                 <td></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5"></td>
+                                                <td colspan="6"></td>
                                                 <td style="text-align: right;">Vat :</td>
                                                 <td class="d-flex"><input id="vat" class="form-control" value="0"
                                                         placeholder="Vat" type="number" onkeyup="calculateTotal()"
@@ -377,7 +383,7 @@
                                                 <td></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5"></td>
+                                                <td colspan="6"></td>
                                                 <td style="text-align: right;">Ait :</td>
                                                 <td class="d-flex"><input id="ait" class="form-control" value="0"
                                                         onkeyup="calculateTotal()" onchange="calculateTotal()"
@@ -387,7 +393,7 @@
                                                 <td></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5"></td>
+                                                <td colspan="6"></td>
                                                 <td style="text-align: right;">Discount :</td>
                                                 <td class="d-flex"><input id="discount" class="form-control"
                                                         placeholder="Discount" type="number" onkeyup="calculateTotal()"
@@ -397,7 +403,7 @@
                                                 <td></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5"></td>
+                                                <td colspan="6"></td>
                                                 <td style="text-align: right;">Grand Total:</td>
                                                 <td class="d-flex"><input id="grandTotal" class="form-control"
                                                         placeholder="Grand Total" type="number" readonly></td>
@@ -724,6 +730,13 @@
                 units.push($this.val());
             });
 
+            var group = [];
+            $('input[id^="group_"]').each(function () {
+                var $this = $(this);
+                group.push($this.val());
+            });
+            
+
             var unitPrice = [];
             $('input[id^="uPrice_"]').each(function () {
                 var $this = $(this);
@@ -749,6 +762,7 @@
             fd.append('specs', specs);
             fd.append('qty', qty);
             fd.append('units', units);
+            fd.append('group', group);
             fd.append('qty', qty);
             fd.append('unitPrice', unitPrice);
             fd.append('totalPrice', totalPrice);

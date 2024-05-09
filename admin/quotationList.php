@@ -4,6 +4,7 @@
 	.select-group input.form-control {
 		width: 65%
 	}
+
 	.select-group select.input-group-addon {
 		width: 35%;
 	}
@@ -18,7 +19,7 @@
 
 
 		<div class="content-wrapper">
-		    <section class="content-header">
+			<section class="content-header">
 				<h1>Quotation Information</h1>
 				<ol class="breadcrumb">
 					<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -33,7 +34,14 @@
 					<div class="col-xs-12">
 						<div class="box">
 							<?php
-							if (isset ($_GET['id'])) {
+
+							// $enum =[
+							// 	'auditor'=> 'auditor',
+							// 	'mngmnt'=> 'mngmnt',
+							// 	'ed'=> 'ed'
+							// ];
+
+							if (isset($_GET['id'])) {
 								$id = $_GET['id'];
 								$sql = "SELECT tbl_token.*,vehicle_master.vehicle_number, m.firstname m_name, e.firstname e_name FROM `tbl_token`
 								left outer join vehicle_master  on tbl_token.vehicle_id = vehicle_master.id
@@ -48,9 +56,40 @@
 							}
 							?>
 							<div class="box-header with-border">
-								<a href="addQuotationView.php?Token_id=<?= isset ($_GET['id']) ? $id = $_GET['id'] : '' ?>&type=procurement"
+								<input type="hidden" id="token_id"
+									value="<?= isset($_GET['id']) ? $id = $_GET['id'] : '' ?>">
+								<a href="addQuotationView.php?Token_id=<?= isset($_GET['id']) ? $id = $_GET['id'] : '' ?>&type=procurement"
 									data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i
 										class="fa fa-plus"></i> Add Quotation</a>
+
+								<div class="btn-group">
+									<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
+										aria-haspopup="true" aria-expanded="false">
+										Set Lower Bidder
+									</button>
+									<div class="dropdown-menu">
+									<li><a class="dropdown-item" onclick="setLowerBidder()"><b>Generate Lower Bidder</b></a></li>
+										<li><a
+												onclick="confirmApproval('<?php  echo $id ?>','\'auditor\'')"><i
+													class="fa fa-edit"></i> Auditor Vetting</a></li>
+										<li><a
+												onclick="confirmApproval('<?php  echo $id ?>','\'mngmnt\'')"><i
+													class="fa fa-edit"></i> Management Vetting</a></li>
+										<li><a onclick="prGenerate('<?php echo $id ?>')"><i
+													class="fa fa-edit"></i> PR Generate</a></li>
+										<li><a onclick="confirmApproval('<?php echo $id ?>','\'ed\'')"><i
+													class="fa fa-edit"></i> Management Approval</a></li>
+										<li><a onclick="poApproval('<?php echo $id ?>')"><i
+													class="fa fa-edit"></i> PO Approval</a></li>
+										<li><a onclick="storeDeprt(' <?php echo $id ?>')"><i
+													class="fa fa-edit"></i> Store Deprt</a></li>
+										<li><a onclick="confirmProcurement('<?php echo $id ?>')"><i
+													class="fa fa-edit"></i> Final Approval</a></li>
+
+									</div>
+								</div>
+								<hr>
+
 								<div class="row">
 									<div class="col-xs-6">
 
@@ -64,7 +103,7 @@
 								</div>
 								<div class="row">
 									<?php
-									if (isset ($_GET['id'])) {
+									if (isset($_GET['id'])) {
 										$id = $_GET['id'];
 										$sql = "SELECT tbl_token.*,vehicle_master.vehicle_number, vehicle_master.employee_name,m.firstname m_name, e.firstname e_name FROM `tbl_token`
 												left outer join vehicle_master  on tbl_token.vehicle_id = vehicle_master.id
@@ -86,20 +125,22 @@
 
 										<div class=" form-group col-md-4">
 											<label for="">Demand No | Vehicle No</label>
-											<input type="text" class="form-control" value="<?= $tokenNo?> | (<?= $vehicle_number?> : <?= $employee_name ?>)")" disabled>
+											<input type="text" class="form-control"
+												value="<?= $tokenNo ?> | (<?= $vehicle_number ?> : <?= $employee_name ?>)"
+												)" disabled>
 										</div>
 										<div class="form-group col-md-4">
 											<label for="">Demand Date</label>
-											<input type="text" class="form-control" value="<?= $tokenDate?>" readonly>
+											<input type="text" class="form-control" value="<?= $tokenDate ?>" readonly>
 										</div>
 										<div class="form-group col-md-4">
 											<label for="">Engineer Name</label>
-											<input type="text" class="form-control" value="<?= $engineerName?>" readonly>
+											<input type="text" class="form-control" value="<?= $engineerName ?>" readonly>
 										</div>
-										
+
 										<div class="form-group col-md-12">
 											<label for="">Problem Definition</label>
-											<textarea  class="form-control" cols="10"  readonly ><?=  $problem ?></textarea>
+											<textarea class="form-control" cols="10" readonly><?= $problem ?></textarea>
 										</div>
 										<?php
 									} ?>

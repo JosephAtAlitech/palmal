@@ -167,81 +167,84 @@ if (isset($_POST["Action"])) {
 
     } else if ($_POST["Action"] == "checkAppovalStatus") {
 
+        $id = $_POST["id"];
         $token_id = $_POST["token_id"];
         $userType = $_POST["userType"];
-        $sql = "SELECT  auditor_approval_date, auditor_approval_status, mngmnt_approval_date, md_approval_date ,md_approval_status,pr_generate_date ,mngmnt_approval_status, ed_approval_date,ed_approval_status FROM tbl_lower_bidder_info Where token_id = $token_id ";
+        $sql = "SELECT  auditor_approverd_date,auditor_approval_status, mngmnt_approved_date, md_approved_date ,md_approval_status,pr_generate_date ,mngmnt_approval_status, ed_approved_date,auditor_rejected_date, mngmnt_rejected_date, md_rejected_date, ed_rejected_date FROM tbl_quotation Where id = $id AND deleted = 'No'";
         $query = $conn->query($sql);
-        if ($query) {
-            $row = $query->fetch_assoc();
+        $row = $query->fetch_assoc();
 
-            $auditor_approved_date = $row['auditor_approval_date'];
-            $auditor_approval_status = $row['auditor_approval_status'];
+        $auditor_approved_date = $row['auditor_approverd_date'];
+        $auditor_rejected_date = $row['auditor_rejected_date'];
+        $auditor_approval_status = $row['auditor_approval_status'];
 
-            $mngmnt_approved_date = $row['mngmnt_approval_date'];
-            $mngmnt_approval_status = $row['mngmnt_approval_status'];
+        $mngmnt_approved_date = $row['mngmnt_approved_date'];
+        $mngmnt_rejected_date = $row['mngmnt_rejected_date'];
+        $mngmnt_approval_status = $row['mngmnt_approval_status'];
 
-            $md_approved_date = $row['md_approval_date'];
-            $md_approval_status = $row['md_approval_status'];
+        $md_approved_date = $row['md_approved_date'];
+        $md_rejected_date = $row['md_rejected_date'];
+        $md_approval_status = $row['md_approval_status'];
 
-            $pr_generate_date = $row['pr_generate_date'];
+        $pr_generate_date = $row['pr_generate_date'];
 
-            $ed_approved_date = $row['ed_approval_date'];
-            $ed_approval_status = $row['ed_approval_status'];
+        $ed_approved_date = $row['ed_approved_date'];
+        $ed_rejected_date = $row['ed_rejected_date'];
 
-            if ($userType == "auditor") {
-                if ($auditor_approved_date != '') {
+
+
+        if ($userType == "auditor") {
+            if ($auditor_approved_date != '') {
+                echo json_encode('have_approval');
+            } else {
+                echo json_encode('dont_have_approval');
+            }
+        }
+
+        if ($userType == "mngmnt") {
+            if ($auditor_approval_status == '') {
+                echo json_encode('revious_step_not_approved');
+            } else {
+                if ($mngmnt_approved_date != '' || $mngmnt_rejected_date != '') {
                     echo json_encode('have_approval');
                 } else {
                     echo json_encode('dont_have_approval');
                 }
             }
 
-            if ($userType == "mngmnt") {
-                if ($auditor_approval_status == '') {
-                    echo json_encode('revious_step_not_approved');
-                } else {
-                    if ($mngmnt_approved_date != '' || $mngmnt_approval_status == 'Accepted') {
-                        echo json_encode('have_approval');
-                    } else {
-                        echo json_encode('dont_have_approval');
-                    }
-                }
-
-            }
-
-            if ($userType == "md") {
-                if ($mngmnt_approval_status == '') {
-                    echo json_encode('revious_step_not_approved');
-                } else {
-                    if ($md_approved_date != '' | $md_approval_status == 'Accepted') {
-                        echo json_encode('have_approval');
-                    } else {
-                        echo json_encode('dont_have_approval');
-                    }
-                }
-            }
-
-            if ($userType == "ed") {
-                if ($pr_generate_date == '') {
-                    echo json_encode('revious_step_not_approved');
-                } else {
-                    if ($ed_approved_date != '' || $ed_approval_status == 'Accepted') {
-                        echo json_encode('have_approval');
-                    } else {
-                        echo json_encode('dont_have_approval');
-                    }
-                }
-            }
-        } else {
-            echo json_encode($conn->error);
         }
+
+        if ($userType == "md") {
+            if ($mngmnt_approval_status == '') {
+                echo json_encode('revious_step_not_approved');
+            } else {
+                if ($md_approved_date != '' | $md_rejected_date != '') {
+                    echo json_encode('have_approval');
+                } else {
+                    echo json_encode('dont_have_approval');
+                }
+            }
+        }
+
+        if ($userType == "ed") {
+            if ($pr_generate_date == '') {
+                echo json_encode('revious_step_not_approved');
+            } else {
+                if ($ed_approved_date != '' || $ed_rejected_date != '') {
+                    echo json_encode('have_approval');
+                } else {
+                    echo json_encode('dont_have_approval');
+                }
+            }
+        }
+
 
 
 
     } else if ($_POST["Action"] == "approval") {
 
         $tokenId = $_POST["token_id_for_approval"];
-        //$quote_id = $_POST["id"];
+        $quote_id = $_POST["id"];
         $approvalDate = $_POST["approvalDate"];
         $comment = $_POST["comment"];
         $userType = $_POST["userType"];
@@ -255,12 +258,12 @@ if (isset($_POST["Action"])) {
             if ($approvalStatus == 'Yes') {
                 $approvalChain = 'Management (approved)';
 
-                $sql = "UPDATE  tbl_lower_bidder_info set mngmnt_approval_status ='$approvalStatus', mngmnt_approval_date = '$approvalDate', mngmnt_comments = '$comment'  , quotation_status='Management Approved'    
-                where tbl_lower_bidder_info.token_id = $tokenId";
+                $sql = "UPDATE  tbl_quotation set mngmnt_approval_status ='$approvalStatus', mngmnt_approved_date = '$approvalDate', mngmnt_comments = '$comment'  , quotation_status='Management Approved'    
+                where tbl_quotation.id = $quote_id";
             } else {
                 $approvalChain = 'Management(not approved)';
-                $sql = "UPDATE  tbl_lower_bidder_info set mngmnt_approval_status ='$approvalStatus', mngmnt_approval_date = '$approvalDate', mngmnt_comments = '$comment'  , quotation_status='Management Not Approved'    
-                where tbl_lower_bidder_info.token_id = $tokenId";
+                $sql = "UPDATE  tbl_quotation set mngmnt_approval_status ='$approvalStatus', mngmnt_rejected_date = '$approvalDate', mngmnt_comments = '$comment'  , quotation_status='Management Not Approved'    
+                where tbl_quotation.id = $quote_id";
             }
             $sql02 = "INSERT INTO quotation_log (step, step_head, token_id, remarks, token_status,department, created_by, created_date ) 
             VALUES( '5', 'Management','$tokenId','Management Approval<br>Approval Chain<br> $approvalChain ','Running','Management','$loginID','$Date')";
@@ -270,12 +273,12 @@ if (isset($_POST["Action"])) {
 
             if ($approvalStatus == 'Yes') {
                 $approvalChain = 'MD (approved)';
-                $sql = "UPDATE  tbl_lower_bidder_info set md_approval_status ='$approvalStatus', md_approval_date = '$approvalDate', md_comments = '$comment', quotation_status='MD Approved'  
-                where tbl_lower_bidder_info.token_id = $tokenId";
+                $sql = "UPDATE  tbl_quotation set md_approval_status ='$approvalStatus', md_approved_date = '$approvalDate', md_comments = '$comment', quotation_status='MD Approved'  
+                where tbl_quotation.id = $quote_id";
             } else {
                 $approvalChain = 'MD (not approved)';
-                $sql = "UPDATE  tbl_lower_bidder_info set md_approval_status ='$approvalStatus', md_approval_date = '$approvalDate', md_comments = '$comment', quotation_status='MD Not Approved'  
-                where tbl_lower_bidder_info.token_id = $tokenId";
+                $sql = "UPDATE  tbl_quotation set md_approval_status ='$approvalStatus', md_rejected_date = '$approvalDate', md_comments = '$comment', quotation_status='MD Not Approved'  
+                where tbl_quotation.id = $quote_id";
             }
             $sql02 = "UPDATE quotation_log set  remarks = 'Management Approval<br>Approval Chain<br> Manager -> $approvalChain' WHERE step = '5'  AND token_id = $tokenId AND deleted = 'No'";
             $query02 = $conn->query($sql02);
@@ -300,12 +303,12 @@ if (isset($_POST["Action"])) {
 
             if ($approvalStatus == 'Yes') {
                 $approvalChain = 'ED (approved)';
-                $sql = "UPDATE  tbl_lower_bidder_info set ed_approval_status ='$approvalStatus', ed_approval_date = '$approvalDate', ed_comments = '$comment', quotation_status='ED Approved'  , ed_uplead_file ='$path'    
-                where tbl_lower_bidder_info.token_id = $tokenId";
+                $sql = "UPDATE  tbl_quotation set ed_approval_status ='$approvalStatus', ed_approved_date = '$approvalDate', ed_comments = '$comment', quotation_status='ED Approved'  , ed_uplead_file ='$path'    
+                where tbl_quotation.id = $quote_id";
             } else {
                 $approvalChain = 'ED (not approved)';
-                $sql = "UPDATE  tbl_lower_bidder_info set  ed_approval_status ='$approvalStatus', ed_approval_date = '$approvalDate', ed_comments = '$comment', quotation_status='ED Not Approved'     
-                where tbl_lower_bidder_info.token_id = $tokenId";
+                $sql = "UPDATE  tbl_quotation set  ed_approval_status ='$approvalStatus', ed_rejected_date = '$approvalDate', ed_comments = '$comment', quotation_status='ED Not Approved'     
+                where tbl_quotation.id = $quote_id";
             }
             $sql02 = "UPDATE quotation_log set  remarks = 'Management Approval<br>Approval Chain<br> Management -> PR Generated -> Ed' WHERE step = '5'  AND token_id = $tokenId AND deleted = 'No'";
             $query02 = $conn->query($sql02);
@@ -314,12 +317,12 @@ if (isset($_POST["Action"])) {
 
             if ($approvalStatus == 'Yes') {
                 $approvalChain = 'Auditor (approved)';
-                $sql = "UPDATE  tbl_lower_bidder_info set auditor_approval_status ='$approvalStatus', auditor_approval_date = '$approvalDate', auditor_comments = '$comment'  , quotation_status='Auditor Approved'   
-                where tbl_lower_bidder_info.token_id = $tokenId";
+                $sql = "UPDATE  tbl_quotation set auditor_approval_status ='$approvalStatus', auditor_approverd_date = '$approvalDate', auditor_comments = '$comment'  , quotation_status='Auditor Approved'   
+                where tbl_quotation.id = $quote_id";
             } else {
                 $approvalChain = 'Auditor (not approved)';
-                $sql = "UPDATE  tbl_lower_bidder_info set auditor_approval_status ='$approvalStatus', auditor_approval_date = '$approvalDate', auditor_comments = '$comment'  , quotation_status='Auditor Not Approved'   
-                where tbl_lower_bidder_info.token_id = $tokenId";
+                $sql = "UPDATE  tbl_quotation set auditor_approval_status ='$approvalStatus', auditor_rejected_date = '$approvalDate', auditor_comments = '$comment'  , quotation_status='Auditor Not Approved'   
+                where tbl_quotation.id = $quote_id";
             }
             $sql02 = "UPDATE quotation_log set  remarks = 'Approved And edited by Wing Head.<br>Appoval Chain<br> $approvalChain <br>Comment: $comment' WHERE step = '4'  AND token_id = $tokenId AND deleted = 'No'";
             $query02 = $conn->query($sql02);
@@ -334,28 +337,25 @@ if (isset($_POST["Action"])) {
         }
     } else if ($_POST["Action"] == "getPrInfo") {
 
+        $id = $_POST["id"];
         $token_id = $_POST["token_id"];
-        $sql = "SELECT pr_generate_date, mngmnt_approval_date FROM tbl_lower_bidder_info Where token_id = $token_id AND deleted = 'No'";
+        $sql = "SELECT pr_generate_date, mngmnt_approved_date FROM tbl_quotation Where id = $id AND deleted = 'No'";
         $query = $conn->query($sql);
-        if ($query) {
-            $row = $query->fetch_assoc();
-            if ($row['mngmnt_approval_date'] == '' || $row['mngmnt_approval_date'] == null) {
-                echo json_encode('mngmnt_not_approved');
-            } else {
-                if ($row['pr_generate_date'] != '') {
-                    echo json_encode('have_pr');
-                } else {
-                    echo json_encode('dont_have_pr');
-                }
-            }
+        $row = $query->fetch_assoc();
+        if ($row['mngmnt_approved_date'] == '') {
+            echo json_encode('mngmnt_not_approverd');
         } else {
-            echo json_encode($conn->error);
+            if ($row['pr_generate_date'] != '') {
+                echo json_encode('have_pr');
+            } else {
+                echo json_encode('dont_have_pr');
+            }
         }
-
     } else if ($_POST["Action"] == "poApprovalGet") {
 
+        $id = $_POST["id"];
         $token_id = $_POST["token_id"];
-        $sql = "SELECT po_date, ed_approval_date, ed_approval_status FROM tbl_lower_bidder_info Where token_id = $token_id AND deleted = 'No'";
+        $sql = "SELECT po_date, ed_approved_date, ed_approval_status FROM tbl_quotation Where id = $id AND deleted = 'No'";
         $query = $conn->query($sql);
         $row = $query->fetch_assoc();
         if ($row['ed_approval_status'] == '') {
@@ -367,12 +367,14 @@ if (isset($_POST["Action"])) {
                 echo json_encode('dont_have_po');
             }
         }
+
     } else if ($_POST["Action"] == "setPrGenerateDate") {
 
+        $id = $_POST["id"];
         $token_id = $_POST["token_id"];
+        $toquote_id_fr_po = $_POST["id"];
         $pr_date = $_POST["pr_date"];
-
-        $sql = "UPDATE tbl_lower_bidder_info set pr_generate_date  = '$pr_date' , pr_generated_by = '$loginID', updated_by = '$loginID' , quotation_status='PR Generated'   Where token_id = $token_id AND deleted = 'No'";
+        $sql = "UPDATE tbl_quotation set pr_generate_date  = '$pr_date' , pr_generated_by = '$loginID', updated_by = '$loginID' , quotation_status='PR Generated'   Where id = $id AND deleted = 'No'";
         $query = $conn->query($sql);
         if ($query) {
 
@@ -389,20 +391,22 @@ if (isset($_POST["Action"])) {
             } else {
                 echo json_encode($conn->error . $sql1);
             }
+
+
         } else {
             echo json_encode($conn->error . $sql1);
         }
     } else if ($_POST["Action"] == "setPoApprovalDate") {
 
-        // $id = $_POST["id"];
+        $id = $_POST["id"];
         $token_id = $_POST["token_id"];
-        //$toquote_id_fr_po = $_POST["id"];
+        $toquote_id_fr_po = $_POST["id"];
         $po_date = $_POST["po_date"];
-        $sql = "UPDATE tbl_lower_bidder_info set po_date  = '$po_date' , updated_by = '$loginID' , quotation_status='PO Generated'   Where token_id = $token_id AND deleted = 'No'";
+        $sql = "UPDATE tbl_quotation set po_date  = '$po_date' , updated_by = '$loginID' , quotation_status='PO Generated'   Where id = $id AND deleted = 'No'";
         $query = $conn->query($sql);
         if ($query) {
             $sql02 = "INSERT INTO quotation_log (step, step_head, token_id, remarks, token_status,department, created_by, created_date ) 
-                      VALUES( '6', 'Procurement','$token_id','Generated PO to lowest bidder','Running','Procurement','$loginID','$Date')";
+                     VALUES( '6', 'Procurement','$token_id','Generated PO to lowest bidder','Running','Procurement','$loginID','$Date')";
             $query02 = $conn->query($sql02);
 
             $sql1 = "UPDATE tbl_token SET  department_status = 'Procurement (PO)' , quotation_status='PO Generated'   WHERE tbl_token.id = '.$token_id.'";
@@ -413,14 +417,13 @@ if (isset($_POST["Action"])) {
             echo json_encode($conn->error . $sql1);
         }
     } else if ($_POST["Action"] == "productsAsPerPo") {
-        // $id = $_POST["id"];
+        $id = $_POST["id"];
         $token_id = $_POST["token_id"];
-        $sql = "SELECT store_approval_date, po_date from tbl_lower_bidder_info where deleted = 'No'  AND tbl_lower_bidder_info.token_id = $token_id";
+        $sql = "SELECT store_approved_date, po_date from tbl_quotation where deleted = 'No'  AND tbl_quotation.id = $id Limit 1";
         $query = $conn->query($sql);
         $data = $query->fetch_assoc();
-        $date = $data['store_approval_date'];
+        $date = $data['store_approved_date'];
         $po_date = $data['po_date'];
-
         $status = '';
         if ($po_date == '') {
             $status = 'po_not_generated';
@@ -429,35 +432,26 @@ if (isset($_POST["Action"])) {
         }
         $products = [];
 
-        $sql = "SELECT tbl_token_requisition.*, tbl_quotation_details.audit_total_amount from tbl_token_requisition 
-                LEFT JOIN tbl_quotation_details on tbl_token_requisition.id = tbl_quotation_details.tbl_token_requisition_id
-                WHERE tbl_token_requisition.deleted = 'No' AND tbl_token_requisition.tbl_token_id = $token_id group by tbl_token_requisition.req_product
-                ORDER BY tbl_token_requisition.id asc";
-     
-
+        $sql = "SELECT * from tbl_quotation_details where deleted = 'No' AND tbl_quotation_details.tbl_quotation_id = $id  ORDER BY id desc";
         $query = $conn->query($sql);
-        
+
         if ($query) {
-            if($query->num_rows > 0){
-                while ($row = $query->fetch_assoc()) {
-                    array_push($products, $row);
-                }
-                echo json_encode(['products' => $products, 'date' => $date, 'msg' => 'success', 'status' => $status]);
-            }else{
-                echo json_encode('');
+            while ($row = $query->fetch_assoc()) {
+                array_push($products, $row);
             }
-           
+            echo json_encode(['products' => $products, 'date' => $date, 'msg' => 'success', 'status' => $status]);
         } else {
             echo json_encode($conn->error . $sql);
         }
     } else if ($_POST["Action"] == "setStoreApprovalInfo") {
 
+        $quoteId = $_POST["quoteId"];
         $tokenId = $_POST["tokenId"];
         $store_date = $_POST["store_date"];
         $store_comment = $_POST["storeComment"];
         $quoteDetailsId = explode(",", $_POST["quoteDetailsId"]);
 
-        $sql = "UPDATE tbl_lower_bidder_info set store_approval_date  = '$store_date' , store_approval_comment = '$store_comment' , quotation_status='Store Approved' ,    store_approved_by  = '$loginID'  Where tbl_lower_bidder_info.token_id =  $quoteId  AND tbl_quotation.deleted = 'No'";
+        $sql = "UPDATE tbl_quotation set store_approved_date  = '$store_date' , store_approval_comment = '$store_comment' , quotation_status='Store Approved' ,    store_approved_by  = '$loginID'  Where tbl_quotation.id =  $quoteId  AND tbl_quotation.deleted = 'No'";
         $query = $conn->query($sql);
 
         $sql02 = "INSERT INTO quotation_log (step, step_head, token_id, remarks, token_status,department, created_by, created_date ) 
@@ -473,6 +467,7 @@ if (isset($_POST["Action"])) {
                 $query = $conn->query($sql);
             }
 
+
             if ($i > 0) {
 
                 echo 'success';
@@ -485,27 +480,24 @@ if (isset($_POST["Action"])) {
 
     } else if ($_POST["Action"] == "productsAsPerStore") {
 
-        //$id = $_POST["id"];
+        $id = $_POST["id"];
         $token_id = $_POST["token_id"];
 
         $products = [];
 
-        $sql = "SELECT fnl_procurement_approval_date ,store_approval_comment, store_approval_date from tbl_lower_bidder_info where deleted = 'No'  AND tbl_lower_bidder_info.token_id = $token_id Limit 1";
+        $sql = "SELECT fnl_procurement_approval_date ,store_approval_comment, store_approved_date from tbl_quotation where deleted = 'No'  AND tbl_quotation.id = $id Limit 1";
         $query = $conn->query($sql);
         $data = $query->fetch_assoc();
         $date = $data['fnl_procurement_approval_date'];
         $storeComment = $data['store_approval_comment'];
-        $storeApprovedDate = $data['store_approval_date'];
+        $storeApprovedDate = $data['store_approved_date'];
         $status = '';
         if ($storeApprovedDate == '') {
             $status = 'store_not_accepted';
         } else {
             $status = 'store_accepted';
         }
-        $sql = "SELECT tbl_token_requisition.*, tbl_quotation_details.audit_total_amount from tbl_token_requisition 
-                LEFT JOIN tbl_quotation_details on tbl_token_requisition.id = tbl_quotation_details.tbl_token_requisition_id
-                WHERE tbl_token_requisition.deleted = 'No' AND  tbl_token_requisition.req_group_name = 'New Spare Parts' AND tbl_token_requisition.tbl_token_id = $token_id group by tbl_token_requisition.req_product
-                ORDER BY tbl_token_requisition.id asc";
+        $sql = "SELECT * from tbl_quotation_details where deleted = 'No' AND store_appproved_status = 'Yes' AND tbl_quotation_details.tbl_quotation_id = $id  ORDER BY id desc";
         $query = $conn->query($sql);
 
         if ($query) {
@@ -518,7 +510,7 @@ if (isset($_POST["Action"])) {
         }
     } else if ($_POST["Action"] == "finalConfirmation") {
 
-        //$quoteId = $_POST["quoteId"];
+        $quoteId = $_POST["quoteId"];
         $tokenId = $_POST["tokenId"];
         $finalConfirmDate = $_POST["final_confirm_date"];
         $procurementComment = $_POST["procurement_comment"];
@@ -527,7 +519,7 @@ if (isset($_POST["Action"])) {
         $query = $conn->query($sql);
 
         if ($query) {
-            $sql = "UPDATE tbl_lower_bidder_info set fnl_procurement_approval_date  = '$finalConfirmDate' , fnl_procurement_approval_comment = '$procurementComment' , quotation_status= 'Job Completed' ,  fnl_procurement_approve_by  = '$loginID' , is_accepted = '1' Where tbl_lower_bidder_info.token_id = '$tokenId'  AND tbl_lower_bidder_info.deleted = 'No'";
+            $sql = "UPDATE tbl_quotation set fnl_procurement_approval_date  = '$finalConfirmDate' , fnl_procurement_approval_comment = '$procurementComment' , quotation_status= 'Job Completed' ,  fnl_procurement_approve_by  = '$loginID' , is_accepted = '1' Where tbl_quotation.id = '$quoteId'  AND tbl_quotation.deleted = 'No'";
             $query = $conn->query($sql);
 
             if ($query) {
@@ -562,20 +554,20 @@ if (isset($_POST["Action"])) {
 
         $token_id = $_POST["token_id"] > 0 || $_POST["token_id"] != '' || $_POST["token_id"] != null || $_POST["token_id"] != 'undefined' ? $_POST["token_id"] : 0;
         if ($token_id > 0) {
-            $sql0 ="SELECT *
-                    FROM tbl_quotation
-                    INNER JOIN tbl_token on tbl_quotation.tbl_token_id = tbl_token.id
-                    WHERE tbl_token.id = $token_id AND tbl_quotation.deleted = 'No'";
+            $sql0 = "SELECT *
+                        FROM tbl_quotation
+                        INNER JOIN tbl_token on tbl_quotation.tbl_token_id = tbl_token.id
+                        WHERE tbl_token.id =  $token_id AND tbl_quotation.deleted = 'No'";
             $query0 = $conn->query($sql0);
 
             if ($query0) {
                 $rowsNum = $query0->num_rows;
                 $flag = 0;
                 if ($rowsNum < 3) {
-                    echo json_encode(['code' => 204, 'msg' => 'Get at least 3 quotation']);
+                    echo json_encode(['code'=>204,'msg' => 'Get at least 3 quotation']);
                 } else {
-                    $audit_total = [];
-
+                    $audit_total =[];
+                
                     while ($row0 = $query0->fetch_assoc()) {
                         array_push($audit_total, $row0['audit_grand_total']);
                         if ($row0['audit_grand_total'] == null || $row0['audit_grand_total'] == '') {
@@ -583,7 +575,7 @@ if (isset($_POST["Action"])) {
                         }
                     }
                     if ($flag > 0) {
-                        echo json_encode(['code' => 203, 'msg' => 'Audit price not set for all quotation.']);
+                        echo json_encode(['code'=>203,'msg' => 'Audit price not set for all quotation.']);
                     } else {
 
                         $data = array();
@@ -606,9 +598,9 @@ if (isset($_POST["Action"])) {
                                 $i++;
                             }
                             if ($i < 3) {
-                                echo json_encode(['code' => 202, 'msg' => 'All Group Not Added.']);
+                                echo json_encode(['code'=>202,'msg' => 'All Group Not Added.']);
                             } else {
-                                $sql1 = "SELECT tbl_lower_bidder_info.*, supplier_1.partyName as supplier_1,supplier_2.partyName as supplier_2,supplier_3.partyName as supplier_3 from tbl_lower_bidder_info
+                                $sql1 ="SELECT tbl_lower_bidder_info.*, supplier_1.partyName as supplier_1,supplier_2.partyName as supplier_2,supplier_3.partyName as supplier_3 from tbl_lower_bidder_info
                                             left join tbl_party as supplier_1 on tbl_lower_bidder_info.supplier_1 = supplier_1.id
                                             left join tbl_party as supplier_2 on tbl_lower_bidder_info.supplier_2 = supplier_2.id
                                             left join tbl_party as supplier_3 on tbl_lower_bidder_info.supplier_3 = supplier_3.id
@@ -617,7 +609,7 @@ if (isset($_POST["Action"])) {
                                 $rowNum = $query1->num_rows;
                                 if ($rowNum > 0) {
                                     $row1 = $query1->fetch_assoc();
-                                    echo json_encode(['code' => 201, 'msg' => 'exist', 'data' => $row1]);
+                                    echo json_encode(['code'=>201,'msg' => 'exist', 'data' => $row1]);
                                 } else {
                                     $sql02 = "INSERT INTO tbl_lower_bidder_info (token_id, group_1, lower_amount_1,supplier_1, group_2, lower_amount_2,supplier_2, group_3, lower_amount_3,supplier_3, created_by, created_at ) 
                                     VALUES( '$token_id',' " . $data['group_1'] . "', '" . $data['lower_amount_1'] . "', '" . $data['supplier_1'] . "','" . $data['group_2'] . "','" . $data['lower_amount_2'] . "', '" . $data['supplier_2'] . "','" . $data['group_3'] . "','" . $data['lower_amount_2'] . "', '" . $data['supplier_3'] . "','$loginID','$Date')";
@@ -626,9 +618,9 @@ if (isset($_POST["Action"])) {
                                     $query3 = $conn->query($sql3);
                                     if ($query02) {
                                         $row3 = $query3->fetch_assoc();
-                                        echo json_encode(['code' => 200, 'msg' => 'success', 'data' => $row3]);
+                                        echo json_encode(['code'=>200,'msg' => 'success', 'data' => $row3]);
                                     } else {
-                                        echo json_encode(['code' => 404, 'msg' => 'Error :' . $conn->error]);
+                                        echo json_encode(['code'=>404,'msg' => 'Error :' . $conn->error]);
                                     }
                                 }
                             }

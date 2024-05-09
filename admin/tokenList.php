@@ -56,7 +56,7 @@
 				<h1>Maintenance Information</h1>
 				<ol class="breadcrumb">
 					<li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-					<li class="active">Service Token List</li>
+					<li class="active">Service List</li>
 				</ol>
 			</section>
 
