@@ -384,7 +384,7 @@ function storeDeprt(token_id) {
                 data = '';
                 $('#lowBidProducts').html('');
                 for (i = 0; i < response['products'].length; i++) {
-                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input type="checkbox" id="checkbox_no_' + i + '" value="' + response['products'][i].id + '" ></td><td><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].Product_name + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td></tr>';
+                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input type="checkbox" id="checkbox_no_' + i + '" value="' + response['products'][i].id + '" ></td><td><input class="form-control" width="20%" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].req_product + '" readonly></td><td width="20%"><input class="form-control" placeholder="Group Name" id="req_group_' + i + '" type="text" value="' + response['products'][i].req_group_name + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td><td><input class="form-control" placeholder="Remarks" id="store_pro_remarks_' + i + '" type="text" value="" > </td></tr>';
                 }
                 $('#lowBidProducts').append(data);
 
@@ -428,11 +428,14 @@ function confirmStore() {
     var store_date = $("#store_date").val();
     var storeComment = $("#storeComment").val();
     var quoteDetailsId = [];
+    var store_remarks = [];
 
+    var i=0;
     $('[id^="checkbox_no_"]').each(function () {
         if ($(this).is(':checked')) {
             quoteDetailsId.push($(this).val());
         }
+        store_remarks[i] = $("#store_pro_remarks_"+i).val();
     });
 
     if (quoteDetailsId == '') {
@@ -447,6 +450,7 @@ function confirmStore() {
 
     fd.append('tokenId', tokenId);
     fd.append('store_date', store_date);
+    fd.append('store_remarks', store_remarks);
     fd.append('storeComment', storeComment);
     fd.append('quoteDetailsId', quoteDetailsId);
     fd.append('Action', "setStoreApprovalInfo");
@@ -533,7 +537,7 @@ function confirmProcurement(token_id) {
                 data = '';
                 $('#finalProducts').html('');
                 for (i = 0; i < response['products'].length; i++) {
-                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].Product_name + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td></tr>';
+                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].req_product + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td></tr>';
                 }
                 $('#finalProducts').append(data);
 

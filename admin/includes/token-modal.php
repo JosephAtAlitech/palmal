@@ -173,7 +173,7 @@
 				</div>
 			</div>
 			<div class="modal-body">
-				<table class="table">
+				<table class="table table-bordered table-responsive">
 					<thead id='bidderTableHeader'>
 						
 					</thead>
@@ -476,6 +476,8 @@
 							<th>Quantity</th>
 							<th>Unit</th>
 							<th>Price</th>
+							<th>Remarks</th>
+							<th>Supplier</th>
 						</thead>
 						<tbody id="lowBidProducts">
 
