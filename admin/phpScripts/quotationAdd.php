@@ -429,10 +429,16 @@ if (isset($_POST["Action"])) {
         }
         $products = [];
 
-        $sql = "SELECT tbl_token_requisition.*, tbl_quotation_details.audit_total_amount from tbl_token_requisition 
-                LEFT JOIN tbl_quotation_details on tbl_token_requisition.id = tbl_quotation_details.tbl_token_requisition_id
-                WHERE tbl_token_requisition.deleted = 'No' AND tbl_token_requisition.tbl_token_id = $token_id 
-                ORDER BY tbl_token_requisition.id desc";
+        // $sql = "SELECT tbl_token_requisition.*, tbl_quotation_details.audit_total_amount from tbl_token_requisition 
+        //         LEFT JOIN tbl_quotation_details on tbl_token_requisition.id = tbl_quotation_details.tbl_token_requisition_id
+        //         WHERE tbl_token_requisition.deleted = 'No' AND tbl_token_requisition.tbl_token_id = $token_id 
+        //         ORDER BY tbl_token_requisition.id desc";
+        $sql = "SELECT SUM(tbl_quotation_details.total_amount) as group_total, tbl_quotation.supplier_id,tbl_quotation_details.id, tbl_quotation_details.quotation_group_name,tbl_quotation_details.tbl_quotation_details.quotation_group_name,tbl_quotation_details.unit, tbl_quotation_details.unit_price, tbl_quotation_details.audit_total_amount
+            FROM tbl_quotation_details
+            INNER JOIN tbl_quotation ON tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
+            INNER JOIN tbl_token_requisition ON tbl_token_requisition.id = tbl_quotation_details.tbl_token_requisition_id
+            WHERE tbl_token_requisition.tbl_token_id = $token_id AND tbl_token_requisition.deleted = 'No' AND tbl_quotation_details.deleted = 'No'
+            GROUP BY tbl_quotation.supplier_id, tbl_quotation_details.quotation_group_name ORDER BY tbl_quotation_details.quotation_group_name,group_total desc";
         $query = $conn->query($sql);
 
         if ($query) {
