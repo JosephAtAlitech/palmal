@@ -1,4 +1,3 @@
-<!-- Edit Vehicle -->
 <div class="modal fade" id="adjustVehicleRequisitionModal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -8,68 +7,62 @@
             	<h4 class="modal-title"><b>Requisition Adjustment</b></h4>
           	</div>
           	<div class="modal-body">
-            	<form class="form-horizontal" id="contact_formEdit" method="POST" action="requisitionSheetAction.php" enctype="multipart/form-data">
+            	<form class="form-horizontal" id="contact_formEdit" method="POST" action="vehicleRepaire_add.php" enctype="multipart/form-data">
           		<input type="hidden" id="editid" name="id">
-				<!-- <div class="form-group">
-					<label for="categoryName" class="col-sm-3 control-label">Requisition id:</label>
-                  	<div class="col-sm-9">
-						<input type="date" id="editrepaire_date" class="form-control" name="repaireDate" required>
-					</div>
-					
-				</div> -->
+				
 				<div class="form-group">
-					<label for="categoryName" class="col-sm-3 control-label"> Vehicle Number :</label>
+					<label for="vehical_no" class="col-sm-3 control-label"> Vehicle Number :</label>
                   	<div class="col-sm-9">
-						<select class="form-control" id="adjustvehicle_no" name="vehicleNumber" required>
-							<option value="" selected>~~ Select Vehicle Number ~~</option>
-							<?php
-								  $sql = "SELECT id,vehicle_number FROM `vehicle_master` WHERE delete_status='Active' ORDER BY `id`  DESC";
-								  $query = $conn->query($sql);
-								  while($prow = $query->fetch_assoc()){
-									echo "
-									  <option value='".$prow['id']."'>".$prow['vehicle_number']."</option>
-									";
-								  }
-								?>
-						</select>
+						<input readonly  id="editvehicle_no">
 					</div>
 					
 				</div>
 				<div class="form-group">
-				<label for="categoryName" class="col-sm-3 control-label">Documentation period:</label>
-					<div class="col-sm-9">
-					<div class="col-sm-9">
-						<select class="form-control" id="adjustvehicle_no" name="vehicleNumber" required>
-							<option value="" selected>~~ from ~~</option>
-							<?php
-								  $sql = "SELECT id,vehicle_documents_proposal.entry_date FROM  'vehicle_documents_proposal' WHERE status='Active'";
-								  $query = $conn->query($sql);
-								  while($prow = $query->fetch_assoc()){
-									echo "
-									  <option value='".$prow['id']."'>".$prow['vehicle_number']."</option>
-									";
-								  }
-								?>
-						</select>
-					</div>
+				<label for="doctime" class="col-sm-3 control-label">Document time</label>
+					<div class="col-sm-5">
+				
+						<label for="timefrom"  class=" control-label">From :</label>
+                    	<input readonly  id="doctimefrom">
+												
+						<label for="timeto" class="col-sm-3 control-label">To :</label>
+                    	<input readonly id="timeto">
+			
+					     
 					</div>
 				</div>
 				<div class="form-group">
-				<label for="categoryName" class="col-sm-3 control-label">created At :</label>
-					<div class="col-sm-9">
-                    <input type="date" id="editrepaire_date" class="form-control" name="repaireDate" required>
+		
+					<div class="col-sm-9 container-fluid">
+						<div>
+													<label for="fethofficefee" >Office fee</label>
+													<input readonly id="fethofficefee">
+													</div>
+													<div>
+													<label for="fethtokenfee">Token Fee</label>
+													<input readonly id="fethtokenfee">
+													</div>
+													<div>
+													<label for="fethotherfee">Others Fee</label>
+													<input readonly id="fethotherfee">
+													</div>
+													<div>
+													<label for="grandtotal">Total</label>
+													<input readonly id="grandtotal">
+													</div>
+											
 					</div>
 				</div>
+			
 				<div class="form-group">
-					<label for="categoryName" class="col-sm-3 control-label"> created By:</label>
-                    <div class="col-sm-9">
-                    <input type="text" id="editparticulars" class="form-control" name="particulars" placeholder=" created By: " required>	
-				    </div>
-                </div>
+				<label for="adjustdamount" class="col-sm-3 control-label"> Adjusted Amount:</label>
+					<div class="col-sm-6">
+                    	<input type="number" id="editamount" class="form-control" name="Repamount" required>
+					</div>
+				</div>
 			
           	<div class="modal-footer">
             	<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-            	<button type="submit" class="btn btn-primary btn-flat" name="adjustvehicalreq"><i class="fa fa-save"> </i> Adjust Vehicle requisition </button>
+            	<button type="submit" class="btn btn-primary btn-flat savepaymentadjust" name=""><i class="fa fa-save"> </i> submit </button>
             	</form>
           	</div>
 			</div>
