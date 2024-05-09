@@ -73,10 +73,10 @@
 							<td class='hidden'></td>
 							<td>".$idNo++."</td>
 							<td>".$row['acc_head']."</td>
-							<td>".$row['amount']."</td>
 							<td>".$row['acc_head_type']."</td>
 							<td>".$row['exp_date']."</td>
-							<td style='width: 10%;'>
+							<td style='width							<td>".$row['amount']."</td>
+: 10%;'>
 								<button class='btn btn-success btn-sm editOfficeExp btn-flat' data-id='".$row['id']."'><i class='fa fa-edit'></i> Edit</button>
 							</td>
                         </tr>

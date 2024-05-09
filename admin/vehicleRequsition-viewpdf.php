@@ -3,7 +3,7 @@ include 'includes/session.php';
 $reqId = $_GET['reqId'];
 //$ym = date("Y-m", strtotime($id));	
 date_default_timezone_set('Asia/Dhaka');
-$toDay = (new DateTime($test))->format("Y-m-d H:i:s");
+$toDay = (new DateTime())->format("Y-m-d H:i:s");
 $todayDate = date('Y-m-d h:i:s A',strtotime($toDay));
 	require_once('../tcpdf/tcpdf.php');
 		
