@@ -72,11 +72,11 @@ $("#form_vechicleRequisition").submit(function (){
 			//alert(response);
 			
 			if(response == "Success"){
+				$("#factory").trigger('change');
 			    $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
 			    $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
 				  $(this).hide(); n();
 				});
-				
 				$('#rider').trigger('change');
 			}
 		},error: function (xhr) {

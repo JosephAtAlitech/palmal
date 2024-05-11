@@ -73,7 +73,7 @@ $wialon_api = new Wialon(); ?>
 
                             <div class="box-body">
 
-                                <table id="example_company" class="table table-bordered">
+                                <table id="table_document_proposal" class="table table-bordered" width="100%">
                                     <thead>
                                         <th>id</th>
                                         <th>Vehicle number</th>
@@ -84,37 +84,6 @@ $wialon_api = new Wialon(); ?>
                                         <th>Total</th>
                                         <th>Action</th>
                                     </thead>
-                                    <tbody>
-                                        <?php
-                                        $sql = "SELECT vehicle_master.vehicle_number ,vehicle_documents_proposal.id,vehicle_documents_proposal.req_id,vehicle_documents_proposal.entry_date,
-								SUM(vehicle_documents_proposal.office_fee) AS TotalOfficeFee ,SUM(vehicle_documents_proposal.token_fee)as  TotalTokenFee,SUM(vehicle_documents_proposal.others_fee) AS TotalOthersFee 
-								FROM `vehicle_documents_proposal`
-								INNER JOIN vehicle_master on vehicle_master.id = vehicle_documents_proposal.vehicle_id
-								Where vehicle_documents_proposal.deleted= 'No'
-								GROUP BY vehicle_documents_proposal.req_id ORDER BY `vehicle_documents_proposal`.`req_id`  DESC";
-                                        $query = $conn->query($sql);
-                                        $idNo = 1;
-                                        while ($row = $query->fetch_assoc()) {
-                                            $total = $row['TotalOfficeFee'] + $row['TotalTokenFee'] + $row['TotalOthersFee'];
-                                            echo "
-                        <tr>
-							<td>" . $idNo++ . "</td>
-							<td>" . $row['vehicle_number'] . "</td>
-							<td>" . $row['entry_date'] . "</td>
-							<td>" . $row['TotalOfficeFee'] . "</td>
-							<td>" . $row['TotalTokenFee'] . "</td>
-							<td>" . $row['TotalOthersFee'] . "</td>
-							<td>" . $total . "</td>
-							<td style='width: 9%;'>
-								<a href='vehicleRequsition-viewpdf.php?reqId=" . $row['req_id'] . "' target='_blank' title='Print' data-toggle='tooltip' class='btn btn-primary btn-sm btn-flat'><i class='fa fa-print'></i> Print </a>
-							    <a href='#' class='btn btn-danger btn-sm deleteVehicleRequisition btn-flat' style='margin-bottom: 5px;' data-id='" . $row['id'] . "'><i class='fa fa-trash'> Delete</i></a>
-								<a href='#' class='btn btn-warning btn-sm adjustVehicleRequisition btn-flat' style='margin-bottom: 5px;' data-id='" . $row['id'] . "'><i class='fa fa-edit'> Adjust</i> </a>
-								</td>
-                        </tr>
-                      ";
-                                        }
-                                        ?>
-                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -131,6 +100,21 @@ $wialon_api = new Wialon(); ?>
     <script src='../bootstrapvalidator.min.js'></script>
     <script src="select2/select2.min.js"></script>
     <script type="text/javascript">
+        $(document).ready(function() {
+            manageRequisitionTable = $("#table_document_proposal").DataTable({
+                'ajax': 'phpScripts/requisitionSheetAction.php',
+                'order': [],
+                'dom': 'Bfrtip',
+                'scrollX': true,
+                'buttons': [
+                    'pageLength','copy', 'csv', 'pdf', 'print'
+                ],
+                language: {
+                    processing: "<img src='../images/loader.gif'>"
+                },
+                processing: true
+            })
+        });
         function vNumberAvailability() {
             $("#loaderIcon").show();
             jQuery.ajax({
@@ -195,11 +179,11 @@ $wialon_api = new Wialon(); ?>
         }
 
 
-        $(function() {
+      
 
-            $('.deleteVehicleRequisition ').click(function(e) {
+            function deleteRow(id) {
                 if (confirm("Are you want to delete the record!") == true) {
-                    var id = $(this).data('id');
+                    var id = id;
 
                     jQuery.ajax({
                         url: "phpScripts/requisitionSheetAction.php",
@@ -210,7 +194,7 @@ $wialon_api = new Wialon(); ?>
                         },
                         success: function(data) {
                             //alert(JSON.stringify(data))
-                            location.reload();
+                            manageRequisitionTable.ajax.reload(null, false);
 
                             $("#loaderIcon").hide();
                         },
@@ -224,13 +208,13 @@ $wialon_api = new Wialon(); ?>
                 } else {
                     text = "You canceled!";
                 }
-            });
-        });
+            }
+        
 
         // ADJUST VEHICAL REQUISITION 
 
         $(function() {
-            $('.adjustVehicleRequisition').click(function() {
+            $('#adjustVehicleRequisition').click(function() {
 
                 var id = $(this).data('id');
                 adjustrow(id);
@@ -254,7 +238,7 @@ $wialon_api = new Wialon(); ?>
                 },
                 success: function(data) {
                     alert(JSON.stringify(data));
-                    
+
                     $('#adjustVehicleRequisitionModal').modal('show');
                     $('#editvehicle_no').val(data['row'].vehicle_number);
                     $('#doctimefrom').val(data['row'].start_date);
@@ -351,6 +335,125 @@ $wialon_api = new Wialon(); ?>
                 dropdownParent: $("#addnewVehicle")
             });
         });
+
+
+  //ADD to requisition Adjusted table
+
+        $('#adjustbuttonsubmit').bootstrapValidator({
+            live: 'enabled',
+            message: 'This value is not valid',
+            submitButton: '$adjustbuttonsubmit button [type="Submit"]',
+            submitHandler: function(validator, form, submitButton) {
+                var editamount = $("#editamount").val();
+                var row = $("#row").val();
+
+                var fd = new FormData();
+
+                fd.append('id', id);
+                fd.append('editamount', editamount);
+                fd.append('row', row);
+
+                $.ajax({
+                    url: "phpScripts/requisitionSheetAction.php",
+                    method: "POST",
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    datatype: "json",
+                    success: function(result) {
+                        if (result != "success") {
+                            alert(JSON.stringify(result));
+                        } else if (result == "success") {
+                            $('#adjustVehicleRequisitionModal').modal('hide');
+                            $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Adjusted");
+                            $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
+                                $(this).hide();
+                                n();
+                            });
+
+                            $("#fcomment").val('');
+                        }
+                        //alert(JSON.stringify(result));
+                        manageRequisitionTable.ajax.reload(null, false);
+                    },
+                    error: function(response) {
+                        alert(JSON.stringify(response));
+                    },
+                    beforeSend: function() {
+                        $('#loading').show();
+                    },
+                    complete: function() {
+                        $('#loading').hide();
+                    }
+                });
+            },
+
+
+            // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            excluded: [':disabled'],
+            fields: {
+                editamount: {
+                    validators: {
+                        stringLength: {
+                            min: 2,
+                        },
+                        notEmpty: {
+                            message: 'Please Vehicle Number like Number DHA-11-1111'
+                        },
+                        regexp: {
+                            regexp: /(\d{2}[- ])\d{4}$/,
+                            message: 'Please insert Vehicle Number DHA-11-1111'
+                        }
+                    }
+                },
+                
+                
+                PurchaseDate: {
+                    validators: {
+                        date: {
+                            message: 'The date is not valid',
+                            format: 'YYYY/MM/DD'
+                        },
+                    }
+                },
+                YearOfManufacture: {
+                    validators: {
+                        stringLength: {
+                            max: 4,
+                        },
+                        notEmpty: {
+                            message: 'Please Insert Year Of Manufacture'
+                        },
+                        regexp: {
+                            regexp: /^([0-9]{1,9})[,]*([0-9]{3,3})*[,]*([0-9]{1,3})*([.]([0-9]{2,2})){0,1}$/,
+                            message: 'Please insert Number Only'
+                        }
+                    }
+                },
+                ChesisNumber: {
+                    validators: {
+                        stringLength: {
+                            min: 3,
+                        },
+                        notEmpty: {
+                            message: 'Please Insert Only Chesis Number'
+                        },
+                        regexp: {
+                            regexp: /^([a-zA-Z0-9_ '\.\-\s\,\;\:\/\&\$\%\(\)]+\s)*[a-zA-Z0-9_ '\.\-\s\,\;\:\/\&\$\%\(\)]+$/,
+                            message: 'Please insert alphanumeric value only'
+                        }
+                    }
+                },
+           
+            }
+        })
+
+
 
         $(document).ready(function() {
             $('#contact_form').bootstrapValidator({
@@ -628,17 +731,7 @@ $wialon_api = new Wialon(); ?>
                 });
         });
     </script>
-    <script>
-        $(document).ready(function() {
-            $('#example_company').DataTable({
-                //responsive: true
-                dom: 'Bfrtip',
-                buttons: [
-                    'pageLength', 'copy', 'csv', 'pdf', 'print'
-                ]
-            })
-        })
-    </script>
+
 </body>
 
 </html>

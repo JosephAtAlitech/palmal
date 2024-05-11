@@ -7,7 +7,7 @@
             	<h4 class="modal-title"><b>Requisition Adjustment</b></h4>
           	</div>
           	<div class="modal-body">
-            	<form class="form-horizontal" id="contact_formEdit" method="POST" action="vehicleRepaire_add.php" enctype="multipart/form-data">
+            	<form class="form-horizontal" id="adjustbuttonsubmit" method="POST"  enctype="multipart/form-data">
           		<input type="hidden" id="editid" name="id">
 				
 				<div class="form-group">
@@ -62,7 +62,7 @@
 			
           	<div class="modal-footer">
             	<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-            	<button type="submit" class="btn btn-primary btn-flat savepaymentadjust" name=""><i class="fa fa-save"> </i> submit </button>
+            	<button type="submit" class="btn btn-primary btn-flat " name="savepaymentadjust"><i class="fa fa-save"> </i> submit </button>
             	</form>
           	</div>
 			</div>
