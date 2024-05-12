@@ -82,6 +82,7 @@ $wialon_api = new Wialon(); ?>
                                         <th>Token Fee</th>
                                         <th>Others Fee</th>
                                         <th>Total</th>
+                                        <th>Adjusted Amount</th>
                                         <th>Action</th>
                                     </thead>
                                 </table>
@@ -107,7 +108,7 @@ $wialon_api = new Wialon(); ?>
                 'dom': 'Bfrtip',
                 'scrollX': true,
                 'buttons': [
-                    'pageLength','copy', 'csv', 'pdf', 'print'
+                    'pageLength', 'copy', 'csv', 'pdf', 'print'
                 ],
                 language: {
                     processing: "<img src='../images/loader.gif'>"
@@ -115,6 +116,7 @@ $wialon_api = new Wialon(); ?>
                 processing: true
             })
         });
+
         function vNumberAvailability() {
             $("#loaderIcon").show();
             jQuery.ajax({
@@ -179,76 +181,75 @@ $wialon_api = new Wialon(); ?>
         }
 
 
-      
 
-            function deleteRow(id) {
-                if (confirm("Are you want to delete the record!") == true) {
-                    var id = id;
 
-                    jQuery.ajax({
-                        url: "phpScripts/requisitionSheetAction.php",
-                        data: 'Action=deleteRequisitionSheet&id=' + id,
-                        type: "POST",
-                        beforeSend: function() {
-                            $('#loading').show();
-                        },
-                        success: function(data) {
-                            //alert(JSON.stringify(data))
-                            manageRequisitionTable.ajax.reload(null, false);
+        function deleteRow(id) {
+            if (confirm("Are you want to delete the record!") == true) {
+                var id = id;
 
-                            $("#loaderIcon").hide();
-                        },
-                        error: function(error) {
-                            alert(error)
-                        },
-                        complete: function(data) {
-                            $('#loading').hide();
-                        }
-                    });
-                } else {
-                    text = "You canceled!";
-                }
+                jQuery.ajax({
+                    url: "phpScripts/requisitionSheetAction.php",
+                    data: 'Action=deleteRequisitionSheet&id=' + id,
+                    type: "POST",
+                    beforeSend: function() {
+                        $('#loading').show();
+                    },
+                    success: function(data) {
+                        //alert(JSON.stringify(data))
+                        manageRequisitionTable.ajax.reload(null, false);
+
+                        $("#loaderIcon").hide();
+                    },
+                    error: function(error) {
+                        alert(error)
+                    },
+                    complete: function(data) {
+                        $('#loading').hide();
+                    }
+                });
+            } else {
+                text = "You canceled!";
             }
-        
+        }
+
 
         // ADJUST VEHICAL REQUISITION 
 
-        $(function() {
-            $('#adjustVehicleRequisition').click(function() {
-
-                var id = $(this).data('id');
-                adjustrow(id);
-            });
-
-
-        });
-
         function adjustrow(id) {
-
-
+            var id = id;
+            var fd = new FormData();
+            fd.append('Action', 'adjustVehicleRequisition');
+            fd.append('id', id);
             jQuery.ajax({
-                url: "phpScripts/requisitionSheetAction.php",
-                data: {
-                    Action: 'adjustRequisitionSheet',
-                    id: id,
-                },
                 type: "POST",
+                url: "phpScripts/requisitionSheetAction.php",
+                data: fd,
+                contentType: false,
+                processData: false,
+                datatype: "json",
                 beforeSend: function() {
                     $('#loading').show();
                 },
-                success: function(data) {
-                    alert(JSON.stringify(data));
-
-                    $('#adjustVehicleRequisitionModal').modal('show');
-                    $('#editvehicle_no').val(data['row'].vehicle_number);
-                    $('#doctimefrom').val(data['row'].start_date);
-                    $('#timeto').val(data['row'].end_date);
-                    $('#fethofficefee').val(data['row'].office_fee);
-                    $('#fethtokenfee').val(data['row'].token_fee);
-                    $('#fethotherfee').val(data['row'].others_fee);
-                    $('#grandtotal').val(data.total);
-
-                    $("#loaderIcon").hide();
+                success: function(response) {
+                    response = JSON.parse(response);
+                    if(response.status == "Success"){
+                        var response_row = response.row;
+                        $('#adjustVehicleRequisitionModal').modal('show');
+                        $('#grandtotal').val(response.total);
+                        $('#editvehicle_no').val(response_row[0].vehicle_number);
+                        $('#doctimefrom').val(response_row[0].start_date);
+                        $('#timeto').val(response_row[0].end_date);
+                        $('#fethofficefee').val(response_row[0].office_fee);
+                        $('#fethtokenfee').val(response_row[0].token_fee);
+                        $('#fethotherfee').val(response_row[0].others_fee);
+                        $('#editamount').val(response.total);
+                        $('#editid').val(response_row[0].id);
+                        $("#loaderIcon").hide();
+                    }else if(response.status == "Information"){
+                        alert(response.message);
+                    }else{
+                        alert(response);
+                    }
                 },
                 error: function(error) {
                     alert(error)
@@ -337,122 +338,44 @@ $wialon_api = new Wialon(); ?>
         });
 
 
-  //ADD to requisition Adjusted table
+        //ADD to requisition Adjusted table
+        // insert code without veledation
 
-        $('#adjustbuttonsubmit').bootstrapValidator({
-            live: 'enabled',
-            message: 'This value is not valid',
-            submitButton: '$adjustbuttonsubmit button [type="Submit"]',
-            submitHandler: function(validator, form, submitButton) {
-                var editamount = $("#editamount").val();
-                var row = $("#row").val();
+        $("#adjustbuttonsubmit").submit(function(e) {
+            e.preventDefault();
+            var editamount = $("#editamount").val();
+            var document_proposal_id = $("#editid").val();
+            var payment_type = $("#payment_type").val();
+            var action = 'adjustRequisitionAmount';
+            var fd = new FormData();
+            fd.append('editamount', editamount);
+            fd.append('document_proposal_id', document_proposal_id);
+            fd.append('payment_type', payment_type);
+            fd.append('Action', action);
 
-                var fd = new FormData();
-
-                fd.append('id', id);
-                fd.append('editamount', editamount);
-                fd.append('row', row);
-
-                $.ajax({
-                    url: "phpScripts/requisitionSheetAction.php",
-                    method: "POST",
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    datatype: "json",
-                    success: function(result) {
-                        if (result != "success") {
-                            alert(JSON.stringify(result));
-                        } else if (result == "success") {
-                            $('#adjustVehicleRequisitionModal').modal('hide');
-                            $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Adjusted");
-                            $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
-                                $(this).hide();
-                                n();
-                            });
-
-                            $("#fcomment").val('');
-                        }
-                        //alert(JSON.stringify(result));
-                        manageRequisitionTable.ajax.reload(null, false);
-                    },
-                    error: function(response) {
-                        alert(JSON.stringify(response));
-                    },
-                    beforeSend: function() {
-                        $('#loading').show();
-                    },
-                    complete: function() {
-                        $('#loading').hide();
-                    }
-                });
-            },
-
-
-            // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
-            feedbackIcons: {
-                valid: 'glyphicon glyphicon-ok',
-                invalid: 'glyphicon glyphicon-remove',
-                validating: 'glyphicon glyphicon-refresh'
-            },
-            excluded: [':disabled'],
-            fields: {
-                editamount: {
-                    validators: {
-                        stringLength: {
-                            min: 2,
-                        },
-                        notEmpty: {
-                            message: 'Please Vehicle Number like Number DHA-11-1111'
-                        },
-                        regexp: {
-                            regexp: /(\d{2}[- ])\d{4}$/,
-                            message: 'Please insert Vehicle Number DHA-11-1111'
-                        }
+            $.ajax({
+                url: 'phpScripts/requisitionSheetAction.php',
+                type: 'POST',
+                datatype: 'json',
+                data: fd,
+                contentType: false,
+                processData: false,
+                success: function(result) {
+                    if(result == "Success"){
+                        alert("Successfully Saved");
                     }
                 },
-                
-                
-                PurchaseDate: {
-                    validators: {
-                        date: {
-                            message: 'The date is not valid',
-                            format: 'YYYY/MM/DD'
-                        },
-                    }
+                error: function(response) {
+                    alert(JSON.stringify(response));
                 },
-                YearOfManufacture: {
-                    validators: {
-                        stringLength: {
-                            max: 4,
-                        },
-                        notEmpty: {
-                            message: 'Please Insert Year Of Manufacture'
-                        },
-                        regexp: {
-                            regexp: /^([0-9]{1,9})[,]*([0-9]{3,3})*[,]*([0-9]{1,3})*([.]([0-9]{2,2})){0,1}$/,
-                            message: 'Please insert Number Only'
-                        }
-                    }
+                beforeSend: function() {
+                    $('#loading').show();
                 },
-                ChesisNumber: {
-                    validators: {
-                        stringLength: {
-                            min: 3,
-                        },
-                        notEmpty: {
-                            message: 'Please Insert Only Chesis Number'
-                        },
-                        regexp: {
-                            regexp: /^([a-zA-Z0-9_ '\.\-\s\,\;\:\/\&\$\%\(\)]+\s)*[a-zA-Z0-9_ '\.\-\s\,\;\:\/\&\$\%\(\)]+$/,
-                            message: 'Please insert alphanumeric value only'
-                        }
-                    }
-                },
-           
-            }
+                complete: function() {
+                    $('#loading').hide();
+                }
+            })
         })
-
 
 
         $(document).ready(function() {

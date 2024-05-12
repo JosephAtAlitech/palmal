@@ -95,7 +95,7 @@ if(isset($_POST['action'])){
 			$conn->query($sql_paid);
 			$last_proposal_id = $conn->insert_id;
 			$voucherNo ='';
-			$query_payment_voucher_no = "SELECT LPAD(IFNULL(max(voucherNo),0)+1, 6, 0) as voucherCode FROM tbl_paymentvoucher";
+			$query_payment_voucher_no = "SELECT LPAD(IFNULL(max(voucherNo),0)+1, 6, 0) as voucherCode FROM tbl_paymentvoucher WHERE vehicle_id='$vehicle_id'";
 			$query_payment_voucher_no = $conn->query($query_payment_voucher_no);
 			$row_payment_voucher_no = $query_payment_voucher_no->fetch_assoc();
 			$grandTotal =  $officeCost + $tokenCost + $othersCost;
