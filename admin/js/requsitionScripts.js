@@ -1,37 +1,9 @@
-$("#factory").change(function (){
-    var factoryId = $("#factory").val();
-    alert(factoryId);
-	if(factoryId != "0" && factoryId != ""){
-        
-		$.ajax({
-    		type: 'POST',
-    		url: 'vehicleRequsitionStatus.php',
-    		data: "action=loadCompletedProducts&id="+factoryId,
-    		dataType: 'json',
-			beforeSend: function(){
-                $('#loading').show();
-            },
-    		success: function(response){
-    			$("#table_completedProductList").html(response);
-    			$("#btn_riderPaymentStatus").show();
-    		},error: function (xhr) {
-    			alert(xhr.responseText);
-    			$("#btn_riderPaymentStatus").hide();
-    		},
-    		complete:function(data){
-                $('#loading').hide();
-            }
-        });
-    }else{
-        $("#table_completedProductList").html("");
-    }
-})
 $("#form_vechicleRequisition").submit(function (){
     event.preventDefault();
     var i = 0;
     var vehicle_info_id=[];
 	var vehicle_id=[];
-	var officeCost=[];
+	var officeCost=[];   
 	var tokenCost=[];
 	var othersCost=[];
 	var type=[];
@@ -87,6 +59,37 @@ $("#form_vechicleRequisition").submit(function (){
         }
 	  });
 })
+
+
+$("#factory").change(function (){
+    var factoryId = $("#factory").val();
+    alert(factoryId);
+	if(factoryId != "0" && factoryId != ""){
+        
+		$.ajax({
+    		type: 'POST',
+    		url: 'vehicleRequsitionStatus.php',
+    		data: "action=loadCompletedProducts&id="+factoryId,
+    		dataType: 'json',
+			beforeSend: function(){
+                $('#loading').show();
+            },
+    		success: function(response){
+    			$("#table_completedProductList").html(response);
+    			$("#btn_riderPaymentStatus").show();
+    		},error: function (xhr) {
+    			alert(xhr.responseText);
+    			$("#btn_riderPaymentStatus").hide();
+    		},
+    		complete:function(data){
+                $('#loading').hide();
+            }
+        });
+    }else{
+        $("#table_completedProductList").html("");
+    }
+})
+
 function checkedStatus(cbxIdThis){
 	var cbxId = $(cbxIdThis).attr('id');
 	if($("#"+cbxId).prop('checked') == true){

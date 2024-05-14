@@ -87,7 +87,7 @@ if(isset($_POST['action'])){
                 $type = substr($type, 0, strlen($type)-3);
             }
 			
-    		$sql_proposal = "INSERT INTO vehicle_documents_proposal(req_id,vehicle_id, office_fee, token_fee, others_fee,type, entry_date, insertedBy, vehicle_documents_info_id) 
+    		$sql_proposal = "INSERT INTO vehicle_documents_proposal(req_id,vehicle_id,office_fee,token_fee, others_fee,type, entry_date, insertedBy, vehicle_documents_info_id) 
 					VALUES ('$lastID','$vehicle_id','$officeCost','$tokenCost','$othersCost','$type','$toDay','$loginID','$vehicle_info_id')";
             
 			$conn->query($sql_proposal);

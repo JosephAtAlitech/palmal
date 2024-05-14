@@ -31,40 +31,28 @@ $wialon_api = new Wialon(); ?>
             </section>
             <!-- Main content -->
             <section class="content">
-                <?php
+                <!-- <?php
 
-                $sql = "SELECT tokenId FROM `customer_token` WHERE status='Active' ORDER BY `id`  DESC";
-                $query = $conn->query($sql);
-                $row = $query->fetch_assoc();
-                $token = $row['tokenId'];
+                // $sql = "SELECT tokenId FROM `customer_token` WHERE status='Active' ORDER BY `id`  DESC";
+                // $query = $conn->query($sql);
+                // $row = $query->fetch_assoc();
+                // $token = $row['tokenId'];
 
-                $tokenInfo = $token;
-                $result = $wialon_api->login($tokenInfo);
-                $json = json_decode($result, true);
-
-                ?>
-                <?php
-                if (isset($_SESSION['error'])) {
-                    echo "
-            <div class='alert alert-danger alert-dismissible'>
+                // $tokenInfo = $token;
+                // $result = $wialon_api->login($tokenInfo);
+                // $json = json_decode($result, true);
+                ?> -->
+           
+            <div id='divErrorMsg' class='alert alert-danger alert-dismissible' style="display:none" >
               <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>
-              <h4><i class='icon fa fa-warning'></i> Error!</h4>
-              " . $_SESSION['error'] . "
+              <h4><i class='icon fa fa-warning'></i> </h4>
+            
             </div>
-          ";
-                    unset($_SESSION['error']);
-                }
-                if (isset($_SESSION['success'])) {
-                    echo "
-            <div class='alert alert-success alert-dismissible'>
+
+            <div id='divMsg' class='alert alert-success alert-dismissible'  style="display:none">
               <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>
               <h4><i class='icon fa fa-check'></i> Success!</h4>
-              " . $_SESSION['success'] . "
             </div>
-          ";
-                    unset($_SESSION['success']);
-                }
-                ?>
                 <link rel="stylesheet" href="buttons.dataTables.min.css" />
                 <div class="row">
                     <div class="col-xs-12">
@@ -246,7 +234,12 @@ $wialon_api = new Wialon(); ?>
                         $('#editid').val(response_row[0].id);
                         $("#loaderIcon").hide();
                     }else if(response.status == "Information"){
-                        alert(response.message);
+                   
+                        $("#divErrorMsg").html("<strong><i class='icon fa fa-check'></i>Error ! </strong>"+response.message);
+                        $("#divErrorMsg").show().delay(2000).fadeOut().queue(function (n) {
+                            $(this).hide(); n();
+                        });
+
                     }else{
                         alert(response);
                     }
@@ -362,7 +355,14 @@ $wialon_api = new Wialon(); ?>
                 processData: false,
                 success: function(result) {
                     if(result == "Success"){
-                        alert("Successfully Saved");
+                        $('#adjustVehicleRequisitionModal').modal('hide');
+                        //alert("Successfully Saved");
+                     
+                        $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong>Succefully Saved");
+                        $("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
+                            $(this).hide(); n();
+                        });
+
                     }
                 },
                 error: function(response) {

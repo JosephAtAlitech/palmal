@@ -1,0 +1,34 @@
+  	## Generating requisition report of selected Factory in requisitionsheet.php ::
+
+       	  	-> data inserted at vehical_document_proposal table.
+		 -> data also inserted at tbl_paymentVoucher table.
+        	 -> updating the payment status at vehical_document_info table.
+   
+              
+
+
+	 ## Actions in requisitionsheetview.php ##
+
+            # when press Delete button::
+                
+
+                 -> Updating the vehicle_documents_proposal table only the row 		  				 where the id column matches the value represented
+ 			 by the variable $id and will mark a specific record in the 
+			 vehicle_documents_proposal table as deleted.
+                
+                -> Upadting the tbl_paymentvoucher table only those rows where the 					tbl_proposal_id column in the tbl_paymentvoucher table  
+			matches the value represented by the variable $id and 
+                       	will mark payment vouchers associated with a specific proposal 	 
+			(identified by $id) as deleted.
+
+                 -> Upadting the vehicle_documents_info table and updates the 					       payment status of a document related to a vehicle proposal to 				        'Pending',based on the given $id.Finally it will be shown in the                           requisitionsheet.php after selected the specific factory  .
+                
+
+
+             # when press Adjust button::
+                        
+ 
+		-> checking the the amount is adjusted or not .
+                 ->if amount is Adjusted  (informed the amount is adjusted)
+                 ->if not we can Adjust the amount.
+                     

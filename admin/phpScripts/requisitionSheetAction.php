@@ -30,23 +30,25 @@ if (isset($_POST['Action'])) {
         $id = $_POST['id'];
 
         try {
+
+            $sql_adjust_req = "SELECT vehicle_master.vehicle_number,vehicle_documents_proposal.id,vehicle_documents_proposal.req_id,vehicle_documents_proposal.start_date,vehicle_documents_proposal.end_date,
+            vehicle_documents_proposal.office_fee,vehicle_documents_proposal.token_fee,vehicle_documents_proposal.others_fee,vehicle_documents_proposal.entry_date, SUM(vehicle_documents_proposal.office_fee) AS TotalOfficeFee ,
+            SUM(vehicle_documents_proposal.token_fee)as TotalTokenFee,SUM(vehicle_documents_proposal.others_fee) AS TotalOthersFee 
+            FROM vehicle_documents_proposal 
+            INNER JOIN vehicle_master on vehicle_master.id = vehicle_documents_proposal.vehicle_id
+            Where vehicle_documents_proposal.id = $id limit 1";
+            $query = $conn->query($sql_adjust_req);
+            
             $dataArr = [];
             $total = 0;
             $sql_check_adjustment = "SELECT id 
                                         FROM proposal_adjustment 
                                         WHERE proposal_adjustment.document_proposal_id='$id'
                                         ORDER BY `id` DESC";
-            $query = $conn->query($sql_check_adjustment);
-            $total = $query->num_rows;
-            if($total == 0){
-                $sql_adjust_req = "SELECT vehicle_master.vehicle_number,vehicle_documents_proposal.id,vehicle_documents_proposal.req_id,vehicle_documents_proposal.start_date,vehicle_documents_proposal.end_date,vehicle_documents_proposal.office_fee,vehicle_documents_proposal.token_fee,vehicle_documents_proposal.others_fee,vehicle_documents_proposal.entry_date, SUM(vehicle_documents_proposal.office_fee) AS TotalOfficeFee ,SUM(vehicle_documents_proposal.token_fee)as TotalTokenFee,SUM(vehicle_documents_proposal.others_fee) AS TotalOthersFee 
-                                    FROM vehicle_documents_proposal 
-                                    INNER JOIN vehicle_master on vehicle_master.id = vehicle_documents_proposal.vehicle_id
-                                    Where vehicle_documents_proposal.id = $id limit 1";
-                $query = $conn->query($sql_adjust_req);
+            $query1 = $conn->query($sql_check_adjustment);
+            $numNO = $query1->num_rows;
+            if($numNO == 0){
                 if ($query) {
-
-
                     while ($row = $query->fetch_assoc()) {
                         $total += $row['TotalOfficeFee'] + $row['TotalTokenFee'] + $row['TotalOthersFee'];
                         array_push($dataArr, $row);
@@ -101,9 +103,8 @@ if (isset($_POST['Action'])) {
             
                 if ($conn->query($sql_payment_voucher)) {
                     echo "Success";
-                    $_SESSION['success'] = 'Payment adjusted successfully';
                 } else {
-                    $_SESSION['error'] = $conn->error;
+                    echo "Error";
                 }
             }  else{
                 echo "Error: Error to save ajustment entry ".$sql_save_adjust;
