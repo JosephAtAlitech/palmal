@@ -10,14 +10,21 @@ if (isset($_POST['Action'])) {
     if ($action == 'deleteRequisitionSheet') {
         $id = $_POST['id'];
         
-        $sql_payment_delete = "UPDATE  tbl_paymentvoucher set deleted = 'Yes', status = 'Inactive', deletedBy='$loginID' WHERE tbl_paymentvoucher.tbl_proposal_id = $id";
-        $query_del = $conn->query($sql_payment_delete);
+        // $sql_payment_delete = "UPDATE  tbl_paymentvoucher set deleted ='Yes', status ='Inactive', deletedBy='$loginID', deletedDate='$toDay' WHERE tbl_paymentvoucher.tbl_proposal_id = $id";
+        // $query_del = $conn->query($sql_payment_delete);
 
-        $sql_delete_vehical_proposal = "UPDATE  vehicle_documents_proposal set deleted = 'Yes', status = 'Inactive', deleted_by='$loginID',deleted_date=date('Y-m-d') WHERE id = $id";
+        $sql_delete_vehical_proposal = "UPDATE  vehicle_documents_proposal set deleted = 'Yes', status = 'Inactive', deleted_by='$loginID',deleted_date='$toDay' WHERE id = $id";
         $query = $conn->query($sql_delete_vehical_proposal);
 
         $sql_paid = "UPDATE vehicle_documents_info SET payment_staus='Pending' WHERE id IN (Select vehicle_documents_info_id FROM vehicle_documents_proposal WHERE id=$id)";
         $conn->query($sql_paid);
+
+        // $sql_delete_proposalAdjust = "UPDATE proposal_adjustment SET deleted='Yes',deleted_by='$loginID',deleted_date='$toDay' WHERE proposal_adjustment.document_proposal_id=$id";
+        // $conn2->query($sql_delete_proposalAdjust);
+         
+        $sql_delete_proposalAdjustPaymentvoucher = "UPDATE tbl_paymentvoucher SET deleted='Yes', tbl_paymentvoucher.deletedBy ='$loginID', tbl_paymentvoucher.deletedDate='$toDay' WHERE tbl_paymentvoucher.proposal_adjust_id IN (SELECT id FROM proposal_adjustment WHERE proposal_adjustment.document_proposal_id=$id AND proposal_adjustment.deleted='No') OR (tbl_paymentvoucher.tbl_proposal_id = payment_voucherid)";
+        $conn2->query($sql_delete_proposalAdjustPaymentvoucher);
+
         if ($query) {
             echo json_encode('success');
         } else {

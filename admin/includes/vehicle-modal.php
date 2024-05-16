@@ -13,7 +13,8 @@
 					<div class="form-group">
 						<div class="col-md-4">
 							<label for="sunit">Select
-								<?php echo '<b> - ' . $json['user']['nm'] . '- </b>'; ?>Online unit:
+								<!-- <?php echo '<b> - ' . $json['user']['nm'] . '- </b>'; ?> -->
+								Online unit:
 							</label>
 							<select class="searchVehicle form-control" id="units" name="wUnitId">
 								<option value="" selected>~~ Select Units ~~</option>
@@ -181,6 +182,56 @@
 								name="employeeName" placeholder=" Write Employee Name ">
 						</div>
 					</div>
+
+
+					<div class="form-group">
+						<div class="col-sm-4">
+							<label class="">Registration start date:</label>
+							<input type="date" id="reg_start_date" maxlength="100" class="form-control" name="reg_start_date"
+								placeholder=" reg_start_date ">
+						</div>
+						<div class="col-sm-4">
+							<label class="">Registration end date:</label>
+							<input type="date" id="reg_end_date" maxlength="100" class="form-control" name="reg_end_date"
+								placeholder=" reg_end_date Brand">
+						</div>
+						<div class="col-sm-4">
+							<label class=""> Tax start date :</label>
+							<input type="date" id="tax_start_date" maxlength="100"  class="form-control" name="tax_start_date"
+								placeholder=" Write tax_start_date ">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-4">
+							<label class="">Tax end date:</label>
+							<input type="date" id="tax_end_date" maxlength="100" class="form-control" name="tax_end_date"
+								placeholder="write tax_end_date ">
+						</div>
+						<div class="col-sm-4">
+							<label class="">insurance start date:</label>
+							<input type="date" id="insu_start_date" maxlength="100" class="form-control" name="insu_start_date"
+								placeholder="Write insu_start_date ">
+						</div>
+						<div class="col-sm-4">
+							<label class=""> insurance end date :</label>
+							<input type="date" id="insu_end_date" maxlength="100" class="form-control" name="insu_end_date"
+								placeholder=" Write insurance end date ">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-4">
+							<label class="">permits start date:</label>
+							<input type="date" id="per_start_date" maxlength="100" class="form-control" name="per_start_date"
+								placeholder=" write per_start_date ">
+						</div>
+						<div class="col-sm-4">
+							<label class="">permits end date:</label>
+							<input type="date" id="per_end_date" maxlength="100" class="form-control" name="per_end_date"
+								placeholder="write per_end_date">
+						</div>
+					</div>
+
 					<div class="form-group">
 						<div class="col-sm-12">
 							<label class=""> Location:</label>

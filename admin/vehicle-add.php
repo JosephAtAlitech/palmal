@@ -8,7 +8,6 @@ if (isset($_POST['addVehicle'])) {
 	$vehicleNumber = $_POST['vehicleNumber'];
 	$wUnitId = $_POST['wUnitId'];
 	$vtype = $_POST['vtype'];
-
 	$oilTankCapacity = $_POST['oilTankCapacity'];
 	$PurchaseDate = $_POST['PurchaseDate'];
 	$MakersName = $_POST['MakersName'];
@@ -16,10 +15,16 @@ if (isset($_POST['addVehicle'])) {
 	$ChesisNumber = $_POST['ChesisNumber'];
 	$EnginNumber = $_POST['EnginNumber'];
 	$BranchStatus = $_POST['BranchStatus'];
-
 	$driver = $_POST['driver'];
 	$engineer = $_POST['engineer'];
-
+	// $reg_start_date = $_POST['reg_start_date'];
+	// $reg_end_date = $_POST['reg_end_date'];
+	// $tax_start_date = $_POST['tax_start_date'];
+	// $tax_end_date = $_POST['tax_end_date'];
+	// $insu_start_date = $_POST['insu_start_date'];
+	// $insu_end_date = $_POST['insu_end_date'];
+	// $per_start_date = $_POST['per_start_date'];
+	// $per_end_date = $_POST['per_end_date'];
 	$registrationDate = $_POST['registrationDate'];
 	$makerBrand = $_POST['makerBrand'];
 	$ccBrand = $_POST['ccBrand'];

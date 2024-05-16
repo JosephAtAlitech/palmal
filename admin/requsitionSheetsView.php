@@ -360,6 +360,7 @@ $wialon_api = new Wialon(); ?>
                 processData: false,
                 success: function(result) {
                     if(result == "Success"){
+                        manageRequisitionTable.ajax.reload(null, false);
                         $('#adjustVehicleRequisitionModal').modal('hide');
                         //alert("Successfully Saved");
                      
