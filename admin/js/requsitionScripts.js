@@ -1,3 +1,5 @@
+//for  save the  generate requisition reports data 
+
 $("#form_vechicleRequisition").submit(function (){
     event.preventDefault();
     var i = 0;
@@ -60,6 +62,7 @@ $("#form_vechicleRequisition").submit(function (){
 	  });
 })
 
+//for loding the selectes items data for generating requisition data
 
 $("#factory").change(function (){
     var factoryId = $("#factory").val();
@@ -89,7 +92,7 @@ $("#factory").change(function (){
         $("#table_completedProductList").html("");
     }
 })
-
+// for checking the checked items data akter selecting the factory.
 function checkedStatus(cbxIdThis){
 	var cbxId = $(cbxIdThis).attr('id');
 	if($("#"+cbxId).prop('checked') == true){

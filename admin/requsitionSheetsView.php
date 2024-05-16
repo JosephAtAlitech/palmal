@@ -89,6 +89,10 @@ $wialon_api = new Wialon(); ?>
     <script src='../bootstrapvalidator.min.js'></script>
     <script src="select2/select2.min.js"></script>
     <script type="text/javascript">
+
+
+// for show the requisitionsheets data by form table id.
+
         $(document).ready(function() {
             manageRequisitionTable = $("#table_document_proposal").DataTable({
                 'ajax': 'phpScripts/requisitionSheetAction.php',
@@ -169,7 +173,7 @@ $wialon_api = new Wialon(); ?>
         }
 
 
-
+    // for delete data from requisitionsheets view 
 
         function deleteRow(id) {
             if (confirm("Are you want to delete the record!") == true) {
@@ -222,6 +226,7 @@ $wialon_api = new Wialon(); ?>
                     response = JSON.parse(response);
                     if(response.status == "Success"){
                         var response_row = response.row;
+                        // showing the data in modal // 
                         $('#adjustVehicleRequisitionModal').modal('show');
                         $('#grandtotal').val(response.total);
                         $('#editvehicle_no').val(response_row[0].vehicle_number);
@@ -234,7 +239,7 @@ $wialon_api = new Wialon(); ?>
                         $('#editid').val(response_row[0].id);
                         $("#loaderIcon").hide();
                     }else if(response.status == "Information"){
-                   
+                         //success of error message 
                         $("#divErrorMsg").html("<strong><i class='icon fa fa-check'></i>Error ! </strong>"+response.message);
                         $("#divErrorMsg").show().delay(2000).fadeOut().queue(function (n) {
                             $(this).hide(); n();

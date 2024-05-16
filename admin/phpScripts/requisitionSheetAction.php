@@ -9,14 +9,14 @@ if (isset($_POST['Action'])) {
     $action = $_POST['Action'];
     if ($action == 'deleteRequisitionSheet') {
         $id = $_POST['id'];
-        $sql_delete_vehical_proposal = "UPDATE  vehicle_documents_proposal set deleted = 'Yes', status = 'Inactive', deleted_by='$loginID',deleted_date=date('Y-m-d') WHERE id = $id";
-        $query = $conn->query($sql_delete_vehical_proposal);
-
-
+        
         $sql_payment_delete = "UPDATE  tbl_paymentvoucher set deleted = 'Yes', status = 'Inactive', deletedBy='$loginID' WHERE tbl_paymentvoucher.tbl_proposal_id = $id";
         $query_del = $conn->query($sql_payment_delete);
 
-        $sql_paid = "UPDATE vehicle_documents_info SET payment_staus='Pending' WHERE id=(Select vehicle_documents_info_id FROM vehicle_documents_proposal WHERE id=$id)";
+        $sql_delete_vehical_proposal = "UPDATE  vehicle_documents_proposal set deleted = 'Yes', status = 'Inactive', deleted_by='$loginID',deleted_date=date('Y-m-d') WHERE id = $id";
+        $query = $conn->query($sql_delete_vehical_proposal);
+
+        $sql_paid = "UPDATE vehicle_documents_info SET payment_staus='Pending' WHERE id IN (Select vehicle_documents_info_id FROM vehicle_documents_proposal WHERE id=$id)";
         $conn->query($sql_paid);
         if ($query) {
             echo json_encode('success');
@@ -25,6 +25,7 @@ if (isset($_POST['Action'])) {
         }
     }
     // echo json_encode($row);  
+
     //ADJUST VEHICAL REQUISITION 
     else if ($action == 'adjustVehicleRequisition') {
         $id = $_POST['id'];
@@ -46,8 +47,8 @@ if (isset($_POST['Action'])) {
                                         WHERE proposal_adjustment.document_proposal_id='$id'
                                         ORDER BY `id` DESC";
             $query1 = $conn->query($sql_check_adjustment);
-            $numNO = $query1->num_rows;
-            if($numNO == 0){
+            $numRow = $query1->num_rows;
+            if($numRow == 0){
                 if ($query) {
                     while ($row = $query->fetch_assoc()) {
                         $total += $row['TotalOfficeFee'] + $row['TotalTokenFee'] + $row['TotalOthersFee'];
