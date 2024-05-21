@@ -123,7 +123,7 @@ if (isset($_POST['Action'])) {
     }
 } else {
     /*Proposal id and req_id should be same*/
-    $sql = "SELECT vehicle_master.vehicle_number ,vehicle_documents_proposal.id,vehicle_documents_proposal.req_id,vehicle_documents_proposal.entry_date,
+    $sql = "SELECT vehicle_master.vehicle_number ,vehicle_documents_proposal.id,vehicle_documents_proposal.req_id,vehicle_documents_proposal.entry_date,vehicle_documents_proposal.type,vehicle_documents_proposal.office_fee,vehicle_documents_proposal.token_fee,vehicle_documents_proposal.others_fee,
     SUM(vehicle_documents_proposal.office_fee) AS TotalOfficeFee ,SUM(vehicle_documents_proposal.token_fee)as  TotalTokenFee,SUM(vehicle_documents_proposal.others_fee) AS TotalOthersFee, proposal_adjustment.adjusted_amount 
     FROM vehicle_documents_proposal
     INNER JOIN vehicle_master on vehicle_master.id = vehicle_documents_proposal.vehicle_id
@@ -140,19 +140,20 @@ if (isset($_POST['Action'])) {
             if($row['adjusted_amount'] != ""){
                 $adjusted_amount = $row['adjusted_amount'];
             }
-            $buttons = "<a href='vehicleRequsition-viewpdf.php?reqId=" . $row['req_id'] . "' target='_blank' title='Print' data-toggle='tooltip' class='btn btn-primary btn-sm btn-flat'><i class='fa fa-print'></i> Print </a>
-            <button type = 'button' class='btn btn-danger btn-sm  btn-flat'  style='margin-bottom: 5px;'  onclick='deleteRow(" . $row['id'] . ")'><i class='fa fa-trash'> Delete</i></button>
-            <button type = 'button' class='btn btn-warning btn-sm  btn-flat'  style='margin-bottom: 5px;'  onclick='adjustrow(" . $row['id'] . ")' ><i class='fa fa-edit'> Adjust</i> </button>";
+            $buttons = "<a href='vehicleRequsition-viewpdf.php?reqId=" . $row['req_id'] . "' target='_blank' title='Print' data-toggle='tooltip' class='btn btn-primary btn-sm btn-flat'><i class='fa fa-print'></i>  </a>
+            <button type = 'button' class='btn btn-danger btn-sm  btn-flat'  style='margin-bottom: 5px;'  onclick='deleteRow(" . $row['id'] . ")'><i class='fa fa-trash'> </i></button>
+            <button type = 'button' class='btn btn-warning btn-sm  btn-flat'  style='margin-bottom: 5px;'  onclick='adjustrow(" . $row['id'] . ")' ><i class='fa fa-edit'> </i> </button>";
 
 
             $total = $row['TotalOfficeFee'] + $row['TotalTokenFee'] + $row['TotalOthersFee'];
             $output['data'][] = array(
                 $idNo++,
                 $row['vehicle_number'],
+                $row['type'],
                 $row['entry_date'],
-                $row['TotalOfficeFee'],
-                $row['TotalTokenFee'],
-                $row['TotalOthersFee'],
+                $row['office_fee'],
+                $row['token_fee'],
+                $row['others_fee'],
                 $total,
                 $adjusted_amount,
                 $buttons

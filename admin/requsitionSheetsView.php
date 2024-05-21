@@ -55,7 +55,7 @@ $wialon_api = new Wialon(); ?>
             </div>
                 <link rel="stylesheet" href="buttons.dataTables.min.css" />
                 <div class="row">
-                    <div class="col-xs-12">
+                    <div class="col-md-12">
                         <div class="box">
 
 
@@ -65,6 +65,7 @@ $wialon_api = new Wialon(); ?>
                                     <thead>
                                         <th>id</th>
                                         <th>Vehicle number</th>
+                                        <th>Document Type</th>
                                         <th>Entry Date</th>
                                         <th>Office Fee</th>
                                         <th>Token Fee</th>
