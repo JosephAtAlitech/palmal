@@ -14,9 +14,8 @@ if(isset($_POST['action'])){
 		vehicle_documents_info.id as infoId
 		FROM vehicle_master
 		INNER JOIN vehicle_documents_info ON vehicle_master.id = vehicle_documents_info.vehicle_id
-		
 		WHERE vehicle_master.delete_status='Active' AND vehicle_documents_info.status='Active' AND vehicle_documents_info.deleted='No' 
-		AND vehicle_documents_info.end_date <= DATE_ADD(NOW(), INTERVAL 30 DAY) AND vehicle_master.branch_status ='".$factoryId."'";
+		AND vehicle_documents_info.end_date <= DATE_ADD(NOW(), INTERVAL 30 DAY) AND vehicle_master.branch_status ='".$factoryId."' AND payment_staus='Pending'";
 		//$sql .= " AND vehicle_master.branch_status='".$factoryId."'";
 		$query = $conn->query($sql);
         $riderOrderList = "";
@@ -54,7 +53,6 @@ if(isset($_POST['action'])){
         $othersCostArray = explode("@!@,",$othersCostList);
         $typeArray = explode("@!@,",$typeList);
 		
-		
 		$sql="SELECT max(req_id) AS req_id FROM `vehicle_documents_proposal`";
 			$query = $conn->query($sql);
 			$lastID=0;
@@ -89,54 +87,30 @@ if(isset($_POST['action'])){
                 $type = substr($type, 0, strlen($type)-3);
             }
 			
-                    
-    		$sql_proposal = "INSERT INTO vehicle_documents_proposal(req_id,vehicle_id, office_fee, token_fee, others_fee,type, entry_date, insertedBy) 
-					VALUES ('$lastID','$vehicle_id','$officeCost','$tokenCost','$othersCost','$type','$toDay','$loginID')";
+    		$sql_proposal = "INSERT INTO vehicle_documents_proposal(req_id,vehicle_id, office_fee, token_fee, others_fee,type, entry_date, insertedBy, vehicle_documents_info_id) 
+					VALUES ('$lastID','$vehicle_id','$officeCost','$tokenCost','$othersCost','$type','$toDay','$loginID','$vehicle_info_id')";
             
 			$conn->query($sql_proposal);
-
+			$sql_paid = "UPDATE vehicle_documents_info SET payment_staus='Paid' WHERE id='$vehicle_info_id'";
+			$conn->query($sql_paid);
 			$last_proposal_id = $conn->insert_id;
-			
-			//$vehicle_id = $_POST['vehicle_id'];
-			// if(isset($_GET['entryBy'])){
-
-			// 	$$loginID = $_GET['entryBy'];
-			
-			// }
-			//$loginID = $_POST['entryBy'];
-			// if(isset($_GET['customerType'])){
-
-			// 	$$customerType = $_GET['customerType'];
-			
-			// }
-			//$customerType = $_POST['customerType'];
-			// if(isset($_GET['customerType'])){
-
-			// 	$toDay = $_GET['entryDate'];
-			
-			// }
-			// $officeCostList = $_POST['officeCost'];
-			// $tokenCostList = $_POST['tokenCost'];
-			// $othersCostList = $_POST['othersCost'];
-			//$toDay = $_POST['entryDate'];
 			$voucherNo ='';
-			$typeList = $_POST['type'];
-			$query_payment_voucher_no = "SELECT LPAD(IFNULL(max(voucherNo),0)+1, 6, 0) as voucherCode FROM tbl_paymentvoucher";
-						$query_payment_voucher_no = $conn->query($query_payment_voucher_no);
-						$row_payment_voucher_no = $query_payment_voucher_no->fetch_assoc();
-						$grandTotal =  $officeCost + $tokenCost + $othersCost;
-						
-						while ($row_payment_voucher_no = $query_payment_voucher_no->fetch_assoc()) {
-							$voucherNo = $row_payment_voucher_no['voucherCode'];
-							
-						}
-						if ($voucherNo == "") {
-							$voucherNo = "000001";	
-						}
-						if ($grandTotal > 0){
-						$sql_payment_voucher_store = "INSERT INTO tbl_paymentvoucher ( vehicle_id, tbl_proposal_id,amount, entryBy, status, remarks, type, voucherType, voucherNo,entryDate) 
-        							VALUES ( '$vehicle_id','$last_proposal_id', '$grandTotal', '$loginID','Active', 'vehical document cost for vehical: $vehicle_id', 'cash', 'WalkinSale', '$voucherNo','$toDay')";
-						$conn->query($sql_payment_voucher_store);
+			$query_payment_voucher_no = "SELECT LPAD(IFNULL(max(voucherNo),0)+1, 6, 0) as voucherCode FROM tbl_paymentvoucher WHERE vehicle_id='$vehicle_id'";
+			$query_payment_voucher_no = $conn->query($query_payment_voucher_no);
+			$row_payment_voucher_no = $query_payment_voucher_no->fetch_assoc();
+			$grandTotal =  $officeCost + $tokenCost + $othersCost;
+			
+			while ($row_payment_voucher_no = $query_payment_voucher_no->fetch_assoc()) {
+				$voucherNo = $row_payment_voucher_no['voucherCode'];
+				
+			}
+			if ($voucherNo == "") {
+				$voucherNo = "000001";	
+			}
+			if ($grandTotal > 0){
+			$sql_payment_voucher_store = "INSERT INTO tbl_paymentvoucher ( vehicle_id, tbl_proposal_id,amount, entryBy, status, remarks, type, voucherType, voucherNo,entryDate) 
+											VALUES ( '$vehicle_id','$last_proposal_id', '$grandTotal', '$loginID','Active', 'vehical document cost for vehical: $vehicle_id', 'cash', 'WalkinSale', '$voucherNo','$toDay')";
+			$conn->query($sql_payment_voucher_store);
     	}
 	}
     	echo json_encode('Success');
