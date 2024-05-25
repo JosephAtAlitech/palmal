@@ -82,7 +82,7 @@
 
 								<table id="tokenTable" class="table table-bordered">
 									<thead>
-										<th>id</th>
+										<th>SN</th>
 										<th>Service info</th>
 										<th>Details Info</th>
 										<th>Requisitions</th>

@@ -13,9 +13,9 @@ function addRow() {
         },
         success: function (response) {
 
-            var groups = ['New Spare Parts','Recondition Spare Parts','Vendor Workshop Works'];
+            var groups = ['New Spare Parts', 'Recondition Spare Parts', 'Vendor Workshop Works'];
             var data = '';
-            data += '<tr id="rowId_' + roNo + '"><td><input type="hidden" value="-1"  id="requisition_id_' + roNo + '" ><input class="form-control" placeholder="Product Name" id="products_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Specification" id="spec_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qty_' + roNo + '" type="number"></td><td><select class="custom-select form-control" id="unit_' + roNo + '" name="unit_' + roNo + '" aria-describedby="inputGroupSuccess1Status">';
+            data += '<tr id="rowId_' + roNo + '"><td><input type="hidden" value="-1"  id="requisition_id_' + roNo + '" ><input class="form-control" placeholder="Product Name" id="products_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Specification" id="spec_' + roNo + '" type="text"></td><td><input class="form-control" placeholder="Quantity" id="qty_' + roNo + '" type="number" value="1"></td><td><select class="custom-select form-control" id="unit_' + roNo + '" name="unit_' + roNo + '" aria-describedby="inputGroupSuccess1Status">';
 
             data += '<option value="">Select Unit</option>';
             for (var i = 0; i < response.length; i++) {
@@ -26,11 +26,12 @@ function addRow() {
                 }
             }
             data += '</select></td>';
-            data +='<td><select class="custom-select form-control" id="group_' + roNo + '" name="group_' + roNo + '"><option value="" >Select Group</option>';            
+            data += '<td><select class="custom-select form-control" id="group_' + roNo + '" name="group_' + roNo + '" required ><option value="" >Select Group</option>';
             for (var i = 0; i < groups.length; i++) {
-                data += '<option value="' + groups[i] + '">' +groups[i]+ '</option>';
-            }            
+                data += '<option value="' + groups[i] + '">' + groups[i] + '</option>';
+            }
             data += '</select></td>';
+            data += '<td><input class="form-control" placeholder="Price" id="price_' + roNo + '" type="number"></td>';
 
             data += '<td><input class="form-control" placeholder="Remarks" id="remarks_' + roNo + '" type="text"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReq(' + roNo + ')"></i></td></tr>';
             $('#requisitionTableBody').append(data);
@@ -290,6 +291,14 @@ $(document).ready(function () {
                         message: 'The date is not valid',
                         format: 'YYYY/MM/DD'
                     },
+                }
+            },
+            tokenDetails: {
+                validators: {
+                    regexp: {
+                        regexp: /^([a-zA-Z0-9_ '\.\-\s\,\;\:\/\&\$\%\(\)]+\s)*[a-zA-Z0-9_ '\.\-\s\,\;\:\/\&\$\%\(\)]+$/,
+                        message: 'Please insert alphanumeric value only'
+                    }
                 }
             }
         }
@@ -573,19 +582,29 @@ function saveRequisition() {
         return;
     }
     var group = [];
+    var flag_g = 0;
     $('select[id^="group_"]').each(function () {
         var $this = $(this);
         group.push($this.val());
         if ($this.val() == '') {
             alert("Group Must be selected!!")
-            return;
+            flag_g = 1;
+            return false;
         }
     });
+    if (flag_g == 1) {
+        return;
+    }
 
     var remarks = [];
     $('input[id^="remarks_"]').each(function () {
         var $this = $(this);
         remarks.push($this.val());
+    });
+    var prices = [];
+    $('input[id^="price_"]').each(function () {
+        var $this = $(this);
+        prices.push($this.val());
     });
 
     var fd = new FormData();
@@ -599,6 +618,7 @@ function saveRequisition() {
     fd.append('specs', specs);
     fd.append('qty', qty);
     fd.append('units', units);
+    fd.append('prices', prices);
     fd.append('remarks', remarks);
     fd.append('estimatedPrice', estimatedPrice);
     fd.append('Action', 'addRequisitions');
@@ -610,7 +630,7 @@ function saveRequisition() {
         processData: false,
         datatype: "json",
         success: function (result) {
-
+            //alert(JSON.stringify(result));
             if (result != "success") {
                 alert(JSON.stringify(result));
             } else if (result == 'success') {
@@ -716,6 +736,8 @@ function addEgineerRequisition(id) {
         },
         success: function (result) {
 
+
+
             $('#id_fr_req').val(result.id);
             $('#tokenTitleForRequisition').val(result.token_title ? result.token_title : '');
             $('#tokenDateForRequisition').val(result.token_date ? result.token_date : '');
@@ -742,41 +764,70 @@ function addEgineerRequisition(id) {
                 },
                 success: function (response) {
                     //alert(JSON.stringify(response.length));
+
+                    if (response.is_bidded == 'Yes') {
+                        $('#update_requisition').prop('disabled', true);
+                        $("#reqModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Rejected ! </strong> Access denied!");
+                        $("#reqModalErrorMsg").show().delay(2000).fadeOut().queue(function (n) {
+                            $(this).hide(); n();
+                        });
+                    } else {
+                        $('#update_requisition').prop('Disabled', false);
+                    }
                     var i = 0;
                     data = '';
 
                     $('#requisitionTableBody').html('');
-                    for (i = 0; i < response['requisitions'].length; i++)
-                    {
-                      var groups = ['New Spare Parts','Recondition Spare Parts','Vendor Workshop Works'];
+                    var groups = ['New Spare Parts', 'Recondition Spare Parts', 'Vendor Workshop Works'];
+                    if (response['requisitions'].length > 0) {
 
 
-                        data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="requisition_id_' + i + '" value="' + response['requisitions'][i].id + '"><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['requisitions'][i].req_product + '"></td><td><input class="form-control" placeholder="Specification" id="spec_' + i + '" type="text" value="' + response['requisitions'][i].spec + '"> </td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['requisitions'][i].qty + '"></td><td><select class="form-control" placeholder="Unit" id="unit_' + i + '"  value="' + response['requisitions'][i].unit + '">';
-                        data += '<option value="">Select Unit</option>';
-                        for (var j = 0; j < response['units'].length; j++) 
-                        {
-                            if (response['units'][j].unitName == response['requisitions'][i].unit)
-                            {
-                                data += '<option value="' + response['units'][j].unitName + '" selected>' + response['units'][j].unitName + '</option>';
-                            } else 
-                            {
-                                data += '<option value="' + response['units'][j].unitName + '">' + response['units'][j].unitName + '</option>';
+                        for (i = 0; i < response['requisitions'].length; i++) {
+                          
+
+
+                            data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="requisition_id_' + i + '" value="' + response['requisitions'][i].id + '"><input class="form-control" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['requisitions'][i].req_product + '"></td><td><input class="form-control" placeholder="Specification" id="spec_' + i + '" type="text" value="' + response['requisitions'][i].spec + '"> </td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['requisitions'][i].qty + '"></td><td><select class="form-control" placeholder="Unit" id="unit_' + i + '"  value="' + response['requisitions'][i].unit + '">';
+                            data += '<option value="">Select Unit</option>';
+                            for (var j = 0; j < response['units'].length; j++) {
+                                if (response['units'][j].unitName == response['requisitions'][i].unit) {
+                                    data += '<option value="' + response['units'][j].unitName + '" selected>' + response['units'][j].unitName + '</option>';
+                                } else {
+                                    data += '<option value="' + response['units'][j].unitName + '">' + response['units'][j].unitName + '</option>';
+                                }
                             }
+                            data += '</select></td>';
+                            data += '<td><select class="custom-select form-control" id="group_' + roNo + '" name="group_' + roNo + '"><option value="" >Select Group</option>';
+                            for (var k = 0; k < groups.length; k++) {
+                                if (groups[k] == response['requisitions'][i].req_group_name) {
+                                    data += '<option value="' + groups[k] + '" selected>' + groups[k] + '</option>';
+                                } else {
+                                    data += '<option value="' + groups[k] + '">' + groups[k] + '</option>';
+                                }
+                            }
+                            data += '</select></td>';
+                            data += '<td><input class="form-control" placeholder="Price" id="price_' + i + '" type="number" value="' + response['requisitions'][i].req_price + '"></td>';
+                            data += '<td><input class="form-control" placeholder="Remarks" id="remarks_' + i + '" type="text" value="' + response['requisitions'][i].remarks + '"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReqFromSource(' + i + ',' + response['requisitions'][i].id + ')"></i></td></tr>';
+
                         }
-                        data += '</select></td>';
-                        data +='<td><select class="custom-select form-control" id="group_' + roNo + '" name="group_' + roNo + '"><option value="" >Select Group</option>';            
-                        for (var k = 0; k < groups.length; k++) {
-                            if (groups[k] ==   response['requisitions'][i].req_group_name ) {
-                                data += '<option value="' + groups[k] + '" selected>' + groups[k] + '</option>';
-                            } else {
-                                data += '<option value="' + groups[k] + '">' +groups[k]+ '</option>';
-                            }
-                        }            
-                        data += '</select></td>';
-                        data += '<td><input class="form-control" placeholder="Remarks" id="remarks_' + i + '" type="text" value="' + response['requisitions'][i].remarks + '"></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReqFromSource(' + i + ',' + response['requisitions'][i].id + ')"></i></td></tr>';
-                    
-                    
                     }
+                    // else{
+                    //     data += '<tr id="rowId_0<td><input type="hidden" id="requisition_id_0" value=""><input class="form-control" placeholder="Product Name" id="products_0" type="text" value=""></td><td><input class="form-control" placeholder="Specification" id="spec_0" type="text" value=""> </td><td><input class="form-control" placeholder="Quantity" id="qty_0" type="number" value="1"></td><td><select class="form-control" placeholder="Unit" id="unit_0"  value="">';
+                    //     data += '<option value="">Select Unit</option>';
+                    //     for (var j = 0; j < response['units'].length; j++) {
+                    //             data += '<option value="' + response['units'][j].unitName + '">' + response['units'][j].unitName + '</option>';
+                    //     }
+                    //     data += '</select></td>';
+                    //     data += '<td><select class="custom-select form-control" id="group_' + roNo + '" name="group_' + roNo + '"><option value="" >Select Group</option>';
+                    //     for (var k = 0; k < groups.length; k++) {
+                        
+                    //             data += '<option value="' + groups[k] + '">' + groups[k] + '</option>';
+                            
+                    //     }
+                    //     data += '</select></td>';
+                    //     data += '<td><input class="form-control" placeholder="Price" id="price_0" type="number" value=""></td>';
+                    //     data += '<td><input class="form-control" placeholder="Remarks" id="remarks_0" type="text" value=""></td><td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteReqFromSource(0, 0 )"></i></td></tr>';
+
+                    // }
                     $('#requisitionTableBody').append(data);
                     roNo = i;
                 },
@@ -841,7 +892,7 @@ function confirmDelete(id) {
     if (confirm('Are you sure you want to delete?')) {
         $.ajax({
             type: 'POST',
-            url: 'tokenAdd.php',
+            url: 'phpScripts/tokenAdd.php',
             data: {
                 id: id,
                 "Action": 'deleteToken'
@@ -853,13 +904,13 @@ function confirmDelete(id) {
             },
             success: function (response) {
                 if (response == 'success') {
-                    $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Deleted");
+                    $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong>Successfully Deleted");
                     $("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
                         $(this).hide(); n();
                     });
                 } else if (response == 'reject') {
-                    $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Reject ! </strong> Already have a Quotatiaon");
-                    $("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
+                    $("#divErrorMsg").html("<strong><i class='icon fa fa-check'></i>Rejected ! </strong> Already have a Quotatiaon");
+                    $("#divErrorMsg").show().delay(2000).fadeOut().queue(function (n) {
                         $(this).hide(); n();
                     });
                 }

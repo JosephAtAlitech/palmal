@@ -1,9 +1,9 @@
 
 const queryString = window.location.search;
-console.log(queryString);
+//console.log(queryString);
 const urlParams = new URLSearchParams(queryString);
 const id = urlParams.get('id')
-console.log(id);
+
 
 $(document).ready(function () {
     $('#mechanic').select2({
@@ -15,7 +15,7 @@ $(document).ready(function () {
 });
 
 
-function setLowerBidder(){
+function setLowerBidder() {
     var token_id = $('#token_id').val();
     $.ajax({
         type: 'POST',
@@ -31,11 +31,11 @@ function setLowerBidder(){
             $("#loading").show();
         },
         success: function (response) {
-          
+
             //alert(JSON.stringify(response));
-           
-            if(response.code != 200){
-                $("#lowerBidderErrorMsg").html("<strong><i class='icon fa fa-check'></i>"+response.code+" ! </strong> "+response.msg);
+
+            if (response.code != 200) {
+                $("#lowerBidderErrorMsg").html("<strong><i class='icon fa fa-check'></i>" + response.code + " ! </strong> " + response.msg);
                 $("#lowerBidderErrorMsg").show().delay(4500).fadeOut().queue(function (n) {
                     $(this).hide(); n();
                 });
@@ -43,18 +43,18 @@ function setLowerBidder(){
             $('#lowerBidderModal').modal('show');
             $("#bidderTableHeader").html('');
             $("#bidderInfo").html('');
-            data ='';
-            data1 ='';
-            if(response.code == 200 || response.code == 201){
-                data1 ='<th>Group</th><th>Price</th><th>Supplier</th>';
-                data+='<tr><td>'+response.data.group_1+'</td><td>'+response.data.lower_amount_1+'</td><td>'+response.data.supplier_1+'</td></tr>'
-                data+='<tr><td>'+response.data.group_2+'</td><td>'+response.data.lower_amount_2+'</td><td>'+response.data.supplier_2+'</td></tr>'
-                data+='<tr><td>'+response.data.group_3+'</td><td>'+response.data.lower_amount_3+'</td><td>'+response.data.supplier_3+'</td></tr>'
-                
+            data = '';
+            data1 = '';
+            if (response.code == 200 || response.code == 201) {
+                data1 = '<th>Group</th><th>Price</th><th>Supplier</th>';
+                data += '<tr><td>' + response.data.group_1 + '</td><td>' + response.data.lower_amount_1 + '</td><td>' + response.data.supplier_1 + '</td></tr>'
+                data += '<tr><td>' + response.data.group_2 + '</td><td>' + response.data.lower_amount_2 + '</td><td>' + response.data.supplier_2 + '</td></tr>'
+                data += '<tr><td>' + response.data.group_3 + '</td><td>' + response.data.lower_amount_3 + '</td><td>' + response.data.supplier_3 + '</td></tr>'
+
                 $("#bidderTableHeader").append(data1);
                 $("#bidderInfo").append(data);
             }
-           
+
         },
         error: function (xhr) {
             alert(xhr.responseText);
@@ -65,6 +65,57 @@ function setLowerBidder(){
         }
     });
 }
+
+function getLowerBidder() {
+    var token_id = $('#token_id_for_approval').val();
+    $.ajax({
+        type: 'POST',
+        url: 'phpScripts/quotationAdd.php',
+        data: {
+            id: id,
+            token_id: token_id,
+            "Action": 'getLowerBidder'
+        },
+        dataType: 'json',
+        beforeSend: function () {
+            // Show image container
+            $("#loading").show();
+        },
+        success: function (response) {
+
+            //alert(JSON.stringify(response));
+
+            $(".tableArea").html('');
+            data = '';
+
+            if (response.msg == 'success') {
+                data += '<table class="table table-bordered">';
+                data += '<thead style="background: gray">';
+                data += '<th>Group</th><th>Price</th><th>Supplier</th>';
+                data += '</thead>';
+                data += '<tbody>';
+                data += '<tr><td>' + response.data.group_1 + '</td><td>' + response.data.lower_amount_1 + '</td><td>' + response.data.supplier_1 + '</td></tr>'
+                data += '<tr><td>' + response.data.group_2 + '</td><td>' + response.data.lower_amount_2 + '</td><td>' + response.data.supplier_2 + '</td></tr>'
+                data += '<tr><td>' + response.data.group_3 + '</td><td>' + response.data.lower_amount_3 + '</td><td>' + response.data.supplier_3 + '</td></tr>'
+                data += '</tbody>';
+                data += '</table>';
+                $(".tableArea").append(data);
+
+            } else {
+                $(".tableArea").html("<p>No Data!</p>");
+            }
+
+        },
+        error: function (xhr) {
+            alert(xhr.responseText);
+        },
+        complete: function (data) {
+            // Hide image container
+            $("#loading").hide();
+        }
+    });
+}
+
 
 
 
@@ -94,10 +145,10 @@ $(document).ready(function () {
             var comment = $("#comment").val();
             var userType = $("#userType").val();
             var approvalStatus = $("#approvalStatus").val();
-           
+
             var fd = new FormData();
 
-            if(userType =='ed'){
+            if (userType == 'ed') {
                 var file = $('#file')[0].files[0];
                 fd.append('file', file);
             }
@@ -171,7 +222,7 @@ $(document).ready(function () {
 
 // PO section
 function prGenerate(token_id) {
-   // $("#quote_id_fr_pr").val(id);
+    // $("#quote_id_fr_pr").val(id);
     $("#token_id_fr_pr").val(token_id);
     $.ajax({
         type: 'POST',
@@ -194,8 +245,8 @@ function prGenerate(token_id) {
                     $(this).hide(); n();
                 });
                 $('.confirmPr').prop('disabled', true);
-            }else{
-                if(response == 'have_pr') {
+            } else {
+                if (response == 'have_pr') {
                     $('.pr_label').text('Already PR Generated');
                     $('#view_pr_button').show();
                     $('#view_pr_button').prop('disabled', false);
@@ -205,7 +256,12 @@ function prGenerate(token_id) {
                     $('#view_pr_button').prop('disabled', true);
                     $('.confirmPr').prop('disabled', false);
                 } else {
-                    alert(JSON.stringify(response));
+                    $("#prModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> " + response);
+                    $("#prModalErrorMsg").show().delay(3500).fadeOut().queue(function (n) {
+                        $(this).hide(); n();
+                    });
+                    $('#view_pr_button').prop('disabled', false);
+                    $('.confirmPr').prop('disabled', false);
                 }
             }
         },
@@ -223,7 +279,7 @@ function confirmPr() {
     // var id = $("#quote_id_fr_pr").val();
     var token_id = $("#token_id_fr_pr").val();
     var pr_date = $("#pr_date").val();
-//alert(id+' '+token_id+' '+po_date);
+    //alert(id+' '+token_id+' '+po_date);
     $.ajax({
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
@@ -266,7 +322,7 @@ function confirmPr() {
 function poApproval(token_id) {
     // $("#quote_id_fr_po").val(id);
     $("#token_id_fr_po").val(token_id);
- 
+
     $.ajax({
         type: 'POST',
         url: 'phpScripts/quotationAdd.php',
@@ -280,6 +336,7 @@ function poApproval(token_id) {
             $("#loading").show();
         },
         success: function (response) {
+            getLowerBidder();
             $('#poApprovalModal').modal('show');
             //alert(JSON.stringify(response));
             if (response == 'ed_not_approved') {
@@ -288,22 +345,28 @@ function poApproval(token_id) {
                     $(this).hide(); n();
                 });
                 $('.confirmPo').prop('disabled', true);
-            }else{
+            } else {
+                $('#view_bill_button').prop('disabled', true);
+                $('.confirmPo').prop('disabled', true);
                 if (response == 'have_po') {
                     $('.po_label').text('Already Have Purchase Oprder');
                     $('#view_bill_button').show();
                     $('#view_bill_button').prop('disabled', false);
-                    $('.confirmPo').prop('disabled', true);
+
                 } else if (response == 'dont_have_po') {
                     $('.po_label').text(' Do You Want to Confirm Purchase Order? ');
-                    $('#view_bill_button').prop('disabled', true);
+
                     $('.confirmPo').prop('disabled', false);
                 } else {
-                    alert(JSON.stringify(response));
+                    $("#poModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong>" + response);
+                    $("#poModalErrorMsg").show().delay(3500).fadeOut().queue(function (n) {
+                        $(this).hide(); n();
+                    });
+
                 }
             }
-            
-          
+
+
         },
         error: function (xhr) {
             alert(xhr.responseText);
@@ -334,6 +397,7 @@ function confirmPo() {
             $("#loading").show();
         },
         success: function (response) {
+
             //alert(JSON.stringify(response));
             if (response == 'success') {
                 $('#poApprovalModal').modal('hide');
@@ -376,6 +440,7 @@ function storeDeprt(token_id) {
             $("#loading").show();
         },
         success: function (response) {
+            getLowerBidder();
             $('#storeApprovalModal').modal('show');
 
             //alert(response.date)
@@ -384,32 +449,39 @@ function storeDeprt(token_id) {
                 data = '';
                 $('#lowBidProducts').html('');
                 for (i = 0; i < response['products'].length; i++) {
-                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="quote_details_id_' + i + '" value="' + response['products'][i].id + '"><input type="checkbox" id="checkbox_no_' + i + '" value="' + response['products'][i].id + '" ></td><td><input class="form-control" width="20%" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].req_product + '" readonly></td><td width="20%"><input class="form-control" placeholder="Group Name" id="req_group_' + i + '" type="text" value="' + response['products'][i].req_group_name + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td><td><input class="form-control" placeholder="Remarks" id="store_pro_remarks_' + i + '" type="text" value="" > </td></tr>';
+                    data += '<tr id="rowId_' + i + '"><td><input type="hidden" id="req_details_id_' + i + '" value="' + response['products'][i].id + '"><input name="checkbox_no" type="checkbox" id="checkbox_no_' + i + '" value="' + response['products'][i].id + '" ></td><td><input class="form-control" width="20%" placeholder="Product Name" id="products_' + i + '" type="text" value="' + response['products'][i].req_product + '" readonly></td><td width="20%"><input class="form-control" placeholder="Group Name" id="req_group_' + i + '" type="text" value="' + response['products'][i].req_group_name + '" readonly></td><td><input class="form-control" placeholder="Quantity" id="qty_' + i + '" type="number" value="' + response['products'][i].qty + '" readonly></td><td><input class="form-control" placeholder="Unit" id="unit_' + i + '" type="text" value="' + response['products'][i].unit + '" readonly></td><td><input class="form-control" placeholder="Total price" id="last_price_' + i + '" type="text" value="' + response['products'][i].audit_total_amount + '" readonly> </td><td><input class="form-control" placeholder="Remarks" name="store_pro_remarks" id="store_pro_remarks_' + i + '" type="text" value="' + response['products'][i].store_remarks + '" > </td></tr>';
                 }
                 $('#lowBidProducts').append(data);
-
-            } else {
-                alert(JSON.stringify(response));
             }
-            if(response.status == 'po_not_generated'){
+            if (response.status == 'po_not_generated') {
                 $("#storeModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> PO Not Generated!");
                 $("#storeModalErrorMsg").show().delay(2000).fadeOut().queue(function (n) {
                     $(this).hide(); n();
                 });
                 $('#storeConfirmBtn').prop('disabled', true);
-            }else{
+            } else {
                 if (response.date === null) {
                     $('#storeConfirmBtn').prop('disabled', false);
-                } else {
+                }
+                else if (response == 'No Bidder Data') {
+                    $("#storeModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> " + response);
+                    $("#storeModalErrorMsg").show().delay(2000).fadeOut().queue(function (n) {
+                        $(this).hide(); n();
+                    });
+                    $('#storeConfirmBtn').prop('disabled', true);
+
+                }
+                else {
                     $("#storeModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> Already Approved");
                     $("#storeModalErrorMsg").show().delay(2000).fadeOut().queue(function (n) {
                         $(this).hide(); n();
                     });
                     $('#storeConfirmBtn').prop('disabled', true);
+                    $('#storeComment').val(response.comment);
                 }
-                
+
             }
-            
+
         },
         error: function (xhr) {
             alert(xhr.responseText);
@@ -420,7 +492,10 @@ function storeDeprt(token_id) {
         }
     });
 }
+function getCheckedRemarks() {
 
+    return checkedRemarks;
+}
 
 function confirmStore() {
     //var quoteId = $("#quote_id_fr_str").val();
@@ -428,16 +503,34 @@ function confirmStore() {
     var store_date = $("#store_date").val();
     var storeComment = $("#storeComment").val();
     var quoteDetailsId = [];
-    var store_remarks = [];
+    var req_details_id = [];
+    var checkedRemarks = [];
 
-    var i=0;
+    var checkboxes = document.querySelectorAll('input[name="checkbox_no"]');
+    checkboxes.forEach(function (checkbox) {
+        if (checkbox.checked) {
+            // Get the row id based on the checked checkbox
+            var rowId = checkbox.id.split('_')[2]; // Extract the row id from the checkbox id
+            // Get the remarks value for the checked row
+            var remarks = document.getElementById('store_pro_remarks_' + rowId).value;
+            // Add the remarks value to the array
+            checkedRemarks.push(remarks);
+        }
+    });
+
+
     $('[id^="checkbox_no_"]').each(function () {
         if ($(this).is(':checked')) {
             quoteDetailsId.push($(this).val());
         }
-        store_remarks[i] = $("#store_pro_remarks_"+i).val();
     });
 
+
+
+    $('input[id^="req_details_id_"]').each(function () {
+        var $this = $(this);
+        req_details_id.push($this.val());
+    });
     if (quoteDetailsId == '') {
         $("#divModalErrorMsg").html("<strong>Error ! </strong> Select Product First!");
         $("#divModalErrorMsg").show().delay(2000).fadeOut().queue(function (n) {
@@ -446,11 +539,13 @@ function confirmStore() {
         return
     }
 
+
     var fd = new FormData();
 
     fd.append('tokenId', tokenId);
+    fd.append('req_details_id', req_details_id);
     fd.append('store_date', store_date);
-    fd.append('store_remarks', store_remarks);
+    fd.append('checkedRemarks', checkedRemarks);
     fd.append('storeComment', storeComment);
     fd.append('quoteDetailsId', quoteDetailsId);
     fd.append('Action', "setStoreApprovalInfo");
@@ -475,7 +570,6 @@ function confirmStore() {
                 $("#divMsg").show().delay(2000).fadeOut().queue(function (n) {
                     $(this).hide(); n();
                 });
-
             } else {
                 alert(JSON.stringify(response));
             }
@@ -513,14 +607,14 @@ function confirmProcurement(token_id) {
 
             $('#storeCommentreview').val(response.storeComment)
             //alert(response.date)
-            
+
             if (response.status === 'store_not_accepted') {
                 $("#procurementModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> Store Not Accepted");
-                    $("#procurementModalErrorMsg").show().delay(3500).fadeOut().queue(function (n) {
-                        $(this).hide(); n();
-                    });
-                    $('#procurementConfirmBtn').prop('disabled', true);
-            }else{
+                $("#procurementModalErrorMsg").show().delay(3500).fadeOut().queue(function (n) {
+                    $(this).hide(); n();
+                });
+                $('#procurementConfirmBtn').prop('disabled', true);
+            } else {
                 if (response.date === null) {
                     $('#procurementConfirmBtn').prop('disabled', false);
                 } else {
@@ -531,7 +625,7 @@ function confirmProcurement(token_id) {
                     $('#procurementConfirmBtn').prop('disabled', true);
                 }
             }
-      
+
             if (response.msg == 'success') {
                 var i = 0;
                 data = '';
@@ -542,7 +636,11 @@ function confirmProcurement(token_id) {
                 $('#finalProducts').append(data);
 
             } else {
-                alert(JSON.stringify(response));
+                $("#procurementModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> " + response);
+                $("#procurementModalErrorMsg").show().delay(3500).fadeOut().queue(function (n) {
+                    $(this).hide(); n();
+                });
+                $('#procurementConfirmBtn').prop('disabled', true);
             }
         },
         error: function (xhr) {
@@ -649,30 +747,48 @@ function confirmApproval(id, user) {
             $("#editLoader").show();
         },
         success: function (response) {
-            alert(JSON.stringify(response));
-            if (response == 'revious_step_not_approved') {
-                $("#approvalModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> Waiting for approval process!");
+            //alert(JSON.stringify(response));
+            getLowerBidder();
+            if (response.msg == 'No bidder Selected') {
+                $("#approvalModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> " + response.msg + "!");
                 $("#approvalModalErrorMsg").show().delay(3000).fadeOut().queue(function (n) {
                     $(this).hide(); n();
                 });
                 $('#approvalSaveBtn').prop('disabled', true);
                 $('#comment').prop('disabled', true);
                 $('#approvalStatus').prop('disabled', true);
+
+            } else {
+
+                if (response.msg == 'revious_step_not_approved') {
+                    $("#approvalModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> Waiting for approval process!");
+                    $("#approvalModalErrorMsg").show().delay(3000).fadeOut().queue(function (n) {
+                        $(this).hide(); n();
+                    });
+                    $('#approvalSaveBtn').prop('disabled', true);
+                    $('#comment').prop('disabled', true);
+                    $('#approvalStatus').prop('disabled', true);
+                }
+                else if (response.msg == 'dont_have_approval') {
+                    $('#approvalSaveBtn').prop('disabled', false);
+                    $('#comment').prop('disabled', false);
+                    $('#approvalStatus').prop('disabled', false);
+                }
+                else {
+                    $("#approvalModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> Already Approved");
+                    $("#approvalModalErrorMsg").show().delay(3000).fadeOut().queue(function (n) {
+                        $(this).hide(); n();
+                    });
+                    $('#approvalDate').val(response.date);
+                    $('#comment').val(response.comment);
+                    $('#approvalStatus').val(response.status).trigger('change');
+
+                    $('#approvalSaveBtn').prop('disabled', true);
+                    $('#comment').prop('disabled', true);
+                    $('#approvalStatus').prop('disabled', true);
+                }
             }
-            else if (response == 'dont_have_approval') {
-                $('#approvalSaveBtn').prop('disabled', false);
-                $('#comment').prop('disabled', false);
-                $('#approvalStatus').prop('disabled', false);
-            }
-            else {
-                $("#approvalModalErrorMsg").html("<strong><i class='icon fa fa-check'></i>Not Procced ! </strong> Already Approved");
-                $("#approvalModalErrorMsg").show().delay(3000).fadeOut().queue(function (n) {
-                    $(this).hide(); n();
-                });
-                $('#approvalSaveBtn').prop('disabled', true);
-                $('#comment').prop('disabled', true);
-                $('#approvalStatus').prop('disabled', true);
-            }
+
         }, error: function (xhr) {
             alert(JSON.stringify(xhr));
         },
@@ -689,7 +805,7 @@ function confirmApproval(id, user) {
 function generateBill() {
     var qid = $("#quote_id_fr_po").val();
     var tid = $("#token_id_fr_po").val();
-    
+
     window.open('quatationDetails.php?id=' + tid + '&quote_id=' + qid, '_blank');
 }
 

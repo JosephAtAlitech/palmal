@@ -35,14 +35,9 @@
 						<div class="box">
 							<?php
 
-							// $enum =[
-							// 	'auditor'=> 'auditor',
-							// 	'mngmnt'=> 'mngmnt',
-							// 	'ed'=> 'ed'
-							// ];
-
 							if (isset($_GET['id'])) {
 								$id = $_GET['id'];
+								$filePDF = '';
 								$sql = "SELECT tbl_token.*,vehicle_master.vehicle_number, m.firstname m_name, e.firstname e_name FROM `tbl_token`
 								left outer join vehicle_master  on tbl_token.vehicle_id = vehicle_master.id
 								inner join admin as e on tbl_token.engineer_id = e.id
@@ -50,7 +45,19 @@
 								where tbl_token.deleted = 'No'  AND tbl_token.id = $id ORDER BY id  DESC";
 								$query = $conn->query($sql);
 								$row = $query->fetch_assoc();
-
+								$sql1 = "SELECT tbl_lower_bidder_info.id,ed_uplead_file from tbl_lower_bidder_info where deleted ='No' AND token_id =$id ";
+								$query1 = $conn->query($sql1);
+								//$row1 = $query1->fetch_assoc();
+								$row1No = $query1->num_rows;
+								if($row1No > 0){
+									$row1 = $query1->fetch_assoc();
+									if ($row1['ed_uplead_file'] != '') {
+										$filePD = $row1['ed_uplead_file'];
+										$filePDF = '<a href="../images/quotation/' . $filePD . '" target="_blank">ED Uploaded PDF</a>';
+									} else {
+										$filePDF = '';
+									}
+								}
 							} else {
 								$id = '';
 							}
@@ -58,10 +65,13 @@
 							<div class="box-header with-border">
 								<input type="hidden" id="token_id"
 									value="<?= isset($_GET['id']) ? $id = $_GET['id'] : '' ?>">
-								<a href="addQuotationView.php?Token_id=<?= isset($_GET['id']) ? $id = $_GET['id'] : '' ?>&type=procurement"
-									data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i
-										class="fa fa-plus"></i> Add Quotation</a>
-
+									<?php if($row1No > 0){ ?>
+								     <a href="#"
+									data-toggle="modal" class="btn btn-primary btn-sm btn-flat"  ><i
+										class="fa fa-plus"></i> Add Quotation</a> 	<?php }else {?>
+											<a href="addQuotationView.php?Token_id=<?= isset($_GET['id']) ? $id = $_GET['id'] : '' ?>&type=procurement"
+									data-toggle="modal" class="btn btn-primary btn-sm btn-flat"   ><i
+										class="fa fa-plus"></i> Add Quotation</a> <?php } ?>
 								<div class="btn-group">
 									<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
 										aria-haspopup="true" aria-expanded="false">
@@ -142,6 +152,10 @@
 											<label for="">Problem Definition</label>
 											<textarea class="form-control" cols="10" readonly><?= $problem ?></textarea>
 										</div>
+										<div class="form-group col-md-12">
+										<?= $filePDF?>
+										</div>
+										
 										<?php
 									} ?>
 								</div>

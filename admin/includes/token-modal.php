@@ -5,13 +5,13 @@
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title"><b>Add Maintenance Letter</b></h4>
+				<h4 class="modal-title"><b>Add Demand Letter</b></h4>
 			</div>
 			<div class="modal-body">
 				<form class="form-horizontal" id="token_add_form" enctype="multipart/form-data">
 
 					<div class="form-group">
-					    <div class="col-sm-6">
+						<div class="col-sm-6">
 							<label class="">Service Title <span class="text-danger">*</span></label>
 							<input type="text" id="tokenTitle" class="form-control" name="tokenTitle"
 								placeholder=" Service Title ">
@@ -25,7 +25,7 @@
 					<div class="form-group">
 						<div class="col-sm-4">
 							<label class="">Vehicle No <span class="text-danger">*</span></label>
-							<select id="vehicle" class="form-control" name="vehicle" placeholder="Select Vehicle "
+							<select id="vehicle" class="form-control" name="vehicle" placeholder=" Select Vehicle "
 								onchange="getDriverAndEngr()">
 								<?php
 								$sql = "SELECT vehicle_master.id,vehicle_master.vehicle_number,manufacturer_name.name,vehicle_master.maker_brand,vehicle_master.cc_brand,vehicle_master.fuel_type,vehicle_master.wings_name,vehicle_master.employee_name,vehicle_master.location 
@@ -45,7 +45,8 @@
 
 						<div class="col-sm-4">
 							<label class="">Select Driver </label>
-							<select id="driver" class="form-control" name="driver" placeholder="Select Driver " disabled>
+							<select id="driver" class="form-control" name="driver" placeholder="Select Driver "
+								disabled>
 								<?php
 								$sql = "SELECT id, driver_name, phone from driver_master where status = 'Active' ORDER BY id desc";
 								$result = $conn->query($sql);
@@ -60,7 +61,8 @@
 						</div>
 						<div class="col-sm-4">
 							<label class="">Select Engineer </label>
-							<select id="engineer" class="form-control" name="engineer" placeholder="Select Engineer " disabled>
+							<select id="engineer" class="form-control" name="engineer" placeholder="Select Engineer "
+								disabled>
 								<?php
 								$sql = "SELECT * from admin where department = 'Workshop' AND position = 'Engineer' AND deleted = 'On' ORDER BY id desc";
 								$result = $conn->query($sql);
@@ -114,7 +116,7 @@
 					</div>
 					<div class="form-group">
 						<div class="col-sm-12">
-							<label class="">Maintenance Details <span class="text-danger">*</span></label>
+							<label class="">Maintenance Details <span class="text-danger"></span></label>
 							<textarea type="text" id="tokenDetails" class="form-control" name="tokenDetails"
 								placeholder=" Service Details" rows="4"></textarea>
 							<span id="phone-availability-status"></span>
@@ -175,7 +177,7 @@
 			<div class="modal-body">
 				<table class="table table-bordered table-responsive">
 					<thead id='bidderTableHeader'>
-						
+
 					</thead>
 					<tbody id='bidderInfo'>
 
@@ -280,7 +282,7 @@
 </div>
 
 <div class="modal fade" id="dgmApprovalModal">
-	<div class="modal-dialog">
+	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -294,6 +296,10 @@
 				</div>
 			</div>
 			<div class="modal-body">
+				<div class="tableArea">
+
+				</div>
+				<hr>
 				<form class="form-horizontal" id="quatationApprovalForm" method="POST" enctype="multipart/form-data">
 					<div class="fieldArea">
 						<div class="form-group">
@@ -359,7 +365,9 @@
 				</div>
 			</div>
 			<div class="modal-body">
-
+				<div class="tableArea">
+				</div>
+				<hr>
 				<div class="form-group">
 					<input type="hidden" id="quote_id_fr_po">
 					<input type="hidden" id="token_id_fr_po">
@@ -382,7 +390,7 @@
 				</div>
 				<div class="modal-footer mt-2">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i
-							class="fa fa-close"></i> Cancle</button>
+							class="fa fa-close"></i> Cancel</button>
 					<button type="submit" class="btn btn-primary btn-flat confirmPo" name="" id="poSaveBtn"
 						onclick="confirmPo()"><i class="fa fa-save"> </i> Yes</button>
 				</div>
@@ -430,7 +438,7 @@
 				</div>
 				<div class="modal-footer mt-2">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i
-							class="fa fa-close"></i> Cancle</button>
+							class="fa fa-close"></i> Cancel</button>
 					<button type="submit" class="btn btn-primary btn-flat confirmPr" name="" id="prSaveBtn"
 						onclick="confirmPr()"><i class="fa fa-save"> </i> Yes</button>
 				</div>
@@ -456,7 +464,9 @@
 				</div>
 			</div>
 			<div class="modal-body">
-
+				<div class="tableArea">
+				</div>
+				<hr>
 				<div class="form-group">
 					<input type="hidden" id="quote_id_fr_str">
 					<input type="hidden" id="token_id_fr_str">
@@ -473,11 +483,11 @@
 						<thead>
 							<th>Check</th>
 							<th>Product Name</th>
+							<th>Group Name</th>
 							<th>Quantity</th>
 							<th>Unit</th>
 							<th>Price</th>
 							<th>Remarks</th>
-							<th>Supplier</th>
 						</thead>
 						<tbody id="lowBidProducts">
 
@@ -493,7 +503,7 @@
 				</div>
 				<div class="modal-footer mt-2">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i
-							class="fa fa-close"></i> Cancle</button>
+							class="fa fa-close"></i> Cancel</button>
 					<button type="submit" class="btn btn-primary btn-flat" name="storeConfirmBtn" id="storeConfirmBtn"
 						onclick="confirmStore()"><i class="fa fa-save">
 						</i> Done</button>
@@ -556,7 +566,7 @@
 
 				<div class="modal-footer mt-2">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i
-							class="fa fa-close"></i> Cancle</button>
+							class="fa fa-close"></i> Cancel</button>
 					<button type="submit" class="btn btn-primary btn-flat" name="procurementConfirmBtn"
 						id="procurementConfirmBtn" onclick="finalConfirmation()"><i class="fa fa-save">
 						</i> Confirm</button>
@@ -576,6 +586,12 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
 						aria-hidden="true">&times;</span></button>
 				<h4 class="modal-title"><b>Generate Requsition </b></h4>
+			</div>
+			<div class="col-md-6">
+				<div id='reqModalMsg' class='alert alert-success alert-dismissible successMessage'>
+				</div>
+				<div id='reqModalErrorMsg' class='alert alert-danger alert-dismissible errorMessage'>
+				</div>
 			</div>
 			<div class="modal-body">
 				<form class="form-horizontal" id="contact_formEdit" method="POST" enctype="multipart/form-data">
@@ -657,22 +673,25 @@
 							</div>
 						</div>
 						<div class="col-md-12">
-							<div class="col-md-2  col-md-offset-10" >
-							
-							<button type="button"
-									class="btn btn-primary col-md-12" onclick="addRow()">+</button></div>
+							<div class="col-md-2  col-md-offset-10">
+
+								<button type="button" class="btn btn-primary col-md-12" onclick="addRow()">+</button>
+							</div>
 						</div>
 					</div>
 
 					<div class="form-group">
 						<div class="col-sm-12 mb-2">
 							<table id="requisitionTable" class="table table-bordered">
-								<thead>
+								<thead class="bg-primary">
 									<th width='30%'>Product Name</th>
 									<th width='5%'>Specification</th>
 									<th width='5%'>Quantity</th>
-									<th width='7%'>Unit</th>
+
+									<th width='10%'>Unit</th>
+
 									<th width='12%'>Group</th>
+									<th width='10%'>Price</th>
 									<th width='10%'>Remarks</th>
 									<th width='3%'>Action</th>
 								</thead>
@@ -708,22 +727,24 @@
 												<option value="Vendor Workshop Works">Vendor Workshop Works</option>
 											</select>
 										</td>
-										<td><input class="form-control" placeholder="Remarks" id="remarks_0"
+										<td><input class="form-control" placeholder="Product Name" id="products_0"
 												type="text"></td>
+										<td><input class="form-control" placeholder="Price" id="price_0" type="Number">
+										</td>
 										<td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; "
 												aria-hidden="true" onclick="deleteReq(0)"></i></td>
 									</tr>
 								</tbody>
-					
-							
-								
+
+
+
 							</table>
 						</div>
 					</div>
 					<div class="modal-footer mt-2">
 						<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i
 								class="fa fa-close"></i> Close</button>
-						<button type="button" class="btn btn-primary btn-flat" name="editDricver"
+						<button type="button" class="btn btn-primary btn-flat" id="update_requisition"
 							onclick="saveRequisition()"><i class="fa fa-save"></i> Update</button>
 					</div>
 				</form>
@@ -794,7 +815,7 @@
 								<label class="">Delivered Status<span class="text-danger">*</span></label>
 								<select class="form-control" id="fapprovalStatus" name="fapprovalStatus">
 									<option value="1" selected>Delivered</option>
-								
+
 								</select>
 							</div>
 						</div>

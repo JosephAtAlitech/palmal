@@ -25,12 +25,10 @@ if (isset($_POST["Action"])) {
             if ($tokenNo == "") {
                 $tokenNo = "000001";
             }
-            $sql = "INSERT INTO tbl_token (token_no, department_status, vehicle_id, current_mileage, driver_id, warehouse_id, token_title, token_details, mechanic_id, engineer_id,token_date, status, created_by, created_date ) 
-                    VALUES( '$tokenNo', 'Workshop','$vehicle','$currentMileage','$driver','$workshop','$tokenTitle','$tokenDetails','$mechanic','$engineer','$tokenDate','Pending','$loginID','$Date' )";
+            $sql = "INSERT INTO tbl_token (token_no, department_status, vehicle_id, current_mileage, driver_id, warehouse_id, token_title, token_details, mechanic_id, engineer_id, token_date, status, created_by, created_date ) 
+                    VALUES('$tokenNo','Workshop','$vehicle','$currentMileage','$driver','$workshop','$tokenTitle','$tokenDetails','$mechanic','$engineer','$tokenDate','Pending','$loginID','$Date')";
             if ($query = $conn->query($sql)) {
                 //$tokenID = $conn->insert_id;
-
-
                 $conn->commit();
                 echo 'success';
             } else {
@@ -50,41 +48,86 @@ if (isset($_POST["Action"])) {
         $group = explode(",", $_POST["group"]);
         $qty = explode(",", $_POST["qty"]);
         $units = explode(",", $_POST["units"]);
+        $prices = explode(",", $_POST["prices"]);
         $remarks = explode(",", $_POST["remarks"]);
         $engineerRequisitionDate = $_POST["engineerRequisitionDate"];
         $engineerComment = $_POST["engineerComment"];
         $estimatedPrice = $_POST["estimatedPrice"];
+        $quoteAmount = 0;
+        for ($i = 0; $i < count($group); $i++) {
+            if ($group[$i] == 'Vendor Workshop Works') {
+                $quoteAmount += $prices[$i];
+            }
+        }
         try {
             $conn->begin_transaction();
 
             $sql0 = "UPDATE tbl_token SET engr_req_details = '$engineerComment' , engr_requisition_date = '$engineerRequisitionDate' , estimated_price ='$estimatedPrice', status = 'Gen_Requsition' WHERE tbl_token.id = $tokenId";
             $query = $conn->query($sql0);
 
-            for ($i = 0; $i < count($productsArr); $i++) {
-                if ($requisition_ids[$i] < 0) {
-                    $sql = "INSERT INTO tbl_token_requisition ( tbl_token_id,  req_product, req_group_name, spec, qty, unit , remarks, created_by, created_date ) 
-                    VALUES( '$tokenId', '$productsArr[$i]','$group[$i]', '$specs[$i]', '$qty[$i]','$units[$i]', '$remarks[$i]',  '$loginID',  '$Date' )";
+            if ($query) {
+
+                $sql = "SELECT tbl_token.warehouse_id FROM `tbl_token`  
+                where tbl_token.id = $tokenId";
+                $query = $conn->query($sql);
+                $data = $query->fetch_assoc();
+                $supplier = $data['warehouse_id'];
+
+                $sql = "SELECT tbl_quotation.supplier_id ,tbl_quotation.id FROM `tbl_quotation`  
+                where tbl_quotation.tbl_token_id = $tokenId AND tbl_quotation.supplier_id = $supplier AND deleted = 'No' limit 1";
+                $query = $conn->query($sql);
+                if ($query->num_rows > 0) {
+                    $row = $query->fetch_assoc();
+                    $quotation_id = $row['id'];
+                    $sql = "UPDATE tbl_quotation set total_amount = '$quoteAmount',  grand_total = '$quoteAmount',  updated_by = '$loginID', updated_date = '$Date'";
                     $query = $conn->query($sql);
-                    
-                    $sql1 = "UPDATE tbl_token SET  department_status = 'Workshop' WHERE tbl_token.id = $tokenId";
-                    $query = $conn->query($sql1);
                 } else {
-                    $sql = "UPDATE tbl_token_requisition SET req_product = '$productsArr[$i]' , spec = '$specs[$i]',qty = '$qty[$i]',unit = '$units[$i]',remarks = '$remarks[$i]' where tbl_token_requisition.id = $requisition_ids[$i]";
+                    $sql = "INSERT INTO tbl_quotation (tbl_token_id, quote_by_id, total_amount, quote_date, supplier_id, grand_total, is_vendor_workshop, quotation_status,  deleted, created_by, created_date) 
+                    VALUES( '$tokenId', '$loginID', '$quoteAmount', '$Date', '$supplier', '$quoteAmount','1','Vendor Workshop Works', 'No', '$loginID', '$Date')";
+                    $query = $conn->query($sql);
+                    $quotation_id = $conn->insert_id;
+                }
+
+                for ($i = 0; $i < count($productsArr); $i++) {
+                    if ($requisition_ids[$i] < 0) {
+
+                        $sql = "INSERT INTO tbl_token_requisition ( tbl_token_id,  req_product, req_group_name, spec, qty, req_price, unit , remarks, created_by, created_date ) 
+                        VALUES( '$tokenId', '$productsArr[$i]','$group[$i]', '$specs[$i]', '$qty[$i]','$prices[$i]','$units[$i]', '$remarks[$i]',  '$loginID',  '$Date' )";
+                        $query = $conn->query($sql);
+                        $requisitionId = $conn->insert_id;
+                        if ($group[$i] == "Vendor Workshop Works") {
+                            $sql3 = "INSERT INTO tbl_quotation_details (tbl_quotation_id, tbl_token_requisition_id, Product_name, qty, unit, quotation_group_name, unit_price,total_amount, wing_head_unit_price,  wing_head_total_amount , audit_unit_price,  audit_total_amount , created_by, created_date ) 
+                                     VALUES( '$quotation_id', '$requisitionId', '$productsArr[$i]', '$qty[$i]', '$units[$i]', '$group[$i]', '$prices[$i]', '$quoteAmount', '$prices[$i]', '$quoteAmount', '$prices[$i]','$quoteAmount', '$loginID', '$Date' )";
+                            $query = $conn->query($sql3);
+                        }
+
+                        $sql1 = "UPDATE tbl_token SET  department_status = 'Workshop' WHERE tbl_token.id = $tokenId";
+                        $query = $conn->query($sql1);
+                    } else {
+                        $sql = "UPDATE tbl_token_requisition SET req_product = '$productsArr[$i]' , spec = '$specs[$i]',qty = '$qty[$i]',unit = '$units[$i]',req_price= '$prices[$i]',remarks = '$remarks[$i]' where tbl_token_requisition.id = $requisition_ids[$i]";
+                        $query = $conn->query($sql);
+
+                        if ($group[$i] == "Vendor Workshop Works") {
+                            $sql3 = "UPDATE tbl_quotation_details set  Product_name ='$productsArr[$i]', qty = '$qty[$i]', unit = '$units[$i]', quotation_group_name = '$group[$i]', unit_price = '$prices[$i]',total_amount = '$quoteAmount', wing_head_unit_price = '$prices[$i]',  wing_head_total_amount ='$quoteAmount', audit_unit_price = '$prices[$i]',  audit_total_amount ='$quoteAmount', updated_by = '$loginID' , updated_date = '$Date'  WHERE tbl_quotation_id =$quotation_id AND tbl_token_requisition_id = $requisition_ids[$i]";
+                            $query = $conn->query($sql3);
+                            if (!$query) {
+                                echo json_encode($conn->error);
+                            }
+                        }
+                    }
+                }
+                $sql2 = "SELECT id from quotation_log where step = '1' AND token_id ='$tokenId' and deleted='No'";
+                $query2 = $conn->query($sql2);
+                $num_rows = $query2->num_rows;
+                if ($num_rows < 1) {
+                    $sql = "INSERT INTO quotation_log (step, step_head, token_id, remarks, token_status,department, created_by, created_date ) 
+                   VALUES( '1', 'Manual Requisition','$tokenId','Engineer created requisition and entired the details into the system.','Gen_Requsition','Workshop','$loginID','$Date')";
                     $query = $conn->query($sql);
                 }
-            }
-            $sql2 = "SELECT id from quotation_log where step = '1' AND token_id ='$tokenId' and deleted='No'";
-            $query2 = $conn->query($sql2);
-            $num_rows = $query2->num_rows;
-            if ($num_rows < 1) {
-                $sql = "INSERT INTO quotation_log (step, step_head, token_id, remarks, token_status,department, created_by, created_date ) 
-                VALUES( '1', 'Manual Requisition','$tokenId','Engineer created requisition and entired the details into the system.','Gen_Requsition','Workshop','$loginID','$Date')";
-                $query = $conn->query($sql);
-            }
 
-            $conn->commit();
-            echo 'success';
-
+                $conn->commit();
+                echo 'success';
+            }
         } catch (Exception $e) {
             $conn->rollback();
             echo $conn->error . $e;
@@ -94,6 +137,7 @@ if (isset($_POST["Action"])) {
 
         $id = $_POST["id"];
         $requisitionArr = [];
+        $is_bidded ='No';
         $sql = "SELECT tbl_token_requisition.* from tbl_token_requisition 
                 where tbl_token_requisition.deleted ='No' and tbl_token_requisition.tbl_token_id = $id";
         $query1 = $conn->query($sql);
@@ -110,7 +154,14 @@ if (isset($_POST["Action"])) {
                 array_push($unites, $row2);
             }
 
-            echo json_encode(['requisitions' => $requisitionArr, 'units' => $unites]);
+            $sql1 = "SELECT tbl_lower_bidder_info.id from tbl_lower_bidder_info  where tbl_lower_bidder_info.token_id = $id";
+            $query = $conn->query($sql1);
+            $rowNum = $query->num_rows;
+            if ($rowNum > 0) {
+               // $row = $query->fetch_assoc();
+                $is_bidded = 'Yes';
+            }
+            echo json_encode(['requisitions' => $requisitionArr, 'units' => $unites, 'is_bidded' => $is_bidded]);
         } else {
             echo json_encode($conn->error . $sql);
         }
@@ -145,29 +196,30 @@ if (isset($_POST["Action"])) {
         }
     } else if ($_POST["Action"] == "deleteToken") {
         $id = $_POST["id"];
-        $sql = "SELECT id from tbl_quotation where tbl_quotation.tbl_token_id  =$id AND deleted = 'No'";
+        $sql = "SELECT id from tbl_quotation where tbl_quotation.tbl_token_id = $id AND deleted = 'No'";
         $query = $conn->query($sql);
-
-        if ($query->num_rows > 0) {
-            $sql = "UPDATE  tbl_token set deleted = 'Yes'
-            where tbl_token.id = $id";
-            $query = $conn->query($sql);
-
-            if ($query) {
-                $sql = "UPDATE  tbl_token_requisition set deleted = 'Yes'
-                        where tbl_token_requisition.tbl_token_id = $id";
+        if ($query) {
+            if ($query->num_rows == 0) {
+                $sql = "UPDATE  tbl_token set deleted = 'Yes'
+                        where tbl_token.id = $id";
                 $query = $conn->query($sql);
+
                 if ($query) {
-                    echo 'success';
+                    $sql = "UPDATE  tbl_token_requisition set deleted = 'Yes'
+                            where tbl_token_requisition.tbl_token_id = $id";
+                    $query = $conn->query($sql);
+                    if ($query) {
+                        echo json_encode('success');
+                    }
+                } else {
+                    echo json_encode($conn->error . $sql);
                 }
             } else {
-                echo json_encode($conn->error . $sql);
+                echo json_encode('reject');
             }
         } else {
-            echo 'reject';
+            echo json_encode($conn->error . $sql);
         }
-
-
     } else if ($_POST["Action"] == "deleteRequisition") {
 
         $id = $_POST["id"];
@@ -282,11 +334,11 @@ if (isset($_POST["Action"])) {
 
     while ($row = $query->fetch_assoc()) {
         $id = $row['id'];
-        if($row['is_delivered']!=''){
-                $deliStataus = '<div class="label label-success" style="font-size:14px; margin-right:2px"><i class="fa fa-view" style="width: 80%;"Delivered</i></div>';
-            }else{
-                $deliStataus = '<div class="label label-danger" style="font-size:14px; margin-right:2px"><i class="fa fa-view" style="width: 80%;">Not_delivered<i></span>'; 
-            }
+        if ($row['is_delivered'] != '') {
+            $deliStataus = '<div class="label label-success" style="font-size:14px; margin-right:2px"><i class="fa fa-view" style="width: 80%;"Delivered</i></div>';
+        } else {
+            $deliStataus = '<div class="label label-danger" style="font-size:14px; margin-right:2px"><i class="fa fa-view" style="width: 80%;">Not_delivered<i></span>';
+        }
         if ($row['problems'] != '') {
             $mc_comments = "Comments  : " . $row['problems'];
         } else {
@@ -314,7 +366,7 @@ if (isset($_POST["Action"])) {
         //  $row1 = $query1->fetch_array();
 
 
-        $sql3 = "SELECT tbl_quotation.id , tbl_party.partyName,tbl_quotation.po_date, tbl_quotation.is_accepted
+        $sql3 = "SELECT tbl_quotation.id , tbl_party.partyName
             FROM `tbl_quotation`
                  join tbl_party on tbl_quotation.supplier_id = tbl_party.id
                  WHERE tbl_quotation.tbl_token_id = $id AND tbl_quotation.deleted ='No' ";
@@ -323,20 +375,32 @@ if (isset($_POST["Action"])) {
         $quote_vendors = '';
         $po_date = '';
         $billButtons = '';
+        $csReport = '';
         while ($qRowsData = $query2->fetch_assoc()) {
 
-            $qouteId = $qRowsData['id'];
-            $po_date = $qRowsData['po_date'];
-            $is_accepted = $qRowsData['is_accepted'];
             $accepted_label = '';
-            
-            if ($is_accepted != '') {
-                $accepted_label = '<b>(Accepted)</b>';
-            }
-            $quote_vendors .= '<li>' . $qRowsData['partyName'] . ' ' . $accepted_label . '</li>';
+
+            // if ($is_accepted != '') {
+            //     $accepted_label = '<b>(Accepted)</b>';
+            // }
+            $quote_vendors .= '<li>' . $qRowsData['partyName'] . '</li>';
+
+
+        }
+
+        $sql4 = "SELECT tbl_lower_bidder_info.id,  tbl_lower_bidder_info.po_date, tbl_lower_bidder_info.is_accepted
+        FROM `tbl_lower_bidder_info`
+        WHERE tbl_lower_bidder_info.token_id = $id AND tbl_lower_bidder_info.deleted ='No'";
+        $query4 = $conn->query($sql4);
+        $lbRows = $query4->num_rows;
+        if ($lbRows > 0) {
+            $lbRowsData = $query4->fetch_assoc();
+            $po_date = $lbRowsData['po_date'];
+            $lowerBidders_id = $lbRowsData['id'];
 
             if ($po_date != '') {
-                $billButtons = '<li><a href="quatationDetails.php?id=' . $id . '&quote_id=' . $qouteId . '"  target="_blank"><i class="fa fa-edit"></i> Challan Bill</a></li>';
+                $billButtons = '<li><a href="quatationDetails.php?id=' . $id . '&lowerBidders_id=' . $lowerBidders_id . '"  target="_blank"><i class="fa fa-edit"></i> Challan Bill</a></li>';
+                $csReport = '<li><a href="tokenReport.php?id=' . $id . '&lowerBidders_id=' . $lowerBidders_id . '"  target="_blank"><i class="fa fa-file-pdf-o"></i> CS Report PDF</a></li>';
             } else {
                 $billButtons = '';
             }
@@ -363,10 +427,9 @@ if (isset($_POST["Action"])) {
                     <li><a href="#" onclick="mechanicComment(' . $id . ')"><i class="fa fa-edit"></i> Diagnosis by Mechanic</a></li>
                      <li><a href="maintenanceDemand.php?id=' . $id . '"  target="_blank"><i class="fa fa-file-pdf-o"></i> Demand Letter PDF</a></li>
                     <li><a href="#" onclick="addEgineerRequisition(' . $id . ')"><i class="fa fa-edit"></i> Generate Egr. Requisition</a></li>
-                    <li><a href="quotationList.php?id=' . $id . '" target="_blank" ><i class="fa fa-edit"></i> Quotations </a></li>
-                    <li><a href="tokenReport.php?id=' . $id . '"  target="_blank"><i class="fa fa-file-pdf-o"></i> CS Report PDF</a></li>
-                   
-                    <li>' . $billButtons . '</li>'
+                    <li><a href="quotationList.php?id=' . $id . '" target="_blank" ><i class="fa fa-edit"></i> Quotations </a></li>'
+            . $csReport
+            . $billButtons
             . $approveButtons .
             '<li><a href="#" onclick="confirmDelete(' . $id . ')"><i class="fa fa-trash"></i> Delete</a></li>
                 </ul>
@@ -376,10 +439,10 @@ if (isset($_POST["Action"])) {
         $output['data'][] = array(
             $i++,
             $row['token_no'] . '<br>Vehicle No:  ' . $row['vehicle_number'] . '<br>Service title: ' . $row['token_title'],
-            'User : ' . $row['employee_name'].'<br>Driver : ' . $row['driver_name'].'<br>Mechanics : '.$row['m_name'] . '<br>Engineer : ' . $row['e_name'],
+            'User : ' . $row['employee_name'] . '<br>Driver : ' . $row['driver_name'] . '<br>Mechanics : ' . $row['m_name'] . '<br>Engineer : ' . $row['e_name'],
             '<a href="#" onclick="addEgineerRequisition(' . $id . ')"><b>Products(' . $rows . ')</b></a><br>' . $products,
             '<a href="quotationList.php?id=' . $id . '" target="_blank" ><b>Quotations (' . $qRows . ')</b></a><br>' . $quote_vendors,
-            $department_status.'<br><br>'.$badge.'<br><br>'.$deliStataus,
+            $department_status . '<br><br>' . $badge . '<br><br>' . $deliStataus,
             $button
         );
     }

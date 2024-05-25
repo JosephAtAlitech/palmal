@@ -50,15 +50,27 @@
                             <div class="box-body">
                                 <div class="form-group ">
                                     <?php
-                                    if (isset ($_GET['Token_id'])) {
+                                    if (isset($_GET['Token_id'])) {
+
+                                        //$quotation_id = $_GET['id'];
                                         $id = $_GET['Token_id'];
+                                        $status = '';
+                                        $button = '';
                                         $sql = "SELECT * FROM `tbl_token` WHERE id = $id ";
                                         $result = $conn->query($sql);
                                         $row = $result->fetch_assoc();
                                         $token = $row['token_title'];
 
-                                        $status = '';
-                                        $button = '';
+                                        $sql = "SELECT id  FROM   tbl_lower_bidder_info   
+                                        WHERE tbl_lower_bidder_info.token_id = " . $id . " AND  tbl_lower_bidder_info.deleted = 'No' LIMIT 1";
+                                        $query = $conn->query($sql);
+
+                                        if ($query) {
+                                            if ($query->num_rows > 0) {
+                                                $status = 'Audit Already set price for final bidding.';
+                                                $button = 'Disabled';
+                                            }
+                                        }
 
                                         $sql = "SELECT tbl_token.*,vehicle_master.vehicle_number,vehicle_master.employee_name, m.firstname m_name, e.firstname e_name FROM `tbl_token`
 												left outer join vehicle_master  on tbl_token.vehicle_id = vehicle_master.id
@@ -67,8 +79,6 @@
 												where tbl_token.deleted = 'No'  AND tbl_token.id = $id ORDER BY id  DESC";
                                         $query = $conn->query($sql);
                                         $row = $query->fetch_assoc();
-
-
                                         $tokenNo = $row['token_no'];
                                         $vehicle_number = $row['vehicle_number'];
                                         $employee_name = $row['employee_name'];
@@ -80,7 +90,9 @@
                                         <div class="row ">
                                             <div class="  col-md-4">
                                                 <label for="">Demand No | Vehicle No</label>
-                                                <input type="text" class="form-control" value="<?= $tokenNo ?> | (<?= $vehicle_number ?> : <?= $employee_name ?>)" disabled>
+                                                <input type="text" class="form-control"
+                                                    value="<?= $tokenNo ?> | (<?= $vehicle_number ?> : <?= $employee_name ?>)"
+                                                    disabled>
                                             </div>
                                             <div class=" col-md-4">
                                                 <label for="">Demand Date</label>
@@ -94,19 +106,16 @@
 
                                             <div class=" col-md-12">
                                                 <label for="">Problem Definition</label>
-                                                <textarea class="form-control" cols="10"
-                                                    readonly><?= $problem ?></textarea>
+                                                <textarea class="form-control" cols="10" readonly><?= $problem ?></textarea>
                                             </div>
                                         </div>
                                         <hr>
                                         <?php
-
-
                                     }
                                     ?>
 
                                 </div>
-                               
+
 
                                 <div class="form-group ">
                                     <div class="col-sm-12 mb-1">
@@ -123,7 +132,7 @@
                                     </div>
 
                                     <?php
-                                    if (isset ($_GET['type'])) {
+                                    if (isset($_GET['type'])) {
                                         if ($_GET['type'] == 'procurement') {
                                             ?>
                                             <div class="col-sm-4">
@@ -152,48 +161,64 @@
 
                                             $quotation_id = $_GET['id'];
 
-                                            $sql = "SELECT supplier_id , auditor_approverd_date FROM   tbl_quotation   
+                                            $sql = "SELECT supplier_id  FROM   tbl_quotation   
                                                      WHERE tbl_quotation.id = " . $quotation_id . " AND  tbl_quotation.deleted = 'No' LIMIT 1";
                                             $result = $conn->query($sql);
                                             $row = $result->fetch_assoc();
                                             $supplier_id = $row['supplier_id'];
-                                            $auditor_approverd_date = $row['auditor_approverd_date'];
-                                            $status = '';
-                                            $button = '';
-                                            if ($auditor_approverd_date != '') {
-                                                $status = 'Quotation Already Approved By Auditor';
-                                                $button = 'Disabled';
-                                            }
+
+
+
                                             ?>
                                             <div class="col-sm-4">
                                                 <label class="">Vendor<span class="text-danger">*</span></label>
-                                                <select type="date" id="supplier" class="form-control" name="supplier"
+                                                <select type="date" id="supplier" class="form-control" name="supplier" value="<?= $supplier_id ? $supplier_id:'' ?>"
                                                     placeholder="Select Vandor " disabled>
                                                     <?php
-                                                    $sql = "SELECT * from tbl_party where deleted = 'No' ORDER BY id desc";
-                                                    $result = $conn->query($sql);
-                                                    echo "<option value=''>Select Vandor</option>";
-                                                    if ($result) {
-                                                        while ($row = $result->fetch_assoc()) {
-                                                            if ($row['id'] == $supplier_id) {
-                                                                echo "<option value='" . $row['id'] . "' selected>" . $row['partyName'] . "</option>";
-                                                            } else {
-                                                                echo "<option value='" . $row['id'] . "'>" . $row['partyName'] . "</option>";
+                                                        $sql = "SELECT tbl_quotation.is_vendor_workshop from tbl_quotation where id = $quotation_id";
+                                                        $result = $conn->query($sql);
+                                                        if ($result) {
+                                                            $row = $result->fetch_assoc();
+    
+                                                            $vendor_workshop = $row['is_vendor_workshop'];
+                            
+                                                            if($vendor_workshop == 0){
+                                                                $sql = "SELECT * from tbl_party where deleted = 'No' ORDER BY id desc";
+                                                                $result = $conn->query($sql);
+                                                                echo "<option value=''>Select Vandor</option>";
+                                                                if ($result) {
+                                                                    while ($row = $result->fetch_assoc()) {
+                                                                        if ($row['id'] == $supplier_id) {
+                                                                            echo "<option value='" . $row['id'] . "' selected>" . $row['partyName'] . "</option>";
+                                                                        } else {
+                                                                            echo "<option value='" . $row['id'] . "'>" . $row['partyName'] . "</option>";
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }else{
+                                                                $sql = "SELECT id, wareHouseName from  tbl_warehouse where deleted = 'No' ORDER BY id desc";
+                                                                $result = $conn->query($sql);
+                                                                echo "<option value=''>Select Vandor</option>";
+                                                                if ($result) {
+                                                                    while ($row = $result->fetch_assoc()) {
+                                                                        if ($row['id'] == $supplier_id) {
+                                                                            echo "<option value='" . $row['id'] . "' selected>" . $row['wareHouseName'] . "</option>";
+                                                                        } else {
+                                                                            echo "<option value='" . $row['id'] . "'>" . $row['wareHouseName'] . "</option>";
+                                                                        }
+                                                                    }
+                                                                }
                                                             }
-                                                        }
-                                                    }
+                                                   
 
                                                     ?>
                                                 </select>
                                                 <span id="supplierError"></span>
                                             </div>
-
                                             <?php
-
                                         }
                                     }
                                     ?>
-
 
                                     <div class="col-sm-4">
                                         <label class="">Pdf File<span class="text-danger"></span></label>
@@ -204,7 +229,7 @@
 
                                 <hr>
                                 <?php
-                                if (isset ($_GET['type'])) {
+                                if (isset($_GET['type'])) {
                                     if ($_GET['type'] == 'wing_head') { ?>
                                         <div class="col-sm-4">
                                             <label class="">Wing head Approval Date<span class="text-danger">*</span></label>
@@ -249,7 +274,7 @@
                                             <th width="12%">Group</th>
 
                                             <?php
-                                            if (isset ($_GET['type'])) {
+                                            if (isset($_GET['type'])) {
                                                 if ($_GET['type'] == 'wing_head') {
                                                     echo '<th>Wing Head Unit </th>
                                                          <th>Wing Head Total </th>';
@@ -266,26 +291,30 @@
                                         </thead>
                                         <tbody>
                                             <?php
-                                            if (isset ($_GET['Token_id'])) {
+                                            if (isset($_GET['Token_id'])) {
                                                 $token_id = $_GET['Token_id'];
-
+                                                $data = '';
                                                 if ($_GET['type'] == 'procurement') {
                                                     $sql = 'SELECT * FROM tbl_token_requisition where tbl_token_id = ' . $token_id . ' and deleted ="No" order by req_group_name';
                                                     $result = $conn->query($sql);
                                                 } else {
                                                     $quotation_id = $_GET['id'];
 
-                                                    $sql = "SELECT tbl_quotation_details.*, tbl_token_requisition.spec, tbl_token_requisition.req_product  FROM  tbl_quotation_details 
-                                                    join tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
-                                                    join tbl_token_requisition on tbl_quotation_details.tbl_token_requisition_id = tbl_token_requisition.id
-                                                    WHERE tbl_quotation.tbl_token_id = " . $token_id . " AND  tbl_quotation.id = " . $quotation_id . " AND tbl_quotation_details.deleted = 'No'  ORDER BY id DESC";
-                                                    $result = $conn->query($sql);
+                                                
+
+                                                        $sql = "SELECT tbl_quotation_details.*, tbl_token_requisition.spec, tbl_token_requisition.req_product, tbl_quotation.is_vendor_workshop  FROM  tbl_quotation_details 
+                                                                join tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
+                                                                join tbl_token_requisition on tbl_quotation_details.tbl_token_requisition_id = tbl_token_requisition.id
+                                                                WHERE tbl_quotation.tbl_token_id = " . $token_id . " AND  tbl_quotation.id = " . $quotation_id . " AND tbl_quotation_details.deleted = 'No'  ";
+                                                        $result = $conn->query($sql);
+                                                    }
+
                                                 }
 
                                                 $i = 1;
                                                 $j = 0;
                                                 $totalUnitPrice = 0;
-                                                if (isset ($_GET['type'])) {
+                                                if (isset($_GET['type'])) {
                                                     if ($_GET['type'] == 'wing_head') {
 
                                                         while ($row = $result->fetch_assoc()) {
@@ -295,20 +324,39 @@
                                                             $qty = $row['qty'];
                                                             $unit = $row['unit'];
                                                             $group = $row['quotation_group_name'];
-                                                            $wing_uPrice = $row['wing_head_unit_price'];
                                                             $wing_tPrice = $row['wing_head_total_amount'];
+                                                            $wing_uPrice = $row['wing_head_unit_price'];
                                                             $totalUnitPrice += (int) $wing_tPrice;
-                                                            echo '<tr id="rowNo_' . $j . '">
-                                                                    <td>' . $i++ . '</td>
-                                                                    <td>  <input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
-                                                                    <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
-                                                                    <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'wing_head\')" onchange="calTotalPrice(' . $j . ',\'wing_head\')" placeholder="Enter Amount"></td>
-                                                                    <td><input class="form-control" type="number" id="wing_head_tPrice_' . $j . '" value="' . $wing_tPrice . '" disabled></td>
-                                                                    <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
-                                                                    </tr>';
+                                                            $vendor_workshop = $row['is_vendor_workshop'];
+                                                            if ($vendor_workshop == 0 && $group != 'Vendor Workshop Works') {
+
+                                                                echo '<tr id="rowNo_' . $j . '">
+                                                                <td>' . $i++ . '</td>
+                                                                <td>  <input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
+                                                                <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'wing_head\')" onchange="calTotalPrice(' . $j . ',\'wing_head\')" placeholder="Enter Amount" ></td>
+                                                                <td><input class="form-control" type="number" id="wing_head_tPrice_' . $j . '" value="' . $wing_tPrice . '" disabled></td>
+                                                                <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
+                                                                </tr>';
+
+                                                            } else {
+
+                                                                echo '<tr id="rowNo_' . $j . '">
+                                                                <td>' . $i++ . '</td>
+                                                                <td>  <input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
+                                                                <td><input class="form-control" type="number" id="wing_head_uPrice_' . $j . '" value="' . $wing_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'wing_head\')" onchange="calTotalPrice(' . $j . ',\'wing_head\')" placeholder="Enter Amount" ></td>
+                                                                <td><input class="form-control" type="number" id="wing_head_tPrice_' . $j . '" value="' . $wing_tPrice . '" disabled></td>
+                                                                <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
+                                                                </tr>';
+
+                                                            }
                                                             $j++;
                                                         }
                                                     } else if ($_GET['type'] == 'audit') {
@@ -323,17 +371,33 @@
                                                             $audit_uPrice = $row['audit_unit_price'];
                                                             $audit_tPrice = $row['audit_total_amount'];
                                                             $totalUnitPrice += (int) $audit_tPrice;
-                                                            echo '<tr id="rowNo_' . $j . '">
+                                                            $vendor_workshop = $row['is_vendor_workshop'];
+
+                                                            if ($vendor_workshop == '0' && $group != 'Vendor Workshop Works') {
+                                                                echo '<tr id="rowNo_' . $j . '">
                                                                     <td>' . $i++ . '</td>
-                                                                    <td> <input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
+                                                                    <td><input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '"><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
                                                                     <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
                                                                     <td><input class="form-control" type="number" id="audit_uPrice_' . $j . '" value="' . $audit_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'audit\')" onchange="calTotalPrice(' . $j . ',\'audit\')" placeholder="Enter Amount"></td>
                                                                     <td><input class="form-control" type="number" id="audit_tPrice_' . $j . '" value="' . $audit_tPrice . '" disabled></td>
-                                                                    <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
+                                                                    <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px;" aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
                                                                 </tr>';
+                                                            } else {
+                                                                echo '<tr id="rowNo_' . $j . '">
+                                                                <td>' . $i++ . '</td>
+                                                                <td><input type="hidden" id="quoteDetailsId_' . $j . '" value="' . $reqId . '"><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $spec . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $qty . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $unit . '" disabled></td>
+                                                                <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
+                                                                <td><input class="form-control" type="number" id="audit_uPrice_' . $j . '" value="' . $audit_uPrice . '" onkeyup="calTotalPrice(' . $j . ',\'audit\')" onchange="calTotalPrice(' . $j . ',\'audit\')" placeholder="Enter Amount"></td>
+                                                                <td><input class="form-control" type="number" id="audit_tPrice_' . $j . '" value="' . $audit_tPrice . '" disabled></td>
+                                                                <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px;" aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
+                                                                </tr>';
+                                                            }
                                                             $j++;
                                                         }
                                                     } else {
@@ -343,18 +407,19 @@
                                                             $qty = $row['qty'];
                                                             $unit = $row['unit'];
                                                             $group = $row['req_group_name'];
-
-                                                            echo '<tr id="rowNo_' . $j . '">
-                                                                <td>' . $i++ . '</td>
-                                                                <td> <input type="hidden" id="requisitionId_' . $j . '" value="' . $row['id'] . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
-                                                                <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $row['spec'] . '" disabled></td>
-                                                                <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $row['qty'] . '" disabled></td>
-                                                                <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $row['unit'] . '" disabled></td>
-                                                                <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
-                                                                <td><input class="form-control" type="number" id="uPrice_' . $j . '" value="" onkeyup="calTotalPrice(' . $j . ',\'procurement\')" onchange="calTotalPrice(' . $j . ',\'procurement\')" placeholder="Enter Amount"></td>
-                                                                <td><input class="form-control" type="number" id="tPrice_' . $j . '" value="" onchange="priceUpdate()" disabled></td>
-                                                                <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px; " aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
-                                                                </tr>';
+                                                            if ($group != 'Vendor Workshop Works') {
+                                                                echo '<tr id="rowNo_' . $j . '">
+                                                                        <td>' . $i++ . '</td>
+                                                                        <td><input type="hidden" id="requisitionId_' . $j . '" value="' . $row['id'] . '" ><input class="form-control" type="text" id="req_product_' . $j . '" value="' . $row['req_product'] . '" disabled></td>
+                                                                        <td><input class="form-control" type="text" id="spec_' . $j . '" value="' . $row['spec'] . '" disabled></td>
+                                                                        <td><input class="form-control" type="text" id="qty_' . $j . '" value="' . $row['qty'] . '" disabled></td>
+                                                                        <td><input class="form-control" type="text" id="unit_' . $j . '" value="' . $row['unit'] . '" disabled></td>
+                                                                        <td><input class="form-control" type="text" id="group_' . $j . '" value="' . $group . '" disabled></td>
+                                                                        <td><input class="form-control" type="number" id="uPrice_' . $j . '" value="" onkeyup="calTotalPrice(' . $j . ',\'procurement\')" onchange="calTotalPrice(' . $j . ',\'procurement\')" placeholder="Enter Amount"></td>
+                                                                        <td><input class="form-control" type="number" id="tPrice_' . $j . '" value="" onchange="priceUpdate()" disabled></td>
+                                                                        <td><i class="fa fa-trash" style="font-size: 22px; padding: 1px;" aria-hidden="true" onclick="deleteRow(' . $j . ')"></i></td>
+                                                                        </tr>';
+                                                            }
                                                             $j++;
                                                         }
                                                     }
@@ -419,14 +484,16 @@
                                     </table>
                                     <div style="padding: 2%; margin-bottom: 2%;">
 
-                                        <button style="width: 100%; box-shadow: 1px 1px 1px 0px #909090;" class="btn btn-default float-right" onclick="saveQuatation()" <?= $button ?>>
-                                        <span class="glyphicon glyphicon-shopping-cart" style="color: #000cbd;"></span> Submit </span>
+                                        <button style="width: 100%; box-shadow: 1px 1px 1px 0px #909090;"
+                                            class="btn btn-default float-right" onclick="saveQuatation()" <?= $button ?>>
+                                            <span class="glyphicon glyphicon-shopping-cart"
+                                                style="color: #000cbd;"></span> Submit </span>
                                     </div>
                                     <div class="text-danger">
-                                    <h5>
-                                        <b><?= $status ?></b>
-                                    </h5>
-                                </div>
+                                        <h5>
+                                            <b><?= $status ?></b>
+                                        </h5>
+                                    </div>
                                 </div>
 
                             </div>
@@ -459,7 +526,9 @@
                 width: "100%"
             });
             $('#supplier').select2({
-                width: "100%"
+                width: "100%",
+                allowClear : true,
+                placeholder: 'Select Vendor'
             });
         });
 
@@ -622,7 +691,7 @@
                 success: function (response) {
                     data = '';
                     $('#supplier').html('');
-
+                    data += '- Seleted Vendor -';
                     for (var i = 0; i < response.vendors.length; i++) {
                         data += '<option value ="' + response.vendors[i].id + '">' + response.vendors[i].partyName + '</option>'
                     }
@@ -735,7 +804,7 @@
                 var $this = $(this);
                 group.push($this.val());
             });
-            
+
 
             var unitPrice = [];
             $('input[id^="uPrice_"]').each(function () {

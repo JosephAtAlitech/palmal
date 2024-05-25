@@ -1,7 +1,6 @@
 <?php ob_start();
 include 'includes/session.php';
 $id = $_GET['id'];
-$quote_id = $_GET['quote_id'];
 //$ym = date("Y-m", strtotime($id));	
 date_default_timezone_set('Asia/Dhaka');
 $toDay = (new DateTime())->format("Y-m-d H:i:s");
@@ -37,7 +36,7 @@ class MYPDF extends TCPDF
 
 $pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 $pdf->SetCreator(PDF_CREATOR);
-$pdf->SetTitle('Vf - Tracker Management Bangladesh');
+$pdf->SetTitle('Vf - Palmal Management Bangladesh');
 $pdf->SetHeaderData('', '', PDF_HEADER_TITLE, PDF_HEADER_STRING);
 $pdf->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 $pdf->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
@@ -50,29 +49,27 @@ $pdf->SetAutoPageBreak(TRUE, 10);
 $pdf->SetFont('helvetica', '', 11);
 $pdf->AddPage();
 $content = '';
-$sql = "SELECT tbl_quotation.id, tbl_token.token_title ,tbl_token.id  as token_id , tbl_party.partyName,tbl_party.partyAddress,tbl_party.partyPhone FROM `tbl_quotation` 
-            JOIN tbl_token on tbl_quotation.tbl_token_id = tbl_token.id
-            LEFT JOIN tbl_party on tbl_quotation.supplier_id = tbl_party.id
-            WHERE tbl_quotation.deleted = 'No' and tbl_quotation.id = $quote_id ORDER BY tbl_quotation.id  DESC";
+$sql = "SELECT * FROM `admin` where id='" . $_SESSION['admin'] . "'";
 
 $query = $conn->query($sql);
 while ($row = $query->fetch_assoc()) {
 	$id = $row['id'];
-	$partyName = $row['partyName'].'<br>Contact : '.$row['partyPhone'].'<br>Address : '.$row['partyAddress'];
+	$firstname = $row['firstname'];
+	$lastname = $row['lastname'];
 }
 $content .= '<style>
                 p{color:black;font-size: 8px;}
 				.cities {background-color: gray;color: white;text-align: center;padding: 30px;}
 				.citiestd {background-color: yellow;color: black;text-align: center;}
-				.citiestd12 {background-color: gray;color: white;text-align: center;}
-				.citiestd13 {background-color: orange;color: white;text-align: center;}
-				.citiestd11 {font-size: 9px;text-align: left;}
+				.citiestd11 {font-size: 7px;text-align: left;}
+				.citiestd12 {font-size: 7px;text-align: right;}
+				.citiestd13 {font-size: 7px;text-align: center;}
+				
 				.citiestd14 {font-size: 9px;text-align: left;}
-				.citiestd15 {font-size: 7px;text-align: left;}
-				.citiestd16 {font-size: 7px;text-align: right;}
-				.citiestd17 {font-size: 7px;text-align: center;}
-				.citiestd18 {font-size: 9px;color:gray;text-align: left;}
-				.citiestd19 {font-size: 9px;text-align: right;}
+				.citiestd15 {font-size: 9px;text-align: left;}
+				.citiestd16 {font-size: 9px;color:gray;text-align: left;}
+				.citiestd17 {font-size: 9px;text-align: left;padding-top: 3%;}
+				.citiestd18 {font-size: 9px;color:gray;text-align: left;padding-top: 3%;}
 				.caption { background-color: gray;}
 				span{font-size: 9px;}
 				h2{font-size: 18px;text-align:center;}
@@ -83,12 +80,12 @@ $content .= ' <br><br>
 		<div class="cities"> Bill Challan </div> <br>
 		<table border="0" cellspacing="0" cellpadding="3">
 			<tr>
-				<td width="70%" class="citiestd11">Company Name :<font color="gray">  ' . $partyName . '</font></td>
+				<td width="70%" class="citiestd11"></td>
 				<td width="30%" class="citiestd14">Print Date :<font color="gray">' . $todayDate . '</font><br>Printed By :<font color="gray">' . $firstname . ' ' . $lastname . '</font></td>
 			</tr>
 		</table>
-		<h3>Service Information: </h3><br><br>
-		<table  cellspacing="0" cellpadding="3">';
+		<h3>Bill Challan Information: </h3><br><br>
+		<table cellspacing="0" cellpadding="3">';
 
 if (isset($_GET['id'])) {
 	$id = $_GET['id'];
@@ -107,31 +104,88 @@ if (isset($_GET['id'])) {
 	$status = $row12['status'];
 	$vehicle_number = $row12['vehicle_number'];
 	$token_date = $row12['token_date'];
-	$content .= '<tr>
-					<td width="15%" class="citiestd11">Service No <br>Service title<br>Mechanic Name<br>Engineer Name</td>
-					<td width"40%" class="citiestd11">: ' . $row12['token_no'] . '<br>: ' . $token_title . '<br>: ' . $m_name . '<br>: ' . $e_name . '</td>
+	$content .= "<tr>
+                    <td width='25%' class='citiestd15'>Requisition No <br>Token title<br>Mechanic Name<br>Engineer Name</td>
+                    <td width='25%' class='citiestd16'>: " . $row12['token_no'] . "<br>: " . $token_title . " L<br>: " . $m_name . "<br>: " . $e_name . "
+                    </td>
 
-					<td  class="citiestd11" width="15%">VehicleNumber <br>Service details <br>Status  <br>Create Date</td>
-					<td class="citiestd11">:'.$vehicle_number.'<br>:' . $token_details . '<br>: ' . $status . '<br>: ' . $token_date . '</td>
-					</tr></table> <hr><br><br>';
-
-
-
-	
-
-		$sql = "SELECT tbl_quotation_details.*  FROM  tbl_quotation_details 
-				join tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
-				WHERE tbl_quotation.tbl_token_id =  $id and tbl_quotation_details.tbl_quotation_id = $quote_id  ORDER BY tbl_quotation_details.id DESC";
-		$query = $conn->query($sql);
-		$content .= '<br><br>	Quotation Details :<br><br>';
-		$content .= '<table border="1" cellspacing="0" cellpadding="3" >
-		            <thead>
+                    <td width='15%' class='citiestd15'>VehicleNumber <br>Token details <br>Status  <br>Create Date</td>
+                    <td width='35%' class='citiestd16'>:".$vehicle_number." <br>:" . $token_details . " <br>: " . $status . "<br>: " . $token_date . "</td>
+                    </tr></table> <hr><br><br>";
+	$content .= '	<br><br>Requisition information :<br><br>
+					<table border="1" cellspacing="0" cellpadding="3">
+					<thead>
 						<tr>
-							<th class="citiestd17" width="6%" >SL#</th>
-							<th class="citiestd17" width="44%" >Product Name</th>
-							<th class="citiestd17" width="16%"  >Qty</th>
-							<th class="citiestd17" width="17%"  >Unit price</th>
-							<th class="citiestd17" width="17%"  >Total amount</th>
+							<th class="citiestd11" width="6%">SL#</th>
+							<th class="citiestd11" width="44%">Product Information</th>
+							<th class="citiestd11" width="20%">Specification</th>
+							<th class="citiestd11" width="10%">Qty</th>
+							<th class="citiestd11" width="20%">Remarks</th>
+						</tr>
+					</thead>
+				    <tbody>';
+	$sql = "SELECT tbl_token_requisition.*  FROM  tbl_token_requisition 
+		    WHERE tbl_token_requisition.tbl_token_id = '" . $id . "' AND deleted ='No' ORDER BY id DESC";
+	$query = $conn->query($sql);
+	$i = 1;
+	while ($row12 = $query->fetch_assoc()) {
+		$content .= '<tr>
+					    <td class="citiestd11" width="6%">' . $i++ . '</td>
+						<td class="citiestd11" width="44%">' . $row12['req_product'] . '</td>
+						<td class="citiestd11" width="20%">' . $row12['Spec'] . '</td>
+						<td class="citiestd11" width="10%">' . $row12['qty'] . ' ' . $row12['unit'] . '</td>
+						<td class="citiestd11" width="20%">' . $row12['remarks'] . '</td>
+					</tr>';
+	}
+	$content .= '</tbody></table>';
+	$content .= '<br><br>	Requiisition information :<br><br>';
+
+	$sql0 = "SELECT tbl_quotation_details.* , admin.firstname FROM  tbl_quotation_details 
+			join tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
+			join admin on tbl_quotation.quote_by_id = admin.id
+			WHERE tbl_quotation.tbl_token_id =  $id ORDER BY tbl_quotation_details.id DESC limit 1";
+	$query0 = $conn->query($sql0);
+
+	$row1 = $query0->fetch_assoc();
+
+	$sql1 = "SELECT DISTINCT tbl_quotation_details.tbl_quotation_id FROM  tbl_quotation_details 
+			join tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
+			WHERE tbl_quotation.tbl_token_id =  $id  ORDER BY tbl_quotation_details.id DESC";
+	$query1 = $conn->query($sql1);
+
+	while ($row10 = $query1->fetch_assoc()) {
+		$quoteId = $row10['tbl_quotation_id'];
+
+		$sql = "SELECT tbl_quotation_details.*,tbl_party.partyName,tbl_party.partyAddress,tbl_party.partyPhone  
+                FROM  tbl_quotation_details 
+                LEFT JOIN tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
+                LEFT JOIN tbl_party on tbl_quotation.supplier_id = tbl_party.id 
+				WHERE tbl_quotation.tbl_token_id =  $id and tbl_quotation_details.tbl_quotation_id = $quoteId ORDER BY tbl_quotation_details.id DESC";
+		$query = $conn->query($sql);
+		
+		$sqlPartyName = "SELECT tbl_party.partyName,tbl_party.partyAddress,tbl_party.partyPhone  
+                FROM  tbl_quotation_details 
+                LEFT JOIN tbl_quotation on tbl_quotation_details.tbl_quotation_id = tbl_quotation.id
+                LEFT JOIN tbl_party on tbl_quotation.supplier_id = tbl_party.id 
+				WHERE tbl_quotation.tbl_token_id =  $id and tbl_quotation_details.tbl_quotation_id = $quoteId ORDER BY tbl_quotation_details.id DESC";
+				
+				
+		$content .= '<table border="1" cellspacing="0" cellpadding="3">';
+		
+		$queryPartyName = $conn->query($sqlPartyName);
+		while ($rowParty = $queryPartyName->fetch_assoc()) {
+		    $partyName = $rowParty['partyName'].'| Contact : '.$rowParty['partyPhone'].'<br> Address : '.$rowParty['partyAddress'];
+		    
+		}
+		$content .= '<caption class="citiestd11"> Supplier Name: ' . $partyName . '</caption><br>';
+		$content .= '<thead>
+						<tr>
+							<th class="citiestd13" width="6%">SL#</th>
+							<th class="citiestd13" width="40%" >Product Name</th>
+							<th class="citiestd13" width="10%" >Qty</th>
+							<th class="citiestd13" width="20%" >Group Name</th>
+							<th class="citiestd13" width="10%" >Unit</th>
+							<th class="citiestd13" width="14%" >Total</th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -144,7 +198,8 @@ if (isset($_GET['id'])) {
         $unitTotalaudit_unit_price =0;
         $unitTotalaudit_total_amount =0;
 		while ($row12 = $query->fetch_assoc()) {
-		    $unitTotal+=(int)$row12['qty'];
+		    
+			$unitTotal+=(int)$row12['qty'];
 		    $unitTotalunit_price+=(int)$row12['unit_price'];
 		    $unitTotaltotal_amount+=(int)$row12['total_amount'];
 		    $unitTotalwing_head_unit_price+=(int)$row12['wing_head_unit_price'];
@@ -152,59 +207,22 @@ if (isset($_GET['id'])) {
 		    $unitTotalaudit_unit_price+=(int)$row12['audit_unit_price'];
 		    $unitTotalaudit_total_amount+=(int)$row12['audit_total_amount'];
 			$content .= '<tr>
-						<td class="citiestd15"  width="6%">' . $i++ . '</td>
-						<td class="citiestd15" width="44%">' . $row12['Product_name'] . '</td>
-						<td class="citiestd17" width="16%">' . $row12['qty'] . ' ' . $row12['unit'] . '</td>
-						<td class="citiestd17" width="17%">' . $row12['unit_price'] . ' </td>
-						<td class="citiestd16" width="17%">' . $row12['audit_total_amount'] . '</td>
-	                </tr>';
+						<td class="citiestd13" width="6%">' . $i++ . '</td>
+						<td class="citiestd11" width="40%">' . $row12['Product_name'] . '</td>
+						<td class="citiestd13" width="10%">' . $row12['qty'] . ' ' . $row12['unit'] . '</td>
+						<td class="citiestd12" width="20%">' . $row12['quotation_group_name'] . ' </td>
+						<td class="citiestd12" width="10%">' . $row12['audit_unit_price'] . ' </td>
+						<td class="citiestd12" width="14%">' . $row12['audit_total_amount'] . '</td>
+	                </tr>
+	                
+	                ';
 		}
 		$content .= '
-		<tr><td ></td><td class="citiestd17">Total</td><td class="citiestd17">'.$unitTotal.'</td><td class="citiestd16"></td><td class="citiestd16">'.number_format($unitTotalaudit_total_amount,2).'</td></tr>
+		<tr><td></td><td class="citiestd13">Total</td><td class="citiestd13">'.$unitTotal.'</td><td></td><td></td><td class="citiestd12">'.number_format($unitTotaltotal_amount,2).'</td><td></td><td class="citiestd12">'.number_format($unitTotalwing_head_total_amount,2).'</td><td></td><td class="citiestd12">'.number_format($unitTotalaudit_total_amount,2).'</td></tr>
 		</tbody></table><br><br><br>';
-
-		$sql13 = "SELECT tbl_quotation.*  FROM  tbl_quotation
-			     	WHERE tbl_quotation.id =  $quote_id ";
-		$query13 = $conn->query($sql13);
-		$row13 = $query13->fetch_assoc();
-		$subtotal  =$row13['total_amount'];
-		$totalDiscount=$row13['discount'];
-		$vat=$row13['Vat'];
-		$ait=$row13['Ait'];
-		$GrandTotalBlance = $row13['audit_grand_total'];
-		$content .='
-			
-		<table>
-			
-			<tr>
-				<td width="70%" class="citiestd18"></td>
-				<td width="20%" class="citiestd14">Sub-Total amount :</td><td width="10%" class="citiestd19">'.number_format($unitTotalaudit_total_amount,2).'</td>
-			</tr>
-			<tr>
-				<td width="70%"></td>
-				<td width="20%" class="citiestd14">Discount :</td><td width="10%" class="citiestd19" >'.$totalDiscount.'</td>
-			</tr>
-			<tr>
-			<td width="70%"></td>
-			<td width="20%" class="citiestd14">Vat :</td><td width="10%" class="citiestd19" >'.$vat.'</td>
-		</tr>
-		<tr>
-		<td width="70%"></td>
-		<td width="20%" class="citiestd14">Ait :</td><td width="10%" class="citiestd19" >'.$ait.'</td>
-	</tr>
-			
-			<tr>
-				<td width="70%"></td>
-				<td width="20%" class="citiestd14">Grand Total :</td><td width="10%" class="citiestd19">'.number_format($unitTotalaudit_total_amount, 2).'</td>
-			</tr>
-			<tr>
-				<td width="70%"></td>
-				<td width="20%" class="citiestd14">Net Payable (Round) :</td><td width="10%" class="citiestd19">'.number_format(round($unitTotalaudit_total_amount), 2).'</td>
-			</tr>';
-	
-	
+	}
 } else {
-	$content .= "<h3>Unauthorized Service Number.</h3>";
+	$content .= "<h3>Unauthorized Requisition Number.</h3>";
 }
 
 $content .= "<style>
@@ -212,9 +230,8 @@ $content .= "<style>
 			</style>
 			<table><br><br><br><br>
 				<tr>
-					<td  class='citiestd14' width='40%'><pre>-------------------------------</pre>Checked by<br>(Sign With date)</td>
-					<td  class='citiestd14' width='30%'><pre>-------------------------------</pre>Print/Review by<br>(Sign With date)</td>
-					<td   class='citiestd15' width='30%'><pre>-------------------------------</pre>Print/Review by<br>(Sign With date)</td>
+					<td width='70%'><pre>-------------------------------</pre>Checked by<br>(Sign With date)</td>
+					<td width='30%'><pre>-------------------------------</pre>Print/Review by<br>(Sign With date)</td>
 				</tr>
 			</table>";
 
